@@ -33,8 +33,8 @@ Open [http://localhost:3000/zh-Hant](http://localhost:3000/zh-Hant)
 
 | Phase | Focus |
 |-------|--------|
-| 0 | Project setup (current) |
-| 1 | Supabase database |
+| 0 | Project setup ✅ |
+| 1 | Supabase database (current) — see [PHASE1.md](./PHASE1.md) |
 | 2 | Authentication |
 | 3 | Public break browsing |
 | 4 | 8-minute slot locking |
