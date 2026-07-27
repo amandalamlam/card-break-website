@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #070b14;
+  --color-surface: #0f1628;
+  --color-surface-elevated: #162035;
+  --color-border: #243049;
+  --color-foreground: #f4f7fb;
+  --color-muted: #9aa8c0;
+  --color-accent: #d4a853;
+  --color-accent-soft: #f0ddb0;
+  --color-success: #3ecf8e;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at top, rgb(212 168 83 / 0.12), transparent 28%),
+      radial-gradient(circle at bottom right, rgb(62 207 142 / 0.08), transparent 24%);
+  }
+
+  ::selection {
+    background: rgb(212 168 83 / 0.35);
+    color: white;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply border border-border/80 bg-surface/80 backdrop-blur-md;
+  }
+
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-accent-soft to-accent bg-clip-text text-transparent;
+  }
+}

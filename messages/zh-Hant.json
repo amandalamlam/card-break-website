@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "title": "Card Break 開箱平台",
+    "description": "香港卡牌開箱平台 — 選擇球隊／球員位置，安全付款，直播開箱後安排寄送。"
+  },
+  "common": {
+    "brand": "Card Break HK",
+    "language": "語言",
+    "comingSoon": "即將推出"
+  },
+  "nav": {
+    "breaks": "進行中的開箱",
+    "account": "我的帳戶",
+    "login": "登入",
+    "signup": "註冊"
+  },
+  "home": {
+    "badge": "香港卡牌開箱平台",
+    "headline": "乾淨、快速、安全的開箱體驗",
+    "subheadline": "瀏覽進行中的開箱活動，選擇你支持的球隊或球員位置。付款後等待直播開箱，再於帳戶內選擇順豐到付、自取或海外寄送。",
+    "ctaBrowse": "瀏覽開箱（Phase 3）",
+    "ctaLearn": "了解流程",
+    "stats": {
+      "secure": "Stripe 安全付款",
+      "wallet": "流局自動退回錢包",
+      "shipping": "開箱後再選寄送"
+    },
+    "phaseNote": "Phase 0 已完成：專案框架、多語言、設計系統。下一步將連接 Supabase 資料庫。"
+  },
+  "footer": {
+    "tagline": "專為香港及海外收藏家而設",
+    "rights": "版權所有"
+  }
+}

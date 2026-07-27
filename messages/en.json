@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "title": "Card Break Platform",
+    "description": "Hong Kong card break platform — pick team/player slots, pay securely, choose shipping after the live reveal."
+  },
+  "common": {
+    "brand": "Card Break HK",
+    "language": "Language",
+    "comingSoon": "Coming soon"
+  },
+  "nav": {
+    "breaks": "Live Breaks",
+    "account": "My Account",
+    "login": "Log in",
+    "signup": "Sign up"
+  },
+  "home": {
+    "badge": "Hong Kong Card Break Platform",
+    "headline": "Clean, fast, secure breaks",
+    "subheadline": "Browse active breaks and claim your favourite team or player slot. Pay securely, watch the live reveal, then choose SF Express collect-on-delivery, pickup, or international shipping from your account.",
+    "ctaBrowse": "Browse breaks (Phase 3)",
+    "ctaLearn": "How it works",
+    "stats": {
+      "secure": "Stripe secure payments",
+      "wallet": "Wallet credits on cancellation",
+      "shipping": "Shipping after the break"
+    },
+    "phaseNote": "Phase 0 complete: project scaffold, i18n, design system. Next up: connect Supabase."
+  },
+  "footer": {
+    "tagline": "Built for HK and international collectors",
+    "rights": "All rights reserved"
+  }
+}
