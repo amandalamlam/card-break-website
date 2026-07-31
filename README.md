@@ -37,5 +37,5 @@ Open [http://localhost:3000/zh-Hant](http://localhost:3000/zh-Hant)
 | 1 | Supabase database ✅ |
 | 2 | Authentication ✅ |
 | 3 | Public break browsing ✅ |
-| 4 | 8-minute slot locking (current) — see [PHASE4.md](./PHASE4.md) |
-| 5 | Stripe payments |
+| 4 | 8-minute slot locking ✅ |
+| 5 | Stripe payments (current) — see [PHASE5.md](./PHASE5.md) |

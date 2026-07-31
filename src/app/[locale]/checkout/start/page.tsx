@@ -84,6 +84,7 @@ export default async function CheckoutStartPage({
           expiresAt={lockResult.expiresAt}
           slotId={slotId}
           breakId={breakId}
+          locale={locale as AppLocale}
         />
       </div>
     </div>

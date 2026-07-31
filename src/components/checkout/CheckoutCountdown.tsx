@@ -3,11 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { CheckoutPayButton } from "./CheckoutPayButton";
+import type { AppLocale } from "@/i18n/routing";
 
 type CheckoutCountdownProps = {
   expiresAt: string;
   slotId: string;
   breakId: string;
+  locale: AppLocale;
 };
 
 function formatRemaining(totalSeconds: number): string {
@@ -16,7 +19,7 @@ function formatRemaining(totalSeconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function CheckoutCountdown({ expiresAt, slotId, breakId }: CheckoutCountdownProps) {
+export function CheckoutCountdown({ expiresAt, slotId, breakId, locale }: CheckoutCountdownProps) {
   const t = useTranslations("checkout");
   const expiresAtMs = useMemo(() => new Date(expiresAt).getTime(), [expiresAt]);
 
@@ -90,9 +93,12 @@ export function CheckoutCountdown({ expiresAt, slotId, breakId }: CheckoutCountd
           {t("backToBreak")}
         </Link>
       ) : (
-        <p className="rounded-2xl border border-dashed border-accent/40 bg-accent/5 px-4 py-3 text-sm text-accent-soft">
-          {t("phaseNote")}
-        </p>
+        <CheckoutPayButton
+          breakId={breakId}
+          slotId={slotId}
+          locale={locale}
+          disabled={isExpired}
+        />
       )}
     </div>
   );
