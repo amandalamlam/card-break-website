@@ -14,18 +14,58 @@
     "login": "登入",
     "signup": "註冊"
   },
+  "auth": {
+    "email": "電郵地址",
+    "phone": "電話號碼",
+    "phoneHint": "請包含國際區號，例如 +852、+1、+886",
+    "phoneInvalid": "請輸入有效的國際電話號碼（需以 + 開頭，例如 +85291234567）",
+    "password": "密碼",
+    "passwordHint": "至少 8 個字元",
+    "submitting": "處理中…",
+    "logout": "登出",
+    "loginTitle": "登入帳戶",
+    "loginSubtitle": "登入後即可鎖定位置並完成付款",
+    "loginSubmit": "登入",
+    "signupTitle": "建立帳戶",
+    "signupSubtitle": "註冊時需提供電郵及國際電話號碼，以便日後順豐寄送及 FPS 提現",
+    "signupSubmit": "建立帳戶",
+    "noAccount": "還沒有帳戶？",
+    "signupLink": "立即註冊",
+    "hasAccount": "已有帳戶？",
+    "loginLink": "前往登入",
+    "confirmEmail": "請查收確認電郵並點擊連結完成註冊。",
+    "callbackError": "登入連結已失效或驗證失敗，請重新登入。"
+  },
+  "account": {
+    "title": "我的帳戶",
+    "subtitle": "查看個人資料及錢包餘額",
+    "email": "電郵",
+    "phone": "電話",
+    "wallet": "錢包餘額",
+    "role": "帳戶類型",
+    "phaseNote": "Phase 2 已完成：登入／註冊。Phase 3 將顯示你購買的開箱記錄。"
+  },
+  "checkout": {
+    "authenticatedBadge": "已登入 — 準備結帳",
+    "title": "結帳攔截測試",
+    "subtitle": "你已成功通過登入攔截。Phase 4 將在此開始 8 分鐘倒數鎖位。",
+    "breakId": "開箱 ID",
+    "slotId": "位置 ID",
+    "phaseNote": "這是 Phase 2 的測試頁面。Phase 3 加入真實開箱頁面後，「Checkout」按鈕會導向此流程。"
+  },
   "home": {
     "badge": "香港卡牌開箱平台",
     "headline": "乾淨、快速、安全的開箱體驗",
     "subheadline": "瀏覽進行中的開箱活動，選擇你支持的球隊或球員位置。付款後等待直播開箱，再於帳戶內選擇順豐到付、自取或海外寄送。",
     "ctaBrowse": "瀏覽開箱（Phase 3）",
     "ctaLearn": "了解流程",
+    "testCheckout": "測試結帳攔截（Phase 2）",
     "stats": {
       "secure": "Stripe 安全付款",
       "wallet": "流局自動退回錢包",
       "shipping": "開箱後再選寄送"
     },
-    "phaseNote": "Phase 0 已完成：專案框架、多語言、設計系統。下一步將連接 Supabase 資料庫。"
+    "phaseNote": "Phase 2 已完成：登入、註冊、結帳攔截。下一步：Phase 3 公開開箱列表。"
   },
   "footer": {
     "tagline": "專為香港及海外收藏家而設",

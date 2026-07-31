@@ -39,6 +39,12 @@ export default async function HomePage({
               {t("ctaBrowse")}
             </Link>
             <Link
+              href="/checkout/start?breakId=demo-break&slotId=demo-lakers"
+              className="rounded-xl border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-medium text-accent-soft transition hover:border-accent hover:text-accent"
+            >
+              {t("testCheckout")}
+            </Link>
+            <Link
               href="#how-it-works"
               className="rounded-xl border border-border px-5 py-3 text-sm font-medium text-foreground transition hover:border-accent/50 hover:text-accent-soft"
             >

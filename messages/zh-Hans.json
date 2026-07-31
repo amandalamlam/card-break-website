@@ -14,18 +14,58 @@
     "login": "登录",
     "signup": "注册"
   },
+  "auth": {
+    "email": "邮箱地址",
+    "phone": "电话号码",
+    "phoneHint": "请包含国际区号，例如 +852、+1、+886",
+    "phoneInvalid": "请输入有效的国际电话号码（需以 + 开头，例如 +85291234567）",
+    "password": "密码",
+    "passwordHint": "至少 8 个字符",
+    "submitting": "处理中…",
+    "logout": "退出登录",
+    "loginTitle": "登录账户",
+    "loginSubtitle": "登录后即可锁定位置并完成付款",
+    "loginSubmit": "登录",
+    "signupTitle": "创建账户",
+    "signupSubtitle": "注册时需提供邮箱及国际电话号码，以便日后顺丰寄送及 FPS 提现",
+    "signupSubmit": "创建账户",
+    "noAccount": "还没有账户？",
+    "signupLink": "立即注册",
+    "hasAccount": "已有账户？",
+    "loginLink": "前往登录",
+    "confirmEmail": "请查收确认邮件并点击链接完成注册。",
+    "callbackError": "登录链接已失效或验证失败，请重新登录。"
+  },
+  "account": {
+    "title": "我的账户",
+    "subtitle": "查看个人资料及钱包余额",
+    "email": "邮箱",
+    "phone": "电话",
+    "wallet": "钱包余额",
+    "role": "账户类型",
+    "phaseNote": "Phase 2 已完成：登录／注册。Phase 3 将显示你购买的开箱记录。"
+  },
+  "checkout": {
+    "authenticatedBadge": "已登录 — 准备结账",
+    "title": "结账拦截测试",
+    "subtitle": "你已成功通过登录拦截。Phase 4 将在此开始 8 分钟倒数锁位。",
+    "breakId": "开箱 ID",
+    "slotId": "位置 ID",
+    "phaseNote": "这是 Phase 2 的测试页面。Phase 3 加入真实开箱页面后，「Checkout」按钮将导向此流程。"
+  },
   "home": {
     "badge": "香港卡牌开箱平台",
     "headline": "干净、快速、安全的开箱体验",
     "subheadline": "浏览进行中的开箱活动，选择你支持的球队或球员位置。付款后等待直播开箱，再在账户内选择顺丰到付、自取或海外寄送。",
     "ctaBrowse": "浏览开箱（Phase 3）",
     "ctaLearn": "了解流程",
+    "testCheckout": "测试结账拦截（Phase 2）",
     "stats": {
       "secure": "Stripe 安全付款",
       "wallet": "流局自动退回钱包",
       "shipping": "开箱后再选寄送"
     },
-    "phaseNote": "Phase 0 已完成：项目框架、多语言、设计系统。下一步将连接 Supabase 数据库。"
+    "phaseNote": "Phase 2 已完成：登录、注册、结账拦截。下一步：Phase 3 公开开箱列表。"
   },
   "footer": {
     "tagline": "专为香港及海外收藏家而设",

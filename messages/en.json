@@ -14,18 +14,58 @@
     "login": "Log in",
     "signup": "Sign up"
   },
+  "auth": {
+    "email": "Email address",
+    "phone": "Phone number",
+    "phoneHint": "Include country code, e.g. +852, +1, +886",
+    "phoneInvalid": "Enter a valid international phone number starting with + (e.g. +85291234567)",
+    "password": "Password",
+    "passwordHint": "At least 8 characters",
+    "submitting": "Working…",
+    "logout": "Log out",
+    "loginTitle": "Log in",
+    "loginSubtitle": "Sign in to lock a slot and complete payment",
+    "loginSubmit": "Log in",
+    "signupTitle": "Create account",
+    "signupSubtitle": "Email and international phone are required for SF Express shipping and FPS payouts",
+    "signupSubmit": "Create account",
+    "noAccount": "No account yet?",
+    "signupLink": "Sign up",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log in",
+    "confirmEmail": "Check your inbox and click the confirmation link to finish signing up.",
+    "callbackError": "The sign-in link expired or failed. Please log in again."
+  },
+  "account": {
+    "title": "My Account",
+    "subtitle": "View your profile and wallet balance",
+    "email": "Email",
+    "phone": "Phone",
+    "wallet": "Wallet balance",
+    "role": "Account type",
+    "phaseNote": "Phase 2 complete: login and signup. Phase 3 will show your break purchase history."
+  },
+  "checkout": {
+    "authenticatedBadge": "Signed in — ready for checkout",
+    "title": "Checkout gate test",
+    "subtitle": "You passed the login gate. Phase 4 will start the 8-minute slot lock here.",
+    "breakId": "Break ID",
+    "slotId": "Slot ID",
+    "phaseNote": "This is a Phase 2 test page. Phase 3 break pages will link Checkout buttons to this flow."
+  },
   "home": {
     "badge": "Hong Kong Card Break Platform",
     "headline": "Clean, fast, secure breaks",
     "subheadline": "Browse active breaks and claim your favourite team or player slot. Pay securely, watch the live reveal, then choose SF Express collect-on-delivery, pickup, or international shipping from your account.",
     "ctaBrowse": "Browse breaks (Phase 3)",
     "ctaLearn": "How it works",
+    "testCheckout": "Test checkout gate (Phase 2)",
     "stats": {
       "secure": "Stripe secure payments",
       "wallet": "Wallet credits on cancellation",
       "shipping": "Shipping after the break"
     },
-    "phaseNote": "Phase 0 complete: project scaffold, i18n, design system. Next up: connect Supabase."
+    "phaseNote": "Phase 2 complete: login, signup, checkout gate. Next: Phase 3 public break listings."
   },
   "footer": {
     "tagline": "Built for HK and international collectors",
