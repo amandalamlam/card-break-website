@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "进行中的开箱",
     "account": "我的账户",
+    "admin": "后台",
     "login": "登录",
     "signup": "注册"
   },
@@ -43,29 +44,75 @@
     "phone": "电话",
     "wallet": "钱包余额",
     "role": "账户类型",
-    "phaseNote": "Phase 2 已完成：登录／注册。Phase 3 将显示你购买的开箱记录。"
+    "phaseNote": "Phase 3 已完成：公开开箱列表。Phase 4 将加入 8 分钟锁位倒数。"
+  },
+  "breaks": {
+    "listTitle": "进行中的开箱",
+    "listSubtitle": "选择球队或球员位置。登录后即可结账（Phase 4 将加入 8 分钟锁位）。",
+    "featuredTitle": "最新开箱",
+    "featuredSubtitle": "从数据库加载的进行中活动",
+    "viewAll": "查看全部",
+    "viewBreak": "查看详情",
+    "empty": "暂时没有进行中的开箱。",
+    "noSlots": "尚未设定位置",
+    "slotsSummary": "{available} / {total} 个可售",
+    "slotsTitle": "选择你的位置",
+    "slotsSubtitle": "可用位置可点击 Checkout。已售出或锁定中的位置无法购买。",
+    "checkout": "Checkout",
+    "soldOutSlot": "已售出",
+    "lockedSlot": "锁定中",
+    "unavailable": "不可购买",
+    "status": {
+      "active": "进行中",
+      "sold_out": "已售罄",
+      "completed": "已完成",
+      "cancelled": "已取消"
+    },
+    "slotStatus": {
+      "available": "可购买",
+      "locked": "锁定中",
+      "sold": "已售出",
+      "refunded": "已退款"
+    }
   },
   "checkout": {
     "authenticatedBadge": "已登录 — 准备结账",
-    "title": "结账拦截测试",
-    "subtitle": "你已成功通过登录拦截。Phase 4 将在此开始 8 分钟倒数锁位。",
-    "breakId": "开箱 ID",
-    "slotId": "位置 ID",
-    "phaseNote": "这是 Phase 2 的测试页面。Phase 3 加入真实开箱页面后，「Checkout」按钮将导向此流程。"
+    "title": "确认结账位置",
+    "subtitle": "你已成功登录并选择了以下位置。Phase 4 将在此开始 8 分钟倒数锁位及 Stripe 付款。",
+    "breakLabel": "开箱",
+    "slotLabel": "位置",
+    "priceLabel": "价格",
+    "phaseNote": "Phase 3：Checkout 按钮已连接真实开箱数据。下一步加入 8 分钟锁位。"
+  },
+  "admin": {
+    "dashboardTitle": "开箱管理",
+    "dashboardSubtitle": "创建及管理 Card Break 活动",
+    "createBreak": "新增开箱",
+    "newBreakTitle": "新增开箱",
+    "newBreakSubtitle": "创建活动并加入球队／球员位置",
+    "titleLabel": "标题",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "30-team break · Live on Instagram · Shipping after break",
+    "imageLabel": "封面图片 URL（选填）",
+    "slotsLabel": "位置列表",
+    "slotsPlaceholder": "Lakers,300\nCeltics,300\nWarriors,280",
+    "slotsHint": "每行一个位置：名称,价格（例如 Lakers,300）",
+    "submitting": "创建中…",
+    "viewPublicPage": "查看公开页面",
+    "slotsSummary": "{available} / {total} 个可售"
   },
   "home": {
     "badge": "香港卡牌开箱平台",
     "headline": "干净、快速、安全的开箱体验",
     "subheadline": "浏览进行中的开箱活动，选择你支持的球队或球员位置。付款后等待直播开箱，再在账户内选择顺丰到付、自取或海外寄送。",
-    "ctaBrowse": "浏览开箱（Phase 3）",
-    "ctaLearn": "了解流程",
-    "testCheckout": "测试结账拦截（Phase 2）",
+    "ctaBrowse": "浏览开箱",
+    "ctaLearn": "查看最新活动",
     "stats": {
       "secure": "Stripe 安全付款",
       "wallet": "流局自动退回钱包",
       "shipping": "开箱后再选寄送"
     },
-    "phaseNote": "Phase 2 已完成：登录、注册、结账拦截。下一步：Phase 3 公开开箱列表。"
+    "phaseNote": "Phase 3 已完成：公开开箱列表及位置网格。下一步：Phase 4 八分钟锁位。"
   },
   "footer": {
     "tagline": "专为香港及海外收藏家而设",

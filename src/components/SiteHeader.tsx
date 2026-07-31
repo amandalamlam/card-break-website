@@ -2,12 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LogoutButton } from "./auth/LogoutButton";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
 
 export async function SiteHeader() {
   const t = await getTranslations("nav");
   const brand = await getTranslations("common");
   const user = await getCurrentUser();
+  const profile = user ? await getCurrentProfile() : null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
@@ -17,12 +18,17 @@ export async function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted md:flex">
-          <Link href="/" className="transition hover:text-foreground">
+          <Link href="/breaks" className="transition hover:text-foreground">
             {t("breaks")}
           </Link>
           <Link href="/account" className="transition hover:text-foreground">
             {t("account")}
           </Link>
+          {profile?.role === "admin" ? (
+            <Link href="/admin/breaks" className="transition hover:text-accent-soft">
+              {t("admin")}
+            </Link>
+          ) : null}
         </nav>
 
         <div className="flex items-center gap-3">

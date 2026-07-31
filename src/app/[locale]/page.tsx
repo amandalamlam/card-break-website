@@ -1,5 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BreakCard } from "@/components/breaks/BreakCard";
+import { getPublicBreaks } from "@/lib/breaks/queries";
 
 export default async function HomePage({
   params,
@@ -10,6 +12,9 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   const t = await getTranslations("home");
+  const breaksT = await getTranslations("breaks");
+  const breaks = await getPublicBreaks();
+  const featuredBreaks = breaks.slice(0, 3);
 
   const stats = [
     { label: t("stats.secure"), icon: "🔒" },
@@ -19,65 +24,55 @@ export default async function HomePage({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 py-12 md:py-20">
-      <section className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-6">
-          <span className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-4 py-1 text-sm text-accent-soft">
-            {t("badge")}
-          </span>
+      <section className="space-y-6">
+        <span className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-4 py-1 text-sm text-accent-soft">
+          {t("badge")}
+        </span>
 
-          <h1 className="max-w-2xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
-            {t("headline")}
-          </h1>
+        <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
+          {t("headline")}
+        </h1>
 
-          <p className="max-w-2xl text-base leading-7 text-muted md:text-lg">{t("subheadline")}</p>
+        <p className="max-w-2xl text-base leading-7 text-muted md:text-lg">{t("subheadline")}</p>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="#"
-              className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft"
-            >
-              {t("ctaBrowse")}
-            </Link>
-            <Link
-              href="/checkout/start?breakId=demo-break&slotId=demo-lakers"
-              className="rounded-xl border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-medium text-accent-soft transition hover:border-accent hover:text-accent"
-            >
-              {t("testCheckout")}
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="rounded-xl border border-border px-5 py-3 text-sm font-medium text-foreground transition hover:border-accent/50 hover:text-accent-soft"
-            >
-              {t("ctaLearn")}
-            </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/breaks"
+            className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft"
+          >
+            {t("ctaBrowse")}
+          </Link>
+          <Link
+            href="#live-breaks"
+            className="rounded-xl border border-border px-5 py-3 text-sm font-medium text-foreground transition hover:border-accent/50 hover:text-accent-soft"
+          >
+            {t("ctaLearn")}
+          </Link>
+        </div>
+      </section>
+
+      <section id="live-breaks" className="space-y-6">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold">{breaksT("featuredTitle")}</h2>
+            <p className="mt-2 text-sm text-muted">{breaksT("featuredSubtitle")}</p>
           </div>
+          <Link href="/breaks" className="text-sm font-medium text-accent-soft hover:text-accent">
+            {breaksT("viewAll")}
+          </Link>
         </div>
 
-        <div className="glass-panel relative overflow-hidden rounded-3xl p-6 shadow-2xl shadow-black/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-success/10" />
-          <div className="relative space-y-4">
-            <div className="rounded-2xl border border-border bg-surface-elevated p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-muted">2026 NBA Prizm Hobby #01</p>
-              <p className="mt-2 text-2xl font-semibold">Lakers · Celtics · Warriors</p>
-              <p className="mt-3 text-sm text-muted">Slot checkout · 8-minute lock · Wallet refunds</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              {["Available", "Locked", "Sold"].map((status) => (
-                <div
-                  key={status}
-                  className="rounded-xl border border-border bg-background/60 px-3 py-4 text-center text-xs text-muted"
-                >
-                  {status}
-                </div>
-              ))}
-            </div>
-
-            <div className="rounded-2xl border border-dashed border-accent/40 bg-accent/5 p-4 text-sm text-accent-soft">
-              Phase 0 placeholder — real break listings arrive in Phase 3.
-            </div>
+        {featuredBreaks.length === 0 ? (
+          <div className="glass-panel rounded-3xl px-6 py-12 text-center text-muted">
+            {breaksT("empty")}
           </div>
-        </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {featuredBreaks.map((breakItem) => (
+              <BreakCard key={breakItem.id} breakItem={breakItem} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">

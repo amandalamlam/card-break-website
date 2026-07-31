@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "進行中的開箱",
     "account": "我的帳戶",
+    "admin": "後台",
     "login": "登入",
     "signup": "註冊"
   },
@@ -43,29 +44,75 @@
     "phone": "電話",
     "wallet": "錢包餘額",
     "role": "帳戶類型",
-    "phaseNote": "Phase 2 已完成：登入／註冊。Phase 3 將顯示你購買的開箱記錄。"
+    "phaseNote": "Phase 3 已完成：公開開箱列表。Phase 4 將加入 8 分鐘鎖位倒數。"
+  },
+  "breaks": {
+    "listTitle": "進行中的開箱",
+    "listSubtitle": "選擇球隊或球員位置。登入後即可結帳（Phase 4 將加入 8 分鐘鎖位）。",
+    "featuredTitle": "最新開箱",
+    "featuredSubtitle": "從資料庫載入的進行中活動",
+    "viewAll": "查看全部",
+    "viewBreak": "查看詳情",
+    "empty": "暫時沒有進行中的開箱。",
+    "noSlots": "尚未設定位置",
+    "slotsSummary": "{available} / {total} 個可售",
+    "slotsTitle": "選擇你的位置",
+    "slotsSubtitle": "可用位置可點擊 Checkout。已售出或鎖定中的位置無法購買。",
+    "checkout": "Checkout",
+    "soldOutSlot": "已售出",
+    "lockedSlot": "鎖定中",
+    "unavailable": "不可購買",
+    "status": {
+      "active": "進行中",
+      "sold_out": "已售罄",
+      "completed": "已完成",
+      "cancelled": "已取消"
+    },
+    "slotStatus": {
+      "available": "可購買",
+      "locked": "鎖定中",
+      "sold": "已售出",
+      "refunded": "已退款"
+    }
   },
   "checkout": {
     "authenticatedBadge": "已登入 — 準備結帳",
-    "title": "結帳攔截測試",
-    "subtitle": "你已成功通過登入攔截。Phase 4 將在此開始 8 分鐘倒數鎖位。",
-    "breakId": "開箱 ID",
-    "slotId": "位置 ID",
-    "phaseNote": "這是 Phase 2 的測試頁面。Phase 3 加入真實開箱頁面後，「Checkout」按鈕會導向此流程。"
+    "title": "確認結帳位置",
+    "subtitle": "你已成功登入並選擇了以下位置。Phase 4 將在此開始 8 分鐘倒數鎖位及 Stripe 付款。",
+    "breakLabel": "開箱",
+    "slotLabel": "位置",
+    "priceLabel": "價格",
+    "phaseNote": "Phase 3：Checkout 按鈕已連接真實開箱資料。下一步加入 8 分鐘鎖位。"
+  },
+  "admin": {
+    "dashboardTitle": "開箱管理",
+    "dashboardSubtitle": "建立及管理 Card Break 活動",
+    "createBreak": "新增開箱",
+    "newBreakTitle": "新增開箱",
+    "newBreakSubtitle": "建立活動並加入球隊／球員位置",
+    "titleLabel": "標題",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "30-team break · Live on Instagram · Shipping after break",
+    "imageLabel": "封面圖片 URL（選填）",
+    "slotsLabel": "位置列表",
+    "slotsPlaceholder": "Lakers,300\nCeltics,300\nWarriors,280",
+    "slotsHint": "每行一個位置：名稱,價格（例如 Lakers,300）",
+    "submitting": "建立中…",
+    "viewPublicPage": "查看公開頁面",
+    "slotsSummary": "{available} / {total} 個可售"
   },
   "home": {
     "badge": "香港卡牌開箱平台",
     "headline": "乾淨、快速、安全的開箱體驗",
     "subheadline": "瀏覽進行中的開箱活動，選擇你支持的球隊或球員位置。付款後等待直播開箱，再於帳戶內選擇順豐到付、自取或海外寄送。",
-    "ctaBrowse": "瀏覽開箱（Phase 3）",
-    "ctaLearn": "了解流程",
-    "testCheckout": "測試結帳攔截（Phase 2）",
+    "ctaBrowse": "瀏覽開箱",
+    "ctaLearn": "查看最新活動",
     "stats": {
       "secure": "Stripe 安全付款",
       "wallet": "流局自動退回錢包",
       "shipping": "開箱後再選寄送"
     },
-    "phaseNote": "Phase 2 已完成：登入、註冊、結帳攔截。下一步：Phase 3 公開開箱列表。"
+    "phaseNote": "Phase 3 已完成：公開開箱列表及位置網格。下一步：Phase 4 八分鐘鎖位。"
   },
   "footer": {
     "tagline": "專為香港及海外收藏家而設",

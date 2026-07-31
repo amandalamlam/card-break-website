@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "Live Breaks",
     "account": "My Account",
+    "admin": "Admin",
     "login": "Log in",
     "signup": "Sign up"
   },
@@ -43,29 +44,75 @@
     "phone": "Phone",
     "wallet": "Wallet balance",
     "role": "Account type",
-    "phaseNote": "Phase 2 complete: login and signup. Phase 3 will show your break purchase history."
+    "phaseNote": "Phase 3 complete: public break listings. Phase 4 adds the 8-minute slot lock."
+  },
+  "breaks": {
+    "listTitle": "Live Breaks",
+    "listSubtitle": "Pick a team or player slot. Sign in to checkout (Phase 4 adds the 8-minute lock).",
+    "featuredTitle": "Latest breaks",
+    "featuredSubtitle": "Active listings loaded from your database",
+    "viewAll": "View all",
+    "viewBreak": "View details",
+    "empty": "No active breaks right now.",
+    "noSlots": "No slots configured yet",
+    "slotsSummary": "{available} / {total} available",
+    "slotsTitle": "Pick your slot",
+    "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
+    "checkout": "Checkout",
+    "soldOutSlot": "Sold",
+    "lockedSlot": "Locked",
+    "unavailable": "Unavailable",
+    "status": {
+      "active": "Active",
+      "sold_out": "Sold out",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "slotStatus": {
+      "available": "Available",
+      "locked": "Locked",
+      "sold": "Sold",
+      "refunded": "Refunded"
+    }
   },
   "checkout": {
     "authenticatedBadge": "Signed in — ready for checkout",
-    "title": "Checkout gate test",
-    "subtitle": "You passed the login gate. Phase 4 will start the 8-minute slot lock here.",
-    "breakId": "Break ID",
-    "slotId": "Slot ID",
-    "phaseNote": "This is a Phase 2 test page. Phase 3 break pages will link Checkout buttons to this flow."
+    "title": "Confirm your slot",
+    "subtitle": "You are signed in and selected the slot below. Phase 4 will start the 8-minute lock and Stripe payment here.",
+    "breakLabel": "Break",
+    "slotLabel": "Slot",
+    "priceLabel": "Price",
+    "phaseNote": "Phase 3: Checkout is wired to real break data. Next up: 8-minute slot lock."
+  },
+  "admin": {
+    "dashboardTitle": "Break management",
+    "dashboardSubtitle": "Create and manage card break events",
+    "createBreak": "New break",
+    "newBreakTitle": "Create a break",
+    "newBreakSubtitle": "Add an event and team/player slots",
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "30-team break · Live on Instagram · Shipping after break",
+    "imageLabel": "Cover image URL (optional)",
+    "slotsLabel": "Slot list",
+    "slotsPlaceholder": "Lakers,300\nCeltics,300\nWarriors,280",
+    "slotsHint": "One slot per line: Name,Price (e.g. Lakers,300)",
+    "submitting": "Creating…",
+    "viewPublicPage": "View public page",
+    "slotsSummary": "{available} / {total} available"
   },
   "home": {
     "badge": "Hong Kong Card Break Platform",
     "headline": "Clean, fast, secure breaks",
     "subheadline": "Browse active breaks and claim your favourite team or player slot. Pay securely, watch the live reveal, then choose SF Express collect-on-delivery, pickup, or international shipping from your account.",
-    "ctaBrowse": "Browse breaks (Phase 3)",
-    "ctaLearn": "How it works",
-    "testCheckout": "Test checkout gate (Phase 2)",
+    "ctaBrowse": "Browse breaks",
+    "ctaLearn": "See latest breaks",
     "stats": {
       "secure": "Stripe secure payments",
       "wallet": "Wallet credits on cancellation",
       "shipping": "Shipping after the break"
     },
-    "phaseNote": "Phase 2 complete: login, signup, checkout gate. Next: Phase 3 public break listings."
+    "phaseNote": "Phase 3 complete: public break listings and slot grids. Next: Phase 4 eight-minute slot lock."
   },
   "footer": {
     "tagline": "Built for HK and international collectors",
