@@ -48,7 +48,7 @@
   },
   "breaks": {
     "listTitle": "进行中的开箱",
-    "listSubtitle": "选择球队或球员位置。登录后即可结账（Phase 4 将加入 8 分钟锁位）。",
+    "listSubtitle": "选择球队或球员位置。结账时将锁定位置 8 分钟。",
     "featuredTitle": "最新开箱",
     "featuredSubtitle": "从数据库加载的进行中活动",
     "viewAll": "查看全部",
@@ -76,13 +76,28 @@
     }
   },
   "checkout": {
+    "lockedBadge": "位置已锁定",
     "authenticatedBadge": "已登录 — 准备结账",
-    "title": "确认结账位置",
-    "subtitle": "你已成功登录并选择了以下位置。Phase 4 将在此开始 8 分钟倒数锁位及 Stripe 付款。",
+    "title": "你的位置已锁定",
+    "subtitle": "请在倒数结束前完成付款。Phase 5 将加入 Stripe 付款。",
     "breakLabel": "开箱",
     "slotLabel": "位置",
     "priceLabel": "价格",
-    "phaseNote": "Phase 3：Checkout 按钮已连接真实开箱数据。下一步加入 8 分钟锁位。"
+    "lockTimerLabel": "剩余锁定时间",
+    "lockActive": "此位置为你保留 8 分钟。倒数结束后将自动释放。",
+    "lockExpired": "锁定时间已过，位置已释放。请返回开箱页重新选择。",
+    "backToBreak": "返回开箱页面",
+    "phaseNote": "Phase 4：8 分钟锁位已生效。Phase 5 将在此页加入 Stripe 付款。",
+    "errors": {
+      "title": "无法锁定此位置",
+      "SLOT_LOCKED_BY_OTHER": "另一位用户正在结账此位置，请选择其他位置或稍后再试。",
+      "SLOT_ALREADY_SOLD": "此位置已售出，请选择其他位置。",
+      "BREAK_NOT_ACTIVE": "此开箱活动已结束或暂停，无法购买。",
+      "SLOT_NOT_FOUND": "找不到此位置，可能已被移除。",
+      "SLOT_UNAVAILABLE": "此位置目前不可购买。",
+      "UNKNOWN": "发生未知错误，请稍后再试。",
+      "backToBreak": "返回开箱页面"
+    }
   },
   "admin": {
     "dashboardTitle": "开箱管理",
@@ -112,7 +127,7 @@
       "wallet": "流局自动退回钱包",
       "shipping": "开箱后再选寄送"
     },
-    "phaseNote": "Phase 3 已完成：公开开箱列表及位置网格。下一步：Phase 4 八分钟锁位。"
+    "phaseNote": "Phase 4 已完成：8 分钟位置锁定。下一步：Phase 5 Stripe 付款。"
   },
   "footer": {
     "tagline": "专为香港及海外收藏家而设",

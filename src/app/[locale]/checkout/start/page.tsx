@@ -1,9 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { CheckoutCountdown } from "@/components/checkout/CheckoutCountdown";
+import { CheckoutLockError } from "@/components/checkout/CheckoutLockError";
 import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { formatPrice } from "@/lib/breaks/format";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentUser } from "@/lib/auth/session";
+import { lockBreakSlot } from "@/lib/slots/locking";
 import { redirect } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -42,13 +45,22 @@ export default async function CheckoutStartPage({
     notFound();
   }
 
+  const lockResult = await lockBreakSlot(slotId, user!.id);
   const t = await getTranslations("checkout");
+
+  if (!lockResult.ok) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-6 py-12 md:py-16">
+        <CheckoutLockError code={lockResult.code} breakId={breakId} />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-6 py-12 md:py-16">
       <div className="glass-panel rounded-3xl p-8">
-        <span className="inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs text-accent-soft">
-          {t("authenticatedBadge")}
+        <span className="inline-flex rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs text-success">
+          {t("lockedBadge")}
         </span>
         <h1 className="mt-4 text-2xl font-semibold">{t("title")}</h1>
         <p className="mt-3 text-sm leading-7 text-muted">{t("subtitle")}</p>
@@ -68,9 +80,11 @@ export default async function CheckoutStartPage({
           </p>
         </div>
 
-        <p className="mt-6 rounded-2xl border border-dashed border-accent/40 bg-accent/5 px-4 py-3 text-sm text-accent-soft">
-          {t("phaseNote")}
-        </p>
+        <CheckoutCountdown
+          expiresAt={lockResult.expiresAt}
+          slotId={slotId}
+          breakId={breakId}
+        />
       </div>
     </div>
   );

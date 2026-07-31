@@ -48,7 +48,7 @@
   },
   "breaks": {
     "listTitle": "Live Breaks",
-    "listSubtitle": "Pick a team or player slot. Sign in to checkout (Phase 4 adds the 8-minute lock).",
+    "listSubtitle": "Pick a team or player slot. Checkout holds the slot for 8 minutes.",
     "featuredTitle": "Latest breaks",
     "featuredSubtitle": "Active listings loaded from your database",
     "viewAll": "View all",
@@ -76,13 +76,28 @@
     }
   },
   "checkout": {
+    "lockedBadge": "Slot locked",
     "authenticatedBadge": "Signed in — ready for checkout",
-    "title": "Confirm your slot",
-    "subtitle": "You are signed in and selected the slot below. Phase 4 will start the 8-minute lock and Stripe payment here.",
+    "title": "Your slot is locked",
+    "subtitle": "Complete payment before the timer expires. Phase 5 adds Stripe checkout here.",
     "breakLabel": "Break",
     "slotLabel": "Slot",
     "priceLabel": "Price",
-    "phaseNote": "Phase 3: Checkout is wired to real break data. Next up: 8-minute slot lock."
+    "lockTimerLabel": "Lock time remaining",
+    "lockActive": "This slot is reserved for you for 8 minutes. It releases automatically when the timer ends.",
+    "lockExpired": "The lock expired and the slot was released. Go back and pick a slot again.",
+    "backToBreak": "Back to break",
+    "phaseNote": "Phase 4: 8-minute lock is live. Phase 5 adds Stripe payment on this page.",
+    "errors": {
+      "title": "Could not lock this slot",
+      "SLOT_LOCKED_BY_OTHER": "Another customer is checking out this slot. Pick a different one or try again later.",
+      "SLOT_ALREADY_SOLD": "This slot is already sold. Please choose another one.",
+      "BREAK_NOT_ACTIVE": "This break is no longer active.",
+      "SLOT_NOT_FOUND": "This slot could not be found.",
+      "SLOT_UNAVAILABLE": "This slot is not available for purchase.",
+      "UNKNOWN": "Something went wrong. Please try again.",
+      "backToBreak": "Back to break"
+    }
   },
   "admin": {
     "dashboardTitle": "Break management",
@@ -112,7 +127,7 @@
       "wallet": "Wallet credits on cancellation",
       "shipping": "Shipping after the break"
     },
-    "phaseNote": "Phase 3 complete: public break listings and slot grids. Next: Phase 4 eight-minute slot lock."
+    "phaseNote": "Phase 4 complete: 8-minute slot lock. Next: Phase 5 Stripe payments."
   },
   "footer": {
     "tagline": "Built for HK and international collectors",

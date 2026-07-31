@@ -44,11 +44,11 @@
     "phone": "電話",
     "wallet": "錢包餘額",
     "role": "帳戶類型",
-    "phaseNote": "Phase 3 已完成：公開開箱列表。Phase 4 將加入 8 分鐘鎖位倒數。"
+    "phaseNote": "Phase 3 已完成：公開開箱列表。Phase 4 已加入 8 分鐘鎖位。"
   },
   "breaks": {
     "listTitle": "進行中的開箱",
-    "listSubtitle": "選擇球隊或球員位置。登入後即可結帳（Phase 4 將加入 8 分鐘鎖位）。",
+    "listSubtitle": "選擇球隊或球員位置。結帳時將鎖定位置 8 分鐘。",
     "featuredTitle": "最新開箱",
     "featuredSubtitle": "從資料庫載入的進行中活動",
     "viewAll": "查看全部",
@@ -76,13 +76,28 @@
     }
   },
   "checkout": {
+    "lockedBadge": "位置已鎖定",
     "authenticatedBadge": "已登入 — 準備結帳",
-    "title": "確認結帳位置",
-    "subtitle": "你已成功登入並選擇了以下位置。Phase 4 將在此開始 8 分鐘倒數鎖位及 Stripe 付款。",
+    "title": "你的位置已鎖定",
+    "subtitle": "請在倒數結束前完成付款。Phase 5 將加入 Stripe 付款。",
     "breakLabel": "開箱",
     "slotLabel": "位置",
     "priceLabel": "價格",
-    "phaseNote": "Phase 3：Checkout 按鈕已連接真實開箱資料。下一步加入 8 分鐘鎖位。"
+    "lockTimerLabel": "剩餘鎖定時間",
+    "lockActive": "此位置為你保留 8 分鐘。倒數結束後將自動釋放。",
+    "lockExpired": "鎖定時間已過，位置已釋放。請返回開箱頁重新選擇。",
+    "backToBreak": "返回開箱頁面",
+    "phaseNote": "Phase 4：8 分鐘鎖位已生效。Phase 5 將在此頁加入 Stripe 付款。",
+    "errors": {
+      "title": "無法鎖定此位置",
+      "SLOT_LOCKED_BY_OTHER": "另一位用戶正在結帳此位置，請選擇其他位置或稍後再試。",
+      "SLOT_ALREADY_SOLD": "此位置已售出，請選擇其他位置。",
+      "BREAK_NOT_ACTIVE": "此開箱活動已結束或暫停，無法購買。",
+      "SLOT_NOT_FOUND": "找不到此位置，可能已被移除。",
+      "SLOT_UNAVAILABLE": "此位置目前不可購買。",
+      "UNKNOWN": "發生未知錯誤，請稍後再試。",
+      "backToBreak": "返回開箱頁面"
+    }
   },
   "admin": {
     "dashboardTitle": "開箱管理",
@@ -112,7 +127,7 @@
       "wallet": "流局自動退回錢包",
       "shipping": "開箱後再選寄送"
     },
-    "phaseNote": "Phase 3 已完成：公開開箱列表及位置網格。下一步：Phase 4 八分鐘鎖位。"
+    "phaseNote": "Phase 4 已完成：8 分鐘位置鎖定。下一步：Phase 5 Stripe 付款。"
   },
   "footer": {
     "tagline": "專為香港及海外收藏家而設",
