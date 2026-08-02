@@ -1,16 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchBreakSlotsWithLazyRelease } from "@/lib/slots/fetch-slots";
 import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
-import { isSlotLockActive, normalizeSlotForDisplay } from "@/lib/slots/helpers";
 import type { Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
 
 function mapBreakListItem(
-  row: Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] }
+  row: Break & { break_slots: Pick<BreakSlot, "status">[] }
 ): BreakListItem {
   const total_count = row.break_slots.length;
-  const available_count = row.break_slots.filter(
-    (slot) => slot.status === "available" || (slot.status === "locked" && !isSlotLockActive(slot))
-  ).length;
+  const available_count = row.break_slots.filter((slot) => slot.status === "available").length;
 
   return {
     id: row.id,
@@ -41,7 +38,7 @@ export async function getPublicBreaks(): Promise<BreakListItem[]> {
   }
 
   return (data ?? []).map((row) =>
-    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] })
+    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
   );
 }
 
@@ -83,7 +80,7 @@ export async function getSlotById(slotId: string, breakId: string): Promise<Brea
     return null;
   }
 
-  return normalizeSlotForDisplay(data as BreakSlot);
+  return data as BreakSlot;
 }
 
 export async function getAllBreaksForAdmin(): Promise<BreakListItem[]> {
@@ -101,6 +98,6 @@ export async function getAllBreaksForAdmin(): Promise<BreakListItem[]> {
   }
 
   return (data ?? []).map((row) =>
-    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] })
+    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
   );
 }

@@ -1,4 +1,5 @@
 import { SLOT_LOCK_DURATION_MS } from "./constants";
+import { uuidEquals } from "./time";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
 
 export function getSlotLockExpiresAt(slot: Pick<BreakSlot, "locked_at">): Date | null {
@@ -25,9 +26,15 @@ export function isSlotLockedByUser(
   return (
     Boolean(userId) &&
     slot.status === "locked" &&
-    slot.user_id === userId &&
-    isSlotLockActive(slot)
+    uuidEquals(slot.user_id, userId)
   );
+}
+
+export function isSlotLockedByOtherUser(
+  slot: Pick<BreakSlot, "status" | "user_id">,
+  userId: string | null | undefined
+): boolean {
+  return slot.status === "locked" && Boolean(slot.user_id) && !uuidEquals(slot.user_id, userId);
 }
 
 export function canUserCheckoutSlot(
@@ -39,11 +46,11 @@ export function canUserCheckoutSlot(
     return false;
   }
 
-  if (slot.status === "available") {
-    return true;
+  if (slot.status === "locked") {
+    return isSlotLockedByUser(slot, userId);
   }
 
-  return isSlotLockedByUser(slot, userId);
+  return slot.status === "available";
 }
 
 export function normalizeSlotForDisplay(slot: BreakSlot): BreakSlot {

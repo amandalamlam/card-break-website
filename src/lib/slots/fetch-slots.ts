@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { normalizeSlotForDisplay } from "@/lib/slots/helpers";
 import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
 import type { BreakSlot } from "@/lib/breaks/types";
 
@@ -27,7 +26,7 @@ export async function fetchBreakSlotsWithLazyRelease(breakId: string): Promise<B
     throw new Error(error.message);
   }
 
-  const slots = (data ?? []).map((row) => normalizeSlotForDisplay(row as BreakSlot));
+  const slots = (data ?? []) as BreakSlot[];
 
   return { slots, released };
 }

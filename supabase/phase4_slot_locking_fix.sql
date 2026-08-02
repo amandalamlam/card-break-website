@@ -1,5 +1,5 @@
--- Phase 4 fix: explicitly clear expired locks inside lock_break_slot
--- Run in Supabase SQL Editor if locks are not releasing after 8 minutes.
+-- Phase 4 fix: resume same-user locks reliably (incl. orphaned user_id) inside lock_break_slot
+-- Run in Supabase SQL Editor if "Continue checkout" fails with SLOT_LOCKED_BY_OTHER.
 
 create or replace function public.lock_break_slot(p_slot_id uuid, p_user_id uuid)
 returns table (
@@ -50,9 +50,20 @@ begin
     v_expires_at := v_slot.locked_at + interval '8 minutes';
 
     if v_expires_at > now() then
-      if v_slot.user_id = p_user_id then
+      -- Resume for same user, or reclaim orphaned lock (status locked but user_id cleared).
+      -- IMPORTANT: must `return` after return query, or the function continues and
+      -- overwrites locked_at with now() (resets the 8-minute timer on refresh).
+      if v_slot.user_id is null or v_slot.user_id = p_user_id then
+        if v_slot.user_id is null then
+          update public.break_slots
+          set user_id = p_user_id, updated_at = now()
+          where id = p_slot_id
+          returning * into v_slot;
+        end if;
+
         return query
         select v_slot.id, v_slot.break_id, v_slot.locked_at, v_expires_at;
+        return;
       end if;
 
       raise exception using errcode = 'P0001', message = 'SLOT_LOCKED_BY_OTHER';

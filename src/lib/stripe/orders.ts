@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { uuidEquals } from "@/lib/slots/time";
+import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
 
 export async function fulfillSlotPurchase(
   orderId: string,
@@ -49,6 +51,8 @@ export async function getOrderByCheckoutSessionId(sessionId: string) {
 }
 
 export async function validateUserLock(slotId: string, userId: string): Promise<boolean> {
+  await releaseExpiredSlotLocks();
+
   const admin = createAdminClient();
 
   const { data, error } = await admin
@@ -61,14 +65,9 @@ export async function validateUserLock(slotId: string, userId: string): Promise<
     return false;
   }
 
-  if (data.status !== "locked" || data.user_id !== userId) {
-    return false;
-  }
-
-  if (!data.locked_at) {
-    return false;
-  }
-
-  const expiresAt = new Date(data.locked_at).getTime() + 8 * 60 * 1000;
-  return expiresAt > Date.now();
+  return (
+    data.status === "locked" &&
+    Boolean(data.locked_at) &&
+    uuidEquals(data.user_id, userId)
+  );
 }

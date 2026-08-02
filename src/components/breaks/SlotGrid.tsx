@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { SlotStatusBadge } from "@/components/breaks/StatusBadge";
 import { formatPrice } from "@/lib/breaks/format";
-import { canUserCheckoutSlot, isSlotLockedByUser, normalizeSlotForDisplay } from "@/lib/slots/helpers";
+import { canUserCheckoutSlot, isSlotLockedByUser } from "@/lib/slots/helpers";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
 
 type SlotGridProps = {
@@ -30,8 +30,7 @@ export async function SlotGrid({
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {slots.map((rawSlot) => {
-        const slot = normalizeSlotForDisplay(rawSlot);
+      {slots.map((slot) => {
         const canCheckout = canUserCheckoutSlot(slot, breakStatus, currentUserId);
         const isResume = isSlotLockedByUser(slot, currentUserId);
         const checkoutHref = `/checkout/start?breakId=${breakId}&slotId=${slot.id}`;
@@ -53,6 +52,7 @@ export async function SlotGrid({
               {canCheckout ? (
                 <Link
                   href={checkoutHref}
+                  prefetch={isResume ? false : undefined}
                   className={`inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition ${
                     isResume
                       ? "border border-accent/40 bg-accent/10 text-accent-soft hover:border-accent hover:text-accent"

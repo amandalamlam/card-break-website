@@ -6,7 +6,7 @@ import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { formatPrice } from "@/lib/breaks/format";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentUser } from "@/lib/auth/session";
-import { lockBreakSlot } from "@/lib/slots/locking";
+import { resumeOrLockBreakSlot } from "@/lib/slots/locking";
 import { redirect } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -45,7 +45,7 @@ export default async function CheckoutStartPage({
     notFound();
   }
 
-  const lockResult = await lockBreakSlot(slotId, user!.id);
+  const lockResult = await resumeOrLockBreakSlot(slotId, user!.id);
   const t = await getTranslations("checkout");
 
   if (!lockResult.ok) {
@@ -81,7 +81,7 @@ export default async function CheckoutStartPage({
         </div>
 
         <CheckoutCountdown
-          expiresAt={lockResult.expiresAt}
+          lockedAt={lockResult.lockedAt}
           slotId={slotId}
           breakId={breakId}
           locale={locale as AppLocale}

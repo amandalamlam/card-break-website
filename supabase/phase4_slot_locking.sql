@@ -75,7 +75,15 @@ begin
     v_expires_at := v_slot.locked_at + interval '8 minutes';
 
     if v_expires_at > now() then
-      if v_slot.user_id = p_user_id then
+      -- Resume same-user lock; must return so locked_at is not overwritten with now().
+      if v_slot.user_id is null or v_slot.user_id = p_user_id then
+        if v_slot.user_id is null then
+          update public.break_slots
+          set user_id = p_user_id, updated_at = now()
+          where id = p_slot_id
+          returning * into v_slot;
+        end if;
+
         return query
         select v_slot.id, v_slot.break_id, v_slot.locked_at, v_expires_at;
         return;

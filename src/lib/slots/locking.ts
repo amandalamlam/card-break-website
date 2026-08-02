@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getLockExpiresAtIso, uuidEquals } from "@/lib/slots/time";
 import type { LockErrorCode, LockResult } from "./constants";
 
 function mapErrorMessage(code: LockErrorCode): string {
@@ -24,6 +25,56 @@ type LockRow = {
   expires_at: string;
 };
 
+type SlotRow = {
+  id: string;
+  break_id: string;
+  status: string;
+  user_id: string | null;
+  locked_at: string | null;
+};
+
+function buildLockSuccess(row: Pick<SlotRow, "id" | "break_id" | "locked_at">): LockResult {
+  if (!row.locked_at) {
+    return { ok: false, code: "UNKNOWN", message: mapErrorMessage("UNKNOWN") };
+  }
+
+  return {
+    ok: true,
+    slotId: row.id,
+    breakId: row.break_id,
+    lockedAt: row.locked_at,
+    expiresAt: getLockExpiresAtIso(row.locked_at),
+  };
+}
+
+/**
+ * Resumes an existing active lock for the same user when possible, otherwise acquires a new lock.
+ * Pre-check avoids false SLOT_LOCKED_BY_OTHER when the user returns via "Continue checkout".
+ */
+export async function resumeOrLockBreakSlot(slotId: string, userId: string): Promise<LockResult> {
+  await releaseExpiredSlotLocks();
+
+  const admin = createAdminClient();
+
+  const { data: slot, error: slotError } = await admin
+    .from("break_slots")
+    .select("id, break_id, status, user_id, locked_at")
+    .eq("id", slotId)
+    .maybeSingle();
+
+  if (slotError || !slot) {
+    return { ok: false, code: "SLOT_NOT_FOUND", message: mapErrorMessage("SLOT_NOT_FOUND") };
+  }
+
+  const row = slot as SlotRow;
+
+  if (row.status === "locked" && row.locked_at && uuidEquals(row.user_id, userId)) {
+    return buildLockSuccess(row);
+  }
+
+  return lockBreakSlot(slotId, userId);
+}
+
 export async function lockBreakSlot(slotId: string, userId: string): Promise<LockResult> {
   const admin = createAdminClient();
 
@@ -39,7 +90,7 @@ export async function lockBreakSlot(slotId: string, userId: string): Promise<Loc
 
   const row = (Array.isArray(data) ? data[0] : data) as LockRow | undefined;
 
-  if (!row) {
+  if (!row?.locked_at) {
     return { ok: false, code: "UNKNOWN", message: mapErrorMessage("UNKNOWN") };
   }
 
@@ -48,7 +99,7 @@ export async function lockBreakSlot(slotId: string, userId: string): Promise<Loc
     slotId: row.slot_id,
     breakId: row.break_id,
     lockedAt: row.locked_at,
-    expiresAt: row.expires_at,
+    expiresAt: getLockExpiresAtIso(row.locked_at),
   };
 }
 

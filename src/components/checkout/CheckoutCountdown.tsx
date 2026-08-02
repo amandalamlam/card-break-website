@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { CheckoutPayButton } from "./CheckoutPayButton";
+import { getLockRemainingSeconds } from "@/lib/slots/time";
 import type { AppLocale } from "@/i18n/routing";
 
 type CheckoutCountdownProps = {
-  expiresAt: string;
+  lockedAt: string;
   slotId: string;
   breakId: string;
   locale: AppLocale;
@@ -19,49 +20,49 @@ function formatRemaining(totalSeconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function CheckoutCountdown({ expiresAt, slotId, breakId, locale }: CheckoutCountdownProps) {
+export function CheckoutCountdown({ lockedAt, slotId, breakId, locale }: CheckoutCountdownProps) {
   const t = useTranslations("checkout");
-  const expiresAtMs = useMemo(() => new Date(expiresAt).getTime(), [expiresAt]);
-
-  const [remainingSeconds, setRemainingSeconds] = useState(() =>
-    Math.max(0, Math.floor((expiresAtMs - Date.now()) / 1000))
-  );
+  // null = not yet synced on client (avoids SSR/hydration mismatch + false expiry)
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [released, setReleased] = useState(false);
 
   useEffect(() => {
     const tick = () => {
-      setRemainingSeconds(Math.max(0, Math.floor((expiresAtMs - Date.now()) / 1000)));
+      setRemainingSeconds(getLockRemainingSeconds(lockedAt));
     };
 
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [expiresAtMs]);
+  }, [lockedAt]);
 
   useEffect(() => {
-    if (remainingSeconds > 0 || released) {
+    // Only release after the client has synced the real remaining time and it hit zero.
+    if (remainingSeconds === null || remainingSeconds > 0 || released) {
       return;
     }
 
     async function notifyExpired() {
       try {
-        // Lazy-release via slots API (no cron required)
+        // Lazy-release expired locks only — do NOT force-release via /api/slots/release
+        // (that endpoint clears the caller's lock even when still active).
         await fetch(`/api/slots?breakId=${breakId}`, { cache: "no-store" });
-        await fetch("/api/slots/release", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slotId }),
-        });
       } finally {
         setReleased(true);
       }
     }
 
     void notifyExpired();
-  }, [remainingSeconds, released, slotId, breakId]);
+  }, [remainingSeconds, released, breakId]);
 
-  const isExpired = remainingSeconds <= 0;
-  const isUrgent = remainingSeconds > 0 && remainingSeconds <= 60;
+  const mounted = remainingSeconds !== null;
+  const isExpired = mounted && remainingSeconds <= 0;
+  const isUrgent = mounted && remainingSeconds > 0 && remainingSeconds <= 60;
+  const timerDisplay = !mounted
+    ? "--:--"
+    : isExpired
+      ? "00:00"
+      : formatRemaining(remainingSeconds);
 
   return (
     <div className="mt-6 space-y-4">
@@ -80,14 +81,16 @@ export function CheckoutCountdown({ expiresAt, slotId, breakId, locale }: Checko
             isExpired ? "text-red-200" : isUrgent ? "text-accent-soft" : "text-success"
           }`}
         >
-          {isExpired ? "00:00" : formatRemaining(remainingSeconds)}
+          {timerDisplay}
         </p>
         <p className="mt-2 text-sm text-muted">
-          {isExpired ? t("lockExpired") : t("lockActive")}
+          {!mounted ? t("lockActive") : isExpired ? t("lockExpired") : t("lockActive")}
         </p>
       </div>
 
-      {isExpired ? (
+      {!mounted ? (
+        <CheckoutPayButton breakId={breakId} slotId={slotId} locale={locale} disabled />
+      ) : isExpired ? (
         <Link
           href={`/breaks/${breakId}`}
           className="inline-flex rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft"

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { SlotStatusBadgeClient } from "@/components/breaks/SlotStatusBadgeClient";
 import { formatPrice } from "@/lib/breaks/format";
-import { canUserCheckoutSlot, isSlotLockedByUser, normalizeSlotForDisplay } from "@/lib/slots/helpers";
+import { canUserCheckoutSlot, isSlotLockedByUser } from "@/lib/slots/helpers";
 import { useSlotPolling } from "@/hooks/useSlotPolling";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
 
@@ -40,8 +40,7 @@ export function SlotGridLive({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {slots.map((rawSlot) => {
-          const slot = normalizeSlotForDisplay(rawSlot);
+        {slots.map((slot) => {
           const canCheckout = canUserCheckoutSlot(slot, breakStatus, currentUserId);
           const isResume = isSlotLockedByUser(slot, currentUserId);
           const checkoutHref = `/checkout/start?breakId=${breakId}&slotId=${slot.id}`;
@@ -65,6 +64,7 @@ export function SlotGridLive({
                 {canCheckout ? (
                   <Link
                     href={checkoutHref}
+                    prefetch={isResume ? false : undefined}
                     className={`inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition ${
                       isResume
                         ? "border border-accent/40 bg-accent/10 text-accent-soft hover:border-accent hover:text-accent"
