@@ -2,15 +2,22 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { SlotStatusBadge } from "@/components/breaks/StatusBadge";
 import { formatPrice } from "@/lib/breaks/format";
+import { canUserCheckoutSlot, isSlotLockedByUser, normalizeSlotForDisplay } from "@/lib/slots/helpers";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
 
 type SlotGridProps = {
   breakId: string;
   breakStatus: BreakStatus;
   slots: BreakSlot[];
+  currentUserId?: string | null;
 };
 
-export async function SlotGrid({ breakId, breakStatus, slots }: SlotGridProps) {
+export async function SlotGrid({
+  breakId,
+  breakStatus,
+  slots,
+  currentUserId = null,
+}: SlotGridProps) {
   const t = await getTranslations("breaks");
 
   if (slots.length === 0) {
@@ -23,8 +30,10 @@ export async function SlotGrid({ breakId, breakStatus, slots }: SlotGridProps) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {slots.map((slot) => {
-        const canCheckout = breakStatus === "active" && slot.status === "available";
+      {slots.map((rawSlot) => {
+        const slot = normalizeSlotForDisplay(rawSlot);
+        const canCheckout = canUserCheckoutSlot(slot, breakStatus, currentUserId);
+        const isResume = isSlotLockedByUser(slot, currentUserId);
         const checkoutHref = `/checkout/start?breakId=${breakId}&slotId=${slot.id}`;
 
         return (
@@ -44,9 +53,13 @@ export async function SlotGrid({ breakId, breakStatus, slots }: SlotGridProps) {
               {canCheckout ? (
                 <Link
                   href={checkoutHref}
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft"
+                  className={`inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    isResume
+                      ? "border border-accent/40 bg-accent/10 text-accent-soft hover:border-accent hover:text-accent"
+                      : "bg-accent text-background hover:bg-accent-soft"
+                  }`}
                 >
-                  {t("checkout")}
+                  {isResume ? t("continueCheckout") : t("checkout")}
                 </Link>
               ) : (
                 <button

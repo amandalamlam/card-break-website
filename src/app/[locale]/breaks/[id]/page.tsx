@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
 import { SlotGrid } from "@/components/breaks/SlotGrid";
 import { getBreakById } from "@/lib/breaks/queries";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function BreakDetailPage({
   params,
@@ -17,6 +18,7 @@ export default async function BreakDetailPage({
     notFound();
   }
 
+  const user = await getCurrentUser();
   const t = await getTranslations("breaks");
 
   return (
@@ -53,6 +55,7 @@ export default async function BreakDetailPage({
           breakId={breakItem.id}
           breakStatus={breakItem.status}
           slots={breakItem.break_slots}
+          currentUserId={user?.id ?? null}
         />
       </section>
     </div>

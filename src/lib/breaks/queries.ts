@@ -1,11 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
+import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
+import { isSlotLockActive, normalizeSlotForDisplay } from "@/lib/slots/helpers";
 import type { Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
 
 function mapBreakListItem(
-  row: Break & { break_slots: { status: BreakSlot["status"] }[] }
+  row: Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] }
 ): BreakListItem {
   const total_count = row.break_slots.length;
-  const available_count = row.break_slots.filter((slot) => slot.status === "available").length;
+  const available_count = row.break_slots.filter(
+    (slot) => slot.status === "available" || (slot.status === "locked" && !isSlotLockActive(slot))
+  ).length;
 
   return {
     id: row.id,
@@ -21,11 +25,13 @@ function mapBreakListItem(
 }
 
 export async function getPublicBreaks(): Promise<BreakListItem[]> {
+  await releaseExpiredSlotLocks();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("breaks")
-    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status)")
+    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
     .in("status", ["active", "sold_out"])
     .order("created_at", { ascending: false });
 
@@ -33,10 +39,14 @@ export async function getPublicBreaks(): Promise<BreakListItem[]> {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row) => mapBreakListItem(row as Break & { break_slots: { status: BreakSlot["status"] }[] }));
+  return (data ?? []).map((row) =>
+    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] })
+  );
 }
 
 export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
+  await releaseExpiredSlotLocks();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -56,11 +66,15 @@ export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
 
   return {
     ...breakRow,
-    break_slots: (breakRow.break_slots ?? []).sort((a, b) => a.name.localeCompare(b.name)),
+    break_slots: (breakRow.break_slots ?? [])
+      .map(normalizeSlotForDisplay)
+      .sort((a, b) => a.name.localeCompare(b.name)),
   };
 }
 
 export async function getSlotById(slotId: string, breakId: string): Promise<BreakSlot | null> {
+  await releaseExpiredSlotLocks();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -74,20 +88,24 @@ export async function getSlotById(slotId: string, breakId: string): Promise<Brea
     return null;
   }
 
-  return data as BreakSlot;
+  return normalizeSlotForDisplay(data as BreakSlot);
 }
 
 export async function getAllBreaksForAdmin(): Promise<BreakListItem[]> {
+  await releaseExpiredSlotLocks();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("breaks")
-    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status)")
+    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
     .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row) => mapBreakListItem(row as Break & { break_slots: { status: BreakSlot["status"] }[] }));
+  return (data ?? []).map((row) =>
+    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status" | "locked_at">[] })
+  );
 }

@@ -59,6 +59,7 @@
     "slotsTitle": "Pick your slot",
     "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
     "checkout": "Checkout",
+    "continueCheckout": "Continue checkout",
     "soldOutSlot": "Sold",
     "lockedSlot": "Locked",
     "unavailable": "Unavailable",
