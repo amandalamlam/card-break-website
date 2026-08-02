@@ -60,6 +60,8 @@
     "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
     "checkout": "Checkout",
     "continueCheckout": "Continue checkout",
+    "liveConnected": "Live updates every 8 seconds",
+    "liveUpdating": "Updating…",
     "soldOutSlot": "Sold",
     "lockedSlot": "Locked",
     "unavailable": "Unavailable",

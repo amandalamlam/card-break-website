@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
-import { releaseSlotLock } from "@/lib/slots/locking";
+import { releaseExpiredSlotLocks, releaseSlotLock } from "@/lib/slots/locking";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "MISSING_SLOT_ID" }, { status: 400 });
   }
 
+  await releaseExpiredSlotLocks();
   const released = await releaseSlotLock(slotId, user.id);
 
   return NextResponse.json({ ok: true, released });

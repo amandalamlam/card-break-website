@@ -9,7 +9,8 @@
 - PostgreSQL functions: `lock_break_slot`, `release_slot_lock`, `release_expired_slot_locks`
 - `SELECT FOR UPDATE` prevents two users locking the same slot at the same millisecond
 - Checkout page auto-locks on load and shows a live **MM:SS countdown**
-- Expired locks auto-release via Vercel Cron (every minute)
+- Expired locks release via **lazy cleanup** on every `/api/slots` request (no cron required)
+- Break page **polls every 8 seconds** and pauses when the tab is hidden
 - Error UI when slot is sold or locked by someone else
 
 ---
@@ -24,25 +25,7 @@ You should see **Success**.
 
 ---
 
-## Step 2 — Add CRON_SECRET
-
-Generate a random string (e.g. `openssl rand -hex 32`).
-
-**Local `.env.local`:**
-```env
-CRON_SECRET=your-random-secret-here
-```
-
-**Vercel → Settings → Environment Variables:**
-- Key: `CRON_SECRET`
-- Value: same random string
-- Environments: Production + Preview
-
-Redeploy after adding.
-
----
-
-## Step 3 — Pull code and run locally
+## Step 2 — Pull code and run locally
 
 ```bash
 cd /Users/amanda/Desktop/card-break-website
@@ -53,7 +36,7 @@ npm run dev
 
 ---
 
-## Step 4 — Test the lock flow
+## Step 3 — Test the lock flow
 
 ### A. Basic lock + countdown
 
@@ -76,19 +59,30 @@ npm run dev
 ### D. Expiry
 
 1. Wait for countdown to hit **00:00** (or test with a short lock in dev)
-2. Slot returns to **可購買 / Available** on the break page
+2. Slot returns to **可購買 / Available** on the break page within ~8 seconds (live polling)
 
 ---
 
-## Step 5 — Deploy
+## Step 4 — Deploy
 
 ```bash
 git add .
-git commit -m "Phase 4: 8-minute slot locking with countdown and cron release"
+git commit -m "Phase 4: slot locking with lazy release and live polling"
 git push
 ```
 
-`vercel.json` configures a cron job at `/api/cron/release-locks` every minute.
+No Vercel cron configuration is required (`vercel.json` is empty).
+
+---
+
+## How lazy release works
+
+| Trigger | Action |
+|---------|--------|
+| `GET /api/slots?breakId=...` | Runs `release_expired_slot_locks()` then returns fresh slots |
+| Break page load | Same lazy release via server-side fetch |
+| Checkout countdown hits 0 | Calls `/api/slots` + `/api/slots/release` |
+| Slot grid polling | Every **8 seconds** while tab is focused |
 
 ---
 
@@ -97,7 +91,7 @@ git push
 | Issue | Fix |
 |-------|-----|
 | `function lock_break_slot does not exist` | Run `supabase/phase4_slot_locking.sql` |
-| Lock never releases | Check `CRON_SECRET` on Vercel; verify cron in Vercel dashboard |
+| Lock never releases | Open break page (polling triggers lazy release); run `phase4_slot_locking_fix.sql` |
 | Countdown shows but slot not locked in DB | Check Supabase logs; verify `SUPABASE_SERVICE_ROLE_KEY` in env |
 | Everyone can lock same slot | RPC not applied — re-run SQL migration |
 

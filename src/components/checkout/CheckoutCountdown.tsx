@@ -45,6 +45,8 @@ export function CheckoutCountdown({ expiresAt, slotId, breakId, locale }: Checko
 
     async function notifyExpired() {
       try {
+        // Lazy-release via slots API (no cron required)
+        await fetch(`/api/slots?breakId=${breakId}`, { cache: "no-store" });
         await fetch("/api/slots/release", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -56,7 +58,7 @@ export function CheckoutCountdown({ expiresAt, slotId, breakId, locale }: Checko
     }
 
     void notifyExpired();
-  }, [remainingSeconds, released, slotId]);
+  }, [remainingSeconds, released, slotId, breakId]);
 
   const isExpired = remainingSeconds <= 0;
   const isUrgent = remainingSeconds > 0 && remainingSeconds <= 60;

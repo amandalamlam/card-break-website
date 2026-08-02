@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
-import { SlotGrid } from "@/components/breaks/SlotGrid";
+import { SlotGridLive } from "@/components/breaks/SlotGridLive";
 import { getBreakById } from "@/lib/breaks/queries";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -51,10 +51,10 @@ export default async function BreakDetailPage({
           <h2 className="text-2xl font-semibold">{t("slotsTitle")}</h2>
           <p className="mt-2 text-sm text-muted">{t("slotsSubtitle")}</p>
         </div>
-        <SlotGrid
+        <SlotGridLive
           breakId={breakItem.id}
           breakStatus={breakItem.status}
-          slots={breakItem.break_slots}
+          initialSlots={breakItem.break_slots}
           currentUserId={user?.id ?? null}
         />
       </section>

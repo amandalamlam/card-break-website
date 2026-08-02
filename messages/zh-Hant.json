@@ -60,6 +60,8 @@
     "slotsSubtitle": "可用位置可點擊 Checkout。已售出或鎖定中的位置無法購買。",
     "checkout": "Checkout",
     "continueCheckout": "繼續結帳",
+    "liveConnected": "即時更新中（每 8 秒）",
+    "liveUpdating": "正在更新…",
     "soldOutSlot": "已售出",
     "lockedSlot": "鎖定中",
     "unavailable": "不可購買",

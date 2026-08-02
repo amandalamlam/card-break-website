@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchBreakSlotsWithLazyRelease } from "@/lib/slots/fetch-slots";
 import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
 import { isSlotLockActive, normalizeSlotForDisplay } from "@/lib/slots/helpers";
 import type { Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
@@ -45,15 +46,11 @@ export async function getPublicBreaks(): Promise<BreakListItem[]> {
 }
 
 export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
-  await releaseExpiredSlotLocks();
-
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("breaks")
-    .select(
-      "id, title, description, image_url, status, video_url, created_at, break_slots(id, break_id, name, price, status, user_id, locked_at)"
-    )
+    .select("id, title, description, image_url, status, video_url, created_at")
     .eq("id", id)
     .in("status", ["active", "sold_out"])
     .single();
@@ -62,13 +59,11 @@ export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
     return null;
   }
 
-  const breakRow = data as Break & { break_slots: BreakSlot[] };
+  const { slots } = await fetchBreakSlotsWithLazyRelease(id);
 
   return {
-    ...breakRow,
-    break_slots: (breakRow.break_slots ?? [])
-      .map(normalizeSlotForDisplay)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+    ...(data as Break),
+    break_slots: slots,
   };
 }
 
