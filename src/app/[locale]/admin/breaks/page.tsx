@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
+import { CancelBreakButton } from "@/components/admin/CancelBreakButton";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { getAllBreaksForAdmin } from "@/lib/breaks/queries";
 import type { AppLocale } from "@/i18n/routing";
@@ -50,12 +51,17 @@ export default async function AdminBreaksPage({
                 })}
               </p>
             </div>
-            <Link
-              href={`/breaks/${breakItem.id}`}
-              className="rounded-lg border border-border px-4 py-2 text-sm text-muted transition hover:text-foreground"
-            >
-              {t("viewPublicPage")}
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={`/breaks/${breakItem.id}`}
+                className="rounded-lg border border-border px-4 py-2 text-sm text-muted transition hover:text-foreground"
+              >
+                {t("viewPublicPage")}
+              </Link>
+              {breakItem.status === "active" || breakItem.status === "sold_out" ? (
+                <CancelBreakButton breakId={breakItem.id} breakTitle={breakItem.title} />
+              ) : null}
+            </div>
           </article>
         ))}
       </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { CheckoutPayButton } from "./CheckoutPayButton";
+import { CheckoutPayment } from "./CheckoutPayment";
 import { getLockRemainingSeconds } from "@/lib/slots/time";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -12,6 +12,8 @@ type CheckoutCountdownProps = {
   slotId: string;
   breakId: string;
   locale: AppLocale;
+  slotPrice: number;
+  availableCredit: number;
 };
 
 function formatRemaining(totalSeconds: number): string {
@@ -20,7 +22,14 @@ function formatRemaining(totalSeconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function CheckoutCountdown({ lockedAt, slotId, breakId, locale }: CheckoutCountdownProps) {
+export function CheckoutCountdown({
+  lockedAt,
+  slotId,
+  breakId,
+  locale,
+  slotPrice,
+  availableCredit,
+}: CheckoutCountdownProps) {
   const t = useTranslations("checkout");
   // null = not yet synced on client (avoids SSR/hydration mismatch + false expiry)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
@@ -89,7 +98,14 @@ export function CheckoutCountdown({ lockedAt, slotId, breakId, locale }: Checkou
       </div>
 
       {!mounted ? (
-        <CheckoutPayButton breakId={breakId} slotId={slotId} locale={locale} disabled />
+        <CheckoutPayment
+          breakId={breakId}
+          slotId={slotId}
+          locale={locale}
+          slotPrice={slotPrice}
+          availableCredit={availableCredit}
+          disabled
+        />
       ) : isExpired ? (
         <Link
           href={`/breaks/${breakId}`}
@@ -98,10 +114,12 @@ export function CheckoutCountdown({ lockedAt, slotId, breakId, locale }: Checkou
           {t("backToBreak")}
         </Link>
       ) : (
-        <CheckoutPayButton
+        <CheckoutPayment
           breakId={breakId}
           slotId={slotId}
           locale={locale}
+          slotPrice={slotPrice}
+          availableCredit={availableCredit}
           disabled={isExpired}
         />
       )}

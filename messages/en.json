@@ -42,9 +42,29 @@
     "subtitle": "View your profile and wallet balance",
     "email": "Email",
     "phone": "Phone",
-    "wallet": "Wallet balance",
+    "wallet": "Available balance",
+    "walletReserved": "Reserved at checkout",
+    "walletNote": "If a break is cancelled, 100% of what you paid is credited to your on-site wallet (no Stripe refund). You can spend wallet credit at checkout — full credit checkout has zero gateway fees.",
     "role": "Account type",
-    "phaseNote": "Phase 3 complete: public break listings. Phase 4 adds the 8-minute slot lock."
+    "transactionsTitle": "Wallet activity",
+    "transactionsSubtitle": "Recent refunds, purchases, and releases",
+    "noTransactions": "No wallet activity yet.",
+    "walletActivity": {
+      "positionsUnit": " slots",
+      "paymentBreakdown": {
+        "creditFull": "Paid fully with wallet credit",
+        "hybrid": "Mixed payment (credit {credit} + Stripe {stripe})",
+        "stripeFull": "Paid fully via Stripe",
+        "stripePartial": "Stripe payment: {amount}"
+      }
+    },
+    "transactionTypes": {
+      "cancellation_refund": "Cancellation refund",
+      "purchase": "Purchase",
+      "checkout_release": "Checkout release",
+      "admin_adjustment": "Admin adjustment"
+    },
+    "phaseNote": "Phase 6: on-site wallet and cancellation credits are live."
   },
   "breaks": {
     "listTitle": "Live Breaks",
@@ -82,11 +102,27 @@
     "lockedBadge": "Slot locked",
     "authenticatedBadge": "Signed in — ready for checkout",
     "title": "Your slot is locked",
-    "subtitle": "Complete Stripe payment before the timer expires.",
+    "subtitle": "Complete payment before the timer expires. Use wallet credit, Stripe, or both.",
+    "walletHint": "Your available wallet balance: {balance}",
+    "walletAvailable": "Available wallet balance",
+    "useMaxCredit": "Use maximum available credit",
+    "creditToApply": "Credit to apply (HKD)",
+    "creditApplied": "Credit applied",
+    "stripeDue": "Due via Stripe",
+    "noWalletCredit": "You have no wallet credit yet. Payment will go through Stripe.",
     "payButton": "Pay with Stripe",
-    "payProcessing": "Redirecting to Stripe…",
+    "payWithCredit": "Confirm with wallet credit",
+    "payMixed": "Pay with credit + Stripe",
+    "payProcessing": "Processing…",
     "payError": "Could not start payment. Make sure your lock is still active and try again.",
     "payHint": "Cards · Apple Pay · Google Pay supported via Stripe",
+    "creditOnlyHint": "Paid fully with wallet credit — no Stripe gateway fees.",
+    "paymentErrors": {
+      "INSUFFICIENT_CREDIT": "Insufficient wallet balance.",
+      "CREDIT_EXCEEDS_PRICE": "Credit cannot exceed the slot price.",
+      "LOCK_EXPIRED": "Your lock expired. Go back and pick a slot again.",
+      "SLOT_UNAVAILABLE": "This slot is not available for purchase."
+    },
     "breakLabel": "Break",
     "slotLabel": "Slot",
     "priceLabel": "Price",
@@ -94,13 +130,22 @@
     "lockActive": "This slot is reserved for you for 8 minutes. It releases automatically when the timer ends.",
     "lockExpired": "The lock expired and the slot was released. Go back and pick a slot again.",
     "backToBreak": "Back to break",
-    "phaseNote": "Phase 5: Stripe payments are live. Webhook confirmation marks the slot as sold.",
+    "phaseNote": "Phase 6: wallet credit, mixed checkout, and cancellation refunds are live.",
     "success": {
       "title": "Payment successful!",
       "subtitle": "Your slot is confirmed. After the live break, choose shipping from your account.",
       "breakLabel": "Break",
       "slotLabel": "Slot",
       "priceLabel": "Amount paid",
+      "creditLabel": "Paid with wallet credit",
+      "stripeLabel": "Paid via Stripe",
+      "paymentMethodLabel": "Payment method",
+      "itemsMulti": "{count} slots",
+      "paymentMethods": {
+        "credit": "Wallet credit only",
+        "stripe": "Stripe only",
+        "hybrid": "Mixed payment"
+      },
       "viewBreak": "View break",
       "viewAccount": "My account"
     },
@@ -130,7 +175,12 @@
     "slotsHint": "One slot per line: Name,Price (e.g. Lakers,300)",
     "submitting": "Creating…",
     "viewPublicPage": "View public page",
-    "slotsSummary": "{available} / {total} available"
+    "slotsSummary": "{available} / {total} available",
+    "cancelBreak": "Cancel break (refund to wallet)",
+    "cancellingBreak": "Cancelling…",
+    "cancelBreakConfirm": "Cancel \"{title}\"? All paid orders will be refunded 100% to user wallets (no Stripe refund).",
+    "cancelBreakSuccess": "Break cancelled. Refunded {count} order(s) to user wallets.",
+    "cancelBreakError": "Could not cancel this break. Please try again."
   },
   "home": {
     "badge": "Hong Kong Card Break Platform",

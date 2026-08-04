@@ -6,14 +6,19 @@ import { getStripe, toStripeAmount } from "@/lib/stripe/server";
 import {
   buildCheckoutCancelUrl,
   buildCheckoutSuccessUrl,
+  buildCheckoutSuccessUrlCreditOnly,
 } from "@/lib/stripe/checkout-urls";
 import { validateUserLock } from "@/lib/stripe/orders";
+import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
+import { createCheckoutOrder, fulfillCreditOnlyOrder } from "@/lib/wallet/credit";
+import { getCurrentProfile } from "@/lib/auth/session";
 import type { AppLocale } from "@/i18n/routing";
 
-type CheckoutBody = {
+type CheckoutPayBody = {
   breakId?: string;
   slotId?: string;
   locale?: AppLocale;
+  creditAmount?: number;
 };
 
 export async function POST(request: Request) {
@@ -24,8 +29,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const body = (await request.json()) as CheckoutBody;
-    const { breakId, slotId, locale = "zh-Hant" } = body;
+    const profile = await getCurrentProfile();
+    if (!profile) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
+    const body = (await request.json()) as CheckoutPayBody;
+    const { breakId, slotId, locale = "zh-Hant", creditAmount = 0 } = body;
 
     if (!breakId || !slotId) {
       return NextResponse.json({ error: "MISSING_PARAMS" }, { status: 400 });
@@ -43,26 +53,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "SLOT_UNAVAILABLE" }, { status: 409 });
     }
 
-    const admin = createAdminClient();
+    const slotPrice = Number(slot.price);
+    const appliedCredit = roundMoney(
+      clampCreditAmount(Number(creditAmount), slotPrice, Number(profile.store_credit))
+    );
+    const stripeAmount = roundMoney(slotPrice - appliedCredit);
 
-    const { data: order, error: orderError } = await admin
-      .from("orders")
-      .insert({
-        user_id: user.id,
-        break_id: breakId,
-        slot_id: slotId,
-        amount: slot.price,
-        currency: "hkd",
-        status: "pending",
-      })
-      .select("id")
-      .single();
+    const orderResult = await createCheckoutOrder(user.id, breakId, slotId, appliedCredit);
 
-    if (orderError || !order) {
-      return NextResponse.json({ error: orderError?.message ?? "ORDER_CREATE_FAILED" }, { status: 500 });
+    if (!orderResult.ok) {
+      return NextResponse.json({ error: orderResult.code }, { status: 409 });
+    }
+
+    const orderId = orderResult.orderId;
+
+    if (stripeAmount <= 0) {
+      await fulfillCreditOnlyOrder(orderId);
+
+      return NextResponse.json({
+        type: "credit",
+        orderId,
+        successUrl: buildCheckoutSuccessUrlCreditOnly(locale, orderId),
+      });
     }
 
     const stripe = getStripe();
+    const admin = createAdminClient();
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -72,35 +88,45 @@ export async function POST(request: Request) {
           quantity: 1,
           price_data: {
             currency: "hkd",
-            unit_amount: toStripeAmount(Number(slot.price)),
+            unit_amount: toStripeAmount(stripeAmount),
             product_data: {
               name: `${breakItem.title} — ${slot.name}`,
-              description: `Card break slot: ${slot.name}`,
+              description:
+                appliedCredit > 0
+                  ? `Card break slot (store credit applied: HK$${appliedCredit.toFixed(2)})`
+                  : `Card break slot: ${slot.name}`,
             },
           },
         },
       ],
-      success_url: buildCheckoutSuccessUrl(locale, order.id),
+      success_url: buildCheckoutSuccessUrl(locale, orderId),
       cancel_url: buildCheckoutCancelUrl(locale, breakId, slotId),
-      client_reference_id: order.id,
+      client_reference_id: orderId,
       metadata: {
-        order_id: order.id,
+        order_id: orderId,
         break_id: breakId,
         slot_id: slotId,
         user_id: user.id,
+        credit_amount: String(appliedCredit),
       },
     });
 
     await admin
       .from("orders")
       .update({ stripe_checkout_session_id: session.id })
-      .eq("id", order.id);
+      .eq("id", orderId);
 
     if (!session.url) {
       return NextResponse.json({ error: "STRIPE_SESSION_FAILED" }, { status: 500 });
     }
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({
+      type: "stripe",
+      orderId,
+      url: session.url,
+      creditAmount: appliedCredit,
+      stripeAmount,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });

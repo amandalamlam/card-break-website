@@ -42,9 +42,29 @@
     "subtitle": "查看个人资料及钱包余额",
     "email": "邮箱",
     "phone": "电话",
-    "wallet": "钱包余额",
+    "wallet": "可用余额",
+    "walletReserved": "结账冻结中",
+    "walletNote": "流局取消后，已付款金额会 100% 退回网站钱包（不经 Stripe 退款）。结账时可使用余额，全额余额支付则免手续费。",
     "role": "账户类型",
-    "phaseNote": "Phase 3 已完成：公开开箱列表。Phase 4 将加入 8 分钟锁位倒数。"
+    "transactionsTitle": "钱包记录",
+    "transactionsSubtitle": "最近的退款、消费及释放记录",
+    "noTransactions": "暂时没有钱包记录。",
+    "walletActivity": {
+      "positionsUnit": " 个位置",
+      "paymentBreakdown": {
+        "creditFull": "全额余额支付",
+        "hybrid": "混合支付 (余额 {credit} + Stripe {stripe})",
+        "stripeFull": "全额 Stripe 支付",
+        "stripePartial": "Stripe 支付: {amount}"
+      }
+    },
+    "transactionTypes": {
+      "cancellation_refund": "流局退款",
+      "purchase": "购买扣款",
+      "checkout_release": "结账释放",
+      "admin_adjustment": "管理员调整"
+    },
+    "phaseNote": "Phase 6：网站钱包及流局退款已接入。"
   },
   "breaks": {
     "listTitle": "进行中的开箱",
@@ -82,11 +102,27 @@
     "lockedBadge": "位置已锁定",
     "authenticatedBadge": "已登录 — 准备结账",
     "title": "你的位置已锁定",
-    "subtitle": "请在倒数结束前完成 Stripe 付款。",
+    "subtitle": "请在倒数结束前完成付款。可使用网站钱包余额或 Stripe。",
+    "walletHint": "你的可用钱包余额：{balance}",
+    "walletAvailable": "可用钱包余额",
+    "useMaxCredit": "使用最高可用余额",
+    "creditToApply": "使用余额（HKD）",
+    "creditApplied": "余额抵扣",
+    "stripeDue": "Stripe 应付",
+    "noWalletCredit": "你目前没有可用钱包余额，将以 Stripe 付款。",
     "payButton": "前往 Stripe 付款",
-    "payProcessing": "正在前往 Stripe…",
+    "payWithCredit": "使用余额立即确认",
+    "payMixed": "余额 + Stripe 付款",
+    "payProcessing": "正在处理…",
     "payError": "无法开始付款，请确认锁位仍然有效并重试。",
     "payHint": "支持信用卡 · Apple Pay · Google Pay（由 Stripe 提供）",
+    "creditOnlyHint": "全额以网站余额支付，无需 Stripe 手续费。",
+    "paymentErrors": {
+      "INSUFFICIENT_CREDIT": "钱包余额不足。",
+      "CREDIT_EXCEEDS_PRICE": "使用余额不能超过位置价格。",
+      "LOCK_EXPIRED": "锁定已过期，请返回重新选择位置。",
+      "SLOT_UNAVAILABLE": "此位置目前无法购买。"
+    },
     "breakLabel": "开箱",
     "slotLabel": "位置",
     "priceLabel": "价格",
@@ -94,13 +130,22 @@
     "lockActive": "此位置为你保留 8 分钟。倒数结束后将自动释放。",
     "lockExpired": "锁定时间已过，位置已释放。请返回开箱页重新选择。",
     "backToBreak": "返回开箱页面",
-    "phaseNote": "Phase 5：Stripe 付款已接入。Webhook 确认后位置会标记为已售出。",
+    "phaseNote": "Phase 6：网站钱包、混合付款及流局退款已接入。",
     "success": {
       "title": "付款成功！",
       "subtitle": "你的位置已确认。等待直播开箱后，可于账户内选择寄送方式。",
       "breakLabel": "开箱",
       "slotLabel": "位置",
       "priceLabel": "已付金额",
+      "creditLabel": "其中使用余额",
+      "stripeLabel": "Stripe 支付",
+      "paymentMethodLabel": "付款方式",
+      "itemsMulti": "{count} 个位置",
+      "paymentMethods": {
+        "credit": "全额余额",
+        "stripe": "全额 Stripe",
+        "hybrid": "混合支付"
+      },
       "viewBreak": "查看开箱",
       "viewAccount": "我的账户"
     },
@@ -130,7 +175,12 @@
     "slotsHint": "每行一个位置：名称,价格（例如 Lakers,300）",
     "submitting": "创建中…",
     "viewPublicPage": "查看公开页面",
-    "slotsSummary": "{available} / {total} 个可售"
+    "slotsSummary": "{available} / {total} 个可售",
+    "cancelBreak": "取消开箱（流局退款）",
+    "cancellingBreak": "正在取消…",
+    "cancelBreakConfirm": "确定要取消「{title}」吗？所有已付款将 100% 退回用户钱包（不经 Stripe 退款）。",
+    "cancelBreakSuccess": "已取消开箱，并退回 {count} 笔订单至用户钱包。",
+    "cancelBreakError": "无法取消此开箱，请稍后再试。"
   },
   "home": {
     "badge": "香港卡牌开箱平台",
@@ -143,7 +193,7 @@
       "wallet": "流局自动退回钱包",
       "shipping": "开箱后再选寄送"
     },
-    "phaseNote": "Phase 4 已完成：8 分钟位置锁定。下一步：Phase 5 Stripe 付款。"
+    "phaseNote": "Phase 6 已完成：网站钱包及流局退款。下一步：Phase 7 提现申请。"
   },
   "footer": {
     "tagline": "专为香港及海外收藏家而设",

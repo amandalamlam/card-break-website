@@ -42,9 +42,29 @@
     "subtitle": "查看個人資料及錢包餘額",
     "email": "電郵",
     "phone": "電話",
-    "wallet": "錢包餘額",
+    "wallet": "可用餘額",
+    "walletReserved": "結帳凍結中",
+    "walletNote": "流局取消後，已付款金額會 100% 退回網站錢包（不經 Stripe 退款）。結帳時可使用餘額，全額餘額支付則免手續費。",
     "role": "帳戶類型",
-    "phaseNote": "Phase 3 已完成：公開開箱列表。Phase 4 已加入 8 分鐘鎖位。"
+    "transactionsTitle": "錢包紀錄",
+    "transactionsSubtitle": "最近的退款、消費及釋放紀錄",
+    "noTransactions": "暫時沒有錢包紀錄。",
+    "walletActivity": {
+      "positionsUnit": " 個位置",
+      "paymentBreakdown": {
+        "creditFull": "全額餘額支付",
+        "hybrid": "混合支付 (餘額 {credit} + Stripe {stripe})",
+        "stripeFull": "全額 Stripe 支付",
+        "stripePartial": "Stripe 支付: {amount}"
+      }
+    },
+    "transactionTypes": {
+      "cancellation_refund": "流局退款",
+      "purchase": "購買扣款",
+      "checkout_release": "結帳釋放",
+      "admin_adjustment": "管理員調整"
+    },
+    "phaseNote": "Phase 6：網站錢包及流局退款已接入。"
   },
   "breaks": {
     "listTitle": "進行中的開箱",
@@ -82,11 +102,27 @@
     "lockedBadge": "位置已鎖定",
     "authenticatedBadge": "已登入 — 準備結帳",
     "title": "你的位置已鎖定",
-    "subtitle": "請在倒數結束前完成 Stripe 付款。",
+    "subtitle": "請在倒數結束前完成付款。可使用網站錢包餘額或 Stripe。",
+    "walletHint": "你的可用錢包餘額：{balance}",
+    "walletAvailable": "可用錢包餘額",
+    "useMaxCredit": "使用最高可用餘額",
+    "creditToApply": "使用餘額（HKD）",
+    "creditApplied": "餘額抵扣",
+    "stripeDue": "Stripe 應付",
+    "noWalletCredit": "你目前沒有可用錢包餘額，將以 Stripe 付款。",
     "payButton": "前往 Stripe 付款",
-    "payProcessing": "正在前往 Stripe…",
+    "payWithCredit": "使用餘額立即確認",
+    "payMixed": "餘額 + Stripe 付款",
+    "payProcessing": "正在處理…",
     "payError": "無法開始付款，請確認鎖位仍然有效並重試。",
     "payHint": "支援信用卡 · Apple Pay · Google Pay（由 Stripe 提供）",
+    "creditOnlyHint": "全額以網站餘額支付，無需 Stripe 手續費。",
+    "paymentErrors": {
+      "INSUFFICIENT_CREDIT": "錢包餘額不足。",
+      "CREDIT_EXCEEDS_PRICE": "使用餘額不能超過位置價格。",
+      "LOCK_EXPIRED": "鎖定已過期，請返回重新選擇位置。",
+      "SLOT_UNAVAILABLE": "此位置目前無法購買。"
+    },
     "breakLabel": "開箱",
     "slotLabel": "位置",
     "priceLabel": "價格",
@@ -94,13 +130,22 @@
     "lockActive": "此位置為你保留 8 分鐘。倒數結束後將自動釋放。",
     "lockExpired": "鎖定時間已過，位置已釋放。請返回開箱頁重新選擇。",
     "backToBreak": "返回開箱頁面",
-    "phaseNote": "Phase 5：Stripe 付款已接入。Webhook 確認後位置會標記為已售出。",
+    "phaseNote": "Phase 6：網站錢包、混合付款及流局退款已接入。",
     "success": {
       "title": "付款成功！",
       "subtitle": "你的位置已確認。等待直播開箱後，可於帳戶內選擇寄送方式。",
       "breakLabel": "開箱",
       "slotLabel": "位置",
       "priceLabel": "已付金額",
+      "creditLabel": "其中使用餘額",
+      "stripeLabel": "Stripe 支付",
+      "paymentMethodLabel": "付款方式",
+      "itemsMulti": "{count} 個位置",
+      "paymentMethods": {
+        "credit": "全額餘額",
+        "stripe": "全額 Stripe",
+        "hybrid": "混合支付"
+      },
       "viewBreak": "查看開箱",
       "viewAccount": "我的帳戶"
     },
@@ -130,7 +175,12 @@
     "slotsHint": "每行一個位置：名稱,價格（例如 Lakers,300）",
     "submitting": "建立中…",
     "viewPublicPage": "查看公開頁面",
-    "slotsSummary": "{available} / {total} 個可售"
+    "slotsSummary": "{available} / {total} 個可售",
+    "cancelBreak": "取消開箱（流局退款）",
+    "cancellingBreak": "正在取消…",
+    "cancelBreakConfirm": "確定要取消「{title}」嗎？所有已付款將 100% 退回用戶錢包（不經 Stripe 退款）。",
+    "cancelBreakSuccess": "已取消開箱，並退回 {count} 筆訂單至用戶錢包。",
+    "cancelBreakError": "無法取消此開箱，請稍後再試。"
   },
   "home": {
     "badge": "香港卡牌開箱平台",
@@ -143,7 +193,7 @@
       "wallet": "流局自動退回錢包",
       "shipping": "開箱後再選寄送"
     },
-    "phaseNote": "Phase 4 已完成：8 分鐘位置鎖定。下一步：Phase 5 Stripe 付款。"
+    "phaseNote": "Phase 6 已完成：網站錢包及流局退款。下一步：Phase 7 提現申請。"
   },
   "footer": {
     "tagline": "專為香港及海外收藏家而設",
