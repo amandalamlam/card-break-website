@@ -21,6 +21,7 @@ Supabase → **SQL Editor** → run in order:
 
 1. `supabase/phase6_wallet.sql`
 2. `supabase/phase6b_wallet_relational.sql` — order_items, wallet_transactions, payment breakdown
+3. `supabase/phase6c_checkout_credit_release.sql` — release `credit_reserved` when slot locks expire or are cancelled
 
 ---
 

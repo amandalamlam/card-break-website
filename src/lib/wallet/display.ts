@@ -117,7 +117,9 @@ export function buildWalletActivityViewModel(
 
   const metadata = paymentBreakdown
     ? `${formattedDate} • ${paymentBreakdown}`
-    : formattedDate;
+    : tx.description.trim()
+      ? `${formattedDate} • ${tx.description}`
+      : formattedDate;
 
   return {
     id: tx.id,

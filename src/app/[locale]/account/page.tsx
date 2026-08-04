@@ -1,15 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { WalletActivityList } from "@/components/account/WalletActivityList";
-import { WithdrawalForm } from "@/components/account/WithdrawalForm";
-import { WithdrawalHistory } from "@/components/account/WithdrawalHistory";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/breaks/format";
 import { getUserWalletTransactions } from "@/lib/wallet/credit";
 import { buildWalletActivityViewModel } from "@/lib/wallet/display";
 import { parseWalletBalance } from "@/lib/wallet/types";
-import { getUserWithdrawals } from "@/lib/wallet/withdrawal-actions";
 import type { AppLocale } from "@/i18n/routing";
 
 type AccountPageProps = {
@@ -34,7 +31,6 @@ export default async function AccountPage({ params }: AccountPageProps) {
   const { email, phone, role } = profile;
   const wallet = parseWalletBalance(profile);
   const transactions = await getUserWalletTransactions(user.id, 10);
-  const withdrawals = await getUserWithdrawals(user.id, 10);
   const t = await getTranslations("account");
 
   const walletActivityCopy = {
@@ -78,9 +74,14 @@ export default async function AccountPage({ params }: AccountPageProps) {
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-muted">{t("wallet")}</p>
-            <p className="mt-1 text-2xl font-semibold text-accent-soft">
-              {formatPrice(wallet.availableCredit)}
-            </p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p className="text-2xl font-semibold text-accent-soft">
+                {formatPrice(wallet.availableCredit)}
+              </p>
+              <Link href="/account/withdraw" className="withdraw-action-link">
+                <span className="withdraw-action-link__label">{t("withdrawals.openAction")}</span>
+              </Link>
+            </div>
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-muted">{t("walletReserved")}</p>
@@ -99,28 +100,18 @@ export default async function AccountPage({ params }: AccountPageProps) {
 
       <section className="mt-8 space-y-4">
         <div>
-          <h2 className="text-xl font-semibold">{t("withdrawals.title")}</h2>
-          <p className="mt-1 text-sm text-muted">{t("withdrawals.subtitle")}</p>
-        </div>
-
-        <div className="glass-panel rounded-3xl p-8">
-          <WithdrawalForm availableCredit={wallet.availableCredit} />
-        </div>
-
-        <WithdrawalHistory
-          withdrawals={withdrawals}
-          locale={locale}
-          noWithdrawals={t("withdrawals.noWithdrawals")}
-        />
-      </section>
-
-      <section className="mt-8 space-y-4">
-        <div>
           <h2 className="text-xl font-semibold">{t("transactionsTitle")}</h2>
           <p className="mt-1 text-sm text-muted">{t("transactionsSubtitle")}</p>
         </div>
 
         <WalletActivityList activities={activities} noTransactions={t("noTransactions")} />
+
+        <Link
+          href="/account/wallet-history"
+          className="inline-flex items-center gap-1 text-sm font-medium text-accent-soft transition hover:text-accent"
+        >
+          {t("viewFullHistory")}
+        </Link>
       </section>
     </div>
   );

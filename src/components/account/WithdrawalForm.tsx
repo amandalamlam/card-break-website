@@ -101,7 +101,7 @@ export function WithdrawalForm({ availableCredit, disabled = false }: Withdrawal
               setAmountInput(event.target.value);
             }}
             disabled={disabled || loading || useMaxAmount}
-            className="w-full max-w-xs rounded-xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-accent/50 md:w-auto"
+            className="input-no-spin w-full max-w-xs rounded-xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-accent/50 md:w-auto"
             placeholder="0.00"
           />
           <label className="flex items-center gap-2 text-sm text-muted">
@@ -122,7 +122,7 @@ export function WithdrawalForm({ availableCredit, disabled = false }: Withdrawal
           value={method}
           onChange={(event) => setMethod(event.target.value as WithdrawalMethod)}
           disabled={disabled || loading}
-          className="mt-2 w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-accent/50 md:max-w-xs"
+          className="form-select mt-2 w-full md:max-w-xs"
         >
           {METHODS.map((option) => (
             <option key={option} value={option}>

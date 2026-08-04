@@ -40,4 +40,46 @@
   .text-gradient-gold {
     @apply bg-gradient-to-r from-accent-soft to-accent bg-clip-text text-transparent;
   }
+
+  .input-no-spin {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .input-no-spin::-webkit-outer-spin-button,
+  .input-no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .form-select {
+    @apply appearance-none rounded-xl border border-border bg-background/50 px-4 py-3 pr-10 text-sm text-foreground outline-none transition focus:border-accent/50;
+    color-scheme: dark;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239aa8c0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+  }
+
+  .form-select:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .form-select option {
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+  }
+
+  .withdraw-action-link {
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full p-px bg-gradient-to-r from-amber-200/60 via-amber-300 to-amber-400/60 text-xs font-medium transition-all duration-300 focus:outline-none;
+  }
+
+  .withdraw-action-link__label {
+    @apply rounded-full bg-slate-900 px-3 py-1.5 font-medium text-white transition-all duration-300;
+  }
+
+  .withdraw-action-link:hover .withdraw-action-link__label,
+  .withdraw-action-link:active .withdraw-action-link__label {
+    @apply bg-transparent text-slate-950;
+  }
 }

@@ -50,6 +50,29 @@
     "transactionsTitle": "钱包记录",
     "transactionsSubtitle": "最近的退款、消费及释放记录",
     "noTransactions": "暂时没有钱包记录。",
+    "viewFullHistory": "查看完整历史记录 →",
+    "walletHistory": {
+      "title": "钱包完整记录",
+      "subtitle": "筛选及查阅过去 24 个月的钱包交易记录。",
+      "backToAccount": "← 返回我的账户",
+      "startMonth": "开始月份",
+      "endMonth": "结束月份",
+      "typeFilter": "交易类型",
+      "searchLabel": "关键字搜索",
+      "searchPlaceholder": "开箱标题、位置或描述",
+      "applyFilters": "应用筛选",
+      "loading": "加载记录中…",
+      "loadError": "无法加载钱包记录，请稍后再试。",
+      "noTransactions": "没有符合筛选条件的交易记录。",
+      "prevPage": "← 上一页",
+      "nextPage": "下一页 →",
+      "types": {
+        "all": "全部类型",
+        "purchase": "购买扣款",
+        "cancellation_refund": "流局退款",
+        "withdrawal": "提现记录"
+      }
+    },
     "walletActivity": {
       "positionsUnit": " 个位置",
       "paymentBreakdown": {
@@ -70,6 +93,12 @@
     "withdrawals": {
       "title": "申请提现",
       "subtitle": "通过 FPS、PayMe 或 PayPal 提取钱包余额。提交后金额会立即从可用余额扣除，待管理员审批。",
+      "openAction": "申请提现",
+      "pageTitle": "提现",
+      "backToAccount": "← 返回我的账户",
+      "availableBalance": "可用余额",
+      "historyTitle": "提现记录",
+      "historySubtitle": "查看待审批、已完成及已拒绝的申请。",
       "amountLabel": "金额 (HKD)",
       "useMaxAmount": "提取全部余额 ({amount})",
       "methodLabel": "收款方式",

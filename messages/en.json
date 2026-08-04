@@ -50,6 +50,29 @@
     "transactionsTitle": "Wallet activity",
     "transactionsSubtitle": "Recent refunds, purchases, and releases",
     "noTransactions": "No wallet activity yet.",
+    "viewFullHistory": "View full history →",
+    "walletHistory": {
+      "title": "Wallet history",
+      "subtitle": "Browse and filter wallet transactions from the past 24 months.",
+      "backToAccount": "← Back to My Account",
+      "startMonth": "Start month",
+      "endMonth": "End month",
+      "typeFilter": "Transaction type",
+      "searchLabel": "Keyword search",
+      "searchPlaceholder": "Break title, position, or description",
+      "applyFilters": "Apply filters",
+      "loading": "Loading transactions…",
+      "loadError": "Could not load wallet history. Please try again.",
+      "noTransactions": "No transactions match your filters.",
+      "prevPage": "← Previous",
+      "nextPage": "Next →",
+      "types": {
+        "all": "All types",
+        "purchase": "Purchases",
+        "cancellation_refund": "Cancellation refunds",
+        "withdrawal": "Withdrawals"
+      }
+    },
     "walletActivity": {
       "positionsUnit": " slots",
       "paymentBreakdown": {
@@ -70,6 +93,12 @@
     "withdrawals": {
       "title": "Request cash out",
       "subtitle": "Withdraw wallet credit via FPS, PayMe, or PayPal. Funds are deducted immediately and held until admin approval.",
+      "openAction": "Request cash out",
+      "pageTitle": "Cash out",
+      "backToAccount": "← Back to My Account",
+      "availableBalance": "Available balance",
+      "historyTitle": "Withdrawal history",
+      "historySubtitle": "Track pending, completed, and rejected requests.",
       "amountLabel": "Amount (HKD)",
       "useMaxAmount": "Withdraw full balance ({amount})",
       "methodLabel": "Payout method",

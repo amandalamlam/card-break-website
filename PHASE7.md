@@ -8,7 +8,7 @@
 
 - **Escrow RPCs** — submit deducts `store_credit` immediately; reject/cancel restores credit; complete marks paid offline
 - **Wallet ledger** — `withdrawal` and `withdrawal_reversal` transaction types
-- **Account UI** — cash out form (FPS / PayMe / PayPal) + withdrawal history with cancel
+- **Account UI** — subtle **Request cash out** link on My Account → dedicated `/account/withdraw` page with form + history
 - **Admin UI** — `/admin/withdrawals` pending queue with Complete / Reject actions
 - **API routes** — user submit/cancel + admin complete/reject (session-scoped, rate-limited)
 
@@ -34,8 +34,8 @@ This adds ledger types, `withdrawal_id` on `wallet_transactions`, and RPCs:
 ## Step 2 — Test user cash out
 
 1. Give a test user wallet credit (`profiles.store_credit`, e.g. `500.00`)
-2. Log in → **My Account** → **Request cash out**
-3. Enter amount, method (FPS / PayMe / PayPal), recipient details → Submit
+2. Log in → **My Account** → click **Request cash out** (beside available balance)
+3. On `/account/withdraw`, enter amount, method (FPS / PayMe / PayPal), recipient details → Submit
 4. Confirm:
    - Available balance drops immediately
    - Withdrawal appears as **Pending**

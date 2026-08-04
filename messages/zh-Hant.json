@@ -50,6 +50,29 @@
     "transactionsTitle": "錢包紀錄",
     "transactionsSubtitle": "最近的退款、消費及釋放紀錄",
     "noTransactions": "暫時沒有錢包紀錄。",
+    "viewFullHistory": "查看完整歷史紀錄 →",
+    "walletHistory": {
+      "title": "錢包完整紀錄",
+      "subtitle": "篩選及查閱過去 24 個月的錢包交易紀錄。",
+      "backToAccount": "← 返回我的帳戶",
+      "startMonth": "開始月份",
+      "endMonth": "結束月份",
+      "typeFilter": "交易類型",
+      "searchLabel": "關鍵字搜尋",
+      "searchPlaceholder": "開箱標題、位置或描述",
+      "applyFilters": "套用篩選",
+      "loading": "載入紀錄中…",
+      "loadError": "無法載入錢包紀錄，請稍後再試。",
+      "noTransactions": "沒有符合篩選條件的交易紀錄。",
+      "prevPage": "← 上一頁",
+      "nextPage": "下一頁 →",
+      "types": {
+        "all": "全部類型",
+        "purchase": "購買扣款",
+        "cancellation_refund": "流局退款",
+        "withdrawal": "提現紀錄"
+      }
+    },
     "walletActivity": {
       "positionsUnit": " 個位置",
       "paymentBreakdown": {
@@ -70,6 +93,12 @@
     "withdrawals": {
       "title": "申請提現",
       "subtitle": "透過 FPS、PayMe 或 PayPal 提取錢包餘額。提交後金額會立即從可用餘額扣除，待管理員審批。",
+      "openAction": "申請提現",
+      "pageTitle": "提現",
+      "backToAccount": "← 返回我的帳戶",
+      "availableBalance": "可用餘額",
+      "historyTitle": "提現紀錄",
+      "historySubtitle": "查看待審批、已完成及已拒絕的申請。",
       "amountLabel": "金額 (HKD)",
       "useMaxAmount": "提取全部餘額 ({amount})",
       "methodLabel": "收款方式",
