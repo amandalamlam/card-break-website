@@ -86,4 +86,4 @@ Verify:
 
 > **"Phase 6 is working"**
 
-Next: **Phase 7 — Withdrawals (cash out request + admin approve/reject)**
+Next: **Phase 7 — Withdrawals (cash out request + admin approve/reject)** ✅ see `PHASE7.md`

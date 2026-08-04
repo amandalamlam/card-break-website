@@ -12,6 +12,7 @@
     "breaks": "进行中的开箱",
     "account": "我的账户",
     "admin": "后台",
+    "withdrawals": "提现",
     "login": "登录",
     "signup": "注册"
   },
@@ -62,7 +63,54 @@
       "cancellation_refund": "流局退款",
       "purchase": "购买扣款",
       "checkout_release": "结账释放",
-      "admin_adjustment": "管理员调整"
+      "admin_adjustment": "管理员调整",
+      "withdrawal": "提现申请",
+      "withdrawal_reversal": "提现退回"
+    },
+    "withdrawals": {
+      "title": "申请提现",
+      "subtitle": "通过 FPS、PayMe 或 PayPal 提取钱包余额。提交后金额会立即从可用余额扣除，待管理员审批。",
+      "amountLabel": "金额 (HKD)",
+      "useMaxAmount": "提取全部余额 ({amount})",
+      "methodLabel": "收款方式",
+      "detailsLabel": "收款资料",
+      "submit": "提交提现申请",
+      "submitting": "提交中…",
+      "submitSuccess": "提现申请已提交，金额已暂时冻结，待管理员审批。",
+      "noWithdrawals": "暂时没有提现记录。",
+      "cancel": "取消申请",
+      "cancelling": "取消中…",
+      "cancelConfirm": "确定取消此笔待审批提现？金额将退回钱包。",
+      "cancelSuccess": "提现申请已取消，余额已退回钱包。",
+      "cancelError": "无法取消此申请，请稍后再试。",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "methodHints": {
+        "FPS": "请输入 FPS 电话号码或 FPS ID。",
+        "PayMe": "请输入 PayMe 手机号码或付款链接。",
+        "PayPal": "请输入接收款项的 PayPal 邮箱地址。"
+      },
+      "detailsPlaceholders": {
+        "FPS": "例如 +85291234567 或 FPS ID",
+        "PayMe": "例如 +85291234567 或 PayMe 链接",
+        "PayPal": "例如 collector@email.com"
+      },
+      "status": {
+        "pending": "待审批",
+        "completed": "已完成",
+        "rejected": "已拒绝"
+      },
+      "errors": {
+        "INSUFFICIENT_CREDIT": "钱包余额不足。",
+        "INVALID_AMOUNT": "请输入有效金额。",
+        "MISSING_DETAILS": "请填写收款资料。",
+        "INVALID_METHOD": "请选择收款方式。",
+        "RATE_LIMIT": "提交次数过多，请稍后再试。",
+        "UNKNOWN": "无法提交申请，请稍后再试。"
+      }
     },
     "phaseNote": "Phase 6：网站钱包及流局退款已接入。"
   },
@@ -180,7 +228,40 @@
     "cancellingBreak": "正在取消…",
     "cancelBreakConfirm": "确定要取消「{title}」吗？所有已付款将 100% 退回用户钱包（不经 Stripe 退款）。",
     "cancelBreakSuccess": "已取消开箱，并退回 {count} 笔订单至用户钱包。",
-    "cancelBreakError": "无法取消此开箱，请稍后再试。"
+    "cancelBreakError": "无法取消此开箱，请稍后再试。",
+    "manageWithdrawals": "管理提现",
+    "withdrawals": {
+      "title": "提现申请",
+      "subtitle": "审批待处理提现，线下转账后标记完成或拒绝。",
+      "backToBreaks": "返回开箱管理",
+      "pendingTitle": "待审批",
+      "pendingSubtitle": "请先线下转账，完成后按「完成提现」；资料有误则按「拒绝」并退回余额。",
+      "noPending": "暂无待审批提现。",
+      "recentTitle": "最近记录",
+      "recentSubtitle": "已完成及已拒绝的申请",
+      "userLabel": "用户",
+      "methodLabel": "方式",
+      "detailsLabel": "收款资料",
+      "complete": "完成提现",
+      "completing": "处理中…",
+      "reject": "拒绝",
+      "rejecting": "拒绝中…",
+      "completeConfirm": "确认已支付 {amount} 并完成此提现？",
+      "rejectConfirm": "拒绝此笔 {amount} 提现并退回用户钱包？",
+      "completeSuccess": "提现已标记为完成。",
+      "rejectSuccess": "提现已拒绝，余额已退回用户钱包。",
+      "actionError": "无法更新此提现，请稍后再试。",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "status": {
+        "pending": "待审批",
+        "completed": "已完成",
+        "rejected": "已拒绝"
+      }
+    }
   },
   "home": {
     "badge": "香港卡牌开箱平台",

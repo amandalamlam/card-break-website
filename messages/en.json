@@ -12,6 +12,7 @@
     "breaks": "Live Breaks",
     "account": "My Account",
     "admin": "Admin",
+    "withdrawals": "Withdrawals",
     "login": "Log in",
     "signup": "Sign up"
   },
@@ -62,7 +63,54 @@
       "cancellation_refund": "Cancellation refund",
       "purchase": "Purchase",
       "checkout_release": "Checkout release",
-      "admin_adjustment": "Admin adjustment"
+      "admin_adjustment": "Admin adjustment",
+      "withdrawal": "Cash out request",
+      "withdrawal_reversal": "Cash out reversal"
+    },
+    "withdrawals": {
+      "title": "Request cash out",
+      "subtitle": "Withdraw wallet credit via FPS, PayMe, or PayPal. Funds are deducted immediately and held until admin approval.",
+      "amountLabel": "Amount (HKD)",
+      "useMaxAmount": "Withdraw full balance ({amount})",
+      "methodLabel": "Payout method",
+      "detailsLabel": "Recipient details",
+      "submit": "Submit cash out request",
+      "submitting": "Submitting…",
+      "submitSuccess": "Cash out request submitted. Your balance has been reserved pending admin approval.",
+      "noWithdrawals": "No cash out requests yet.",
+      "cancel": "Cancel request",
+      "cancelling": "Cancelling…",
+      "cancelConfirm": "Cancel this pending cash out request? The amount will be returned to your wallet.",
+      "cancelSuccess": "Cash out request cancelled. Credit restored to your wallet.",
+      "cancelError": "Could not cancel this request. Please try again.",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "methodHints": {
+        "FPS": "Enter your FPS phone number or FPS ID.",
+        "PayMe": "Enter your PayMe mobile number or payment link.",
+        "PayPal": "Enter the PayPal email address to receive the payout."
+      },
+      "detailsPlaceholders": {
+        "FPS": "e.g. +85291234567 or FPS ID",
+        "PayMe": "e.g. +85291234567 or PayMe link",
+        "PayPal": "e.g. collector@email.com"
+      },
+      "status": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      },
+      "errors": {
+        "INSUFFICIENT_CREDIT": "Insufficient wallet balance.",
+        "INVALID_AMOUNT": "Enter a valid amount.",
+        "MISSING_DETAILS": "Enter recipient details.",
+        "INVALID_METHOD": "Select a payout method.",
+        "RATE_LIMIT": "Too many requests. Please wait before submitting again.",
+        "UNKNOWN": "Could not submit your request. Please try again."
+      }
     },
     "phaseNote": "Phase 6: on-site wallet and cancellation credits are live."
   },
@@ -180,7 +228,40 @@
     "cancellingBreak": "Cancelling…",
     "cancelBreakConfirm": "Cancel \"{title}\"? All paid orders will be refunded 100% to user wallets (no Stripe refund).",
     "cancelBreakSuccess": "Break cancelled. Refunded {count} order(s) to user wallets.",
-    "cancelBreakError": "Could not cancel this break. Please try again."
+    "cancelBreakError": "Could not cancel this break. Please try again.",
+    "manageWithdrawals": "Manage withdrawals",
+    "withdrawals": {
+      "title": "Withdrawal requests",
+      "subtitle": "Review pending cash out requests, pay users offline, then complete or reject.",
+      "backToBreaks": "Back to breaks",
+      "pendingTitle": "Pending requests",
+      "pendingSubtitle": "Transfer cash manually, then mark complete or reject if details are wrong.",
+      "noPending": "No pending withdrawal requests.",
+      "recentTitle": "Recent history",
+      "recentSubtitle": "Completed and rejected requests",
+      "userLabel": "User",
+      "methodLabel": "Method",
+      "detailsLabel": "Recipient details",
+      "complete": "Complete withdrawal",
+      "completing": "Completing…",
+      "reject": "Reject",
+      "rejecting": "Rejecting…",
+      "completeConfirm": "Mark {amount} as paid and complete this withdrawal?",
+      "rejectConfirm": "Reject this {amount} withdrawal and restore credit to the user's wallet?",
+      "completeSuccess": "Withdrawal marked as completed.",
+      "rejectSuccess": "Withdrawal rejected. Credit restored to user wallet.",
+      "actionError": "Could not update this withdrawal. Please try again.",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "status": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      }
+    }
   },
   "home": {
     "badge": "Hong Kong Card Break Platform",

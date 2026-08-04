@@ -2,7 +2,9 @@ export type WalletTransactionType =
   | "cancellation_refund"
   | "purchase"
   | "checkout_release"
-  | "admin_adjustment";
+  | "admin_adjustment"
+  | "withdrawal"
+  | "withdrawal_reversal";
 
 export type OrderPaymentType = "credit" | "stripe" | "hybrid";
 

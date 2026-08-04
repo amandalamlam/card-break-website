@@ -31,6 +31,12 @@ export default async function AdminBreaksPage({
         >
           {t("createBreak")}
         </Link>
+        <Link
+          href="/admin/withdrawals"
+          className="rounded-xl border border-border px-5 py-3 text-sm text-muted transition hover:text-foreground"
+        >
+          {t("manageWithdrawals")}
+        </Link>
       </div>
 
       <div className="space-y-4">

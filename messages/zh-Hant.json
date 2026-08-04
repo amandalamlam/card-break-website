@@ -12,6 +12,7 @@
     "breaks": "進行中的開箱",
     "account": "我的帳戶",
     "admin": "後台",
+    "withdrawals": "提現",
     "login": "登入",
     "signup": "註冊"
   },
@@ -62,7 +63,54 @@
       "cancellation_refund": "流局退款",
       "purchase": "購買扣款",
       "checkout_release": "結帳釋放",
-      "admin_adjustment": "管理員調整"
+      "admin_adjustment": "管理員調整",
+      "withdrawal": "提現申請",
+      "withdrawal_reversal": "提現退回"
+    },
+    "withdrawals": {
+      "title": "申請提現",
+      "subtitle": "透過 FPS、PayMe 或 PayPal 提取錢包餘額。提交後金額會立即從可用餘額扣除，待管理員審批。",
+      "amountLabel": "金額 (HKD)",
+      "useMaxAmount": "提取全部餘額 ({amount})",
+      "methodLabel": "收款方式",
+      "detailsLabel": "收款資料",
+      "submit": "提交提現申請",
+      "submitting": "提交中…",
+      "submitSuccess": "提現申請已提交，金額已暫時凍結，待管理員審批。",
+      "noWithdrawals": "暫時沒有提現紀錄。",
+      "cancel": "取消申請",
+      "cancelling": "取消中…",
+      "cancelConfirm": "確定取消此筆待審批提現？金額將退回錢包。",
+      "cancelSuccess": "提現申請已取消，餘額已退回錢包。",
+      "cancelError": "無法取消此申請，請稍後再試。",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "methodHints": {
+        "FPS": "請輸入 FPS 電話號碼或 FPS ID。",
+        "PayMe": "請輸入 PayMe 手機號碼或付款連結。",
+        "PayPal": "請輸入接收款項的 PayPal 電郵地址。"
+      },
+      "detailsPlaceholders": {
+        "FPS": "例如 +85291234567 或 FPS ID",
+        "PayMe": "例如 +85291234567 或 PayMe 連結",
+        "PayPal": "例如 collector@email.com"
+      },
+      "status": {
+        "pending": "待審批",
+        "completed": "已完成",
+        "rejected": "已拒絕"
+      },
+      "errors": {
+        "INSUFFICIENT_CREDIT": "錢包餘額不足。",
+        "INVALID_AMOUNT": "請輸入有效金額。",
+        "MISSING_DETAILS": "請填寫收款資料。",
+        "INVALID_METHOD": "請選擇收款方式。",
+        "RATE_LIMIT": "提交次數過多，請稍後再試。",
+        "UNKNOWN": "無法提交申請，請稍後再試。"
+      }
     },
     "phaseNote": "Phase 6：網站錢包及流局退款已接入。"
   },
@@ -180,7 +228,40 @@
     "cancellingBreak": "正在取消…",
     "cancelBreakConfirm": "確定要取消「{title}」嗎？所有已付款將 100% 退回用戶錢包（不經 Stripe 退款）。",
     "cancelBreakSuccess": "已取消開箱，並退回 {count} 筆訂單至用戶錢包。",
-    "cancelBreakError": "無法取消此開箱，請稍後再試。"
+    "cancelBreakError": "無法取消此開箱，請稍後再試。",
+    "manageWithdrawals": "管理提現",
+    "withdrawals": {
+      "title": "提現申請",
+      "subtitle": "審批待處理提現，線下轉帳後標記完成或拒絕。",
+      "backToBreaks": "返回開箱管理",
+      "pendingTitle": "待審批",
+      "pendingSubtitle": "請先線下轉帳，完成後按「完成提現」；資料有誤則按「拒絕」並退回餘額。",
+      "noPending": "暫無待審批提現。",
+      "recentTitle": "最近紀錄",
+      "recentSubtitle": "已完成及已拒絕的申請",
+      "userLabel": "用戶",
+      "methodLabel": "方式",
+      "detailsLabel": "收款資料",
+      "complete": "完成提現",
+      "completing": "處理中…",
+      "reject": "拒絕",
+      "rejecting": "拒絕中…",
+      "completeConfirm": "確認已支付 {amount} 並完成此提現？",
+      "rejectConfirm": "拒絕此筆 {amount} 提現並退回用戶錢包？",
+      "completeSuccess": "提現已標記為完成。",
+      "rejectSuccess": "提現已拒絕，餘額已退回用戶錢包。",
+      "actionError": "無法更新此提現，請稍後再試。",
+      "methods": {
+        "FPS": "FPS",
+        "PayMe": "PayMe",
+        "PayPal": "PayPal"
+      },
+      "status": {
+        "pending": "待審批",
+        "completed": "已完成",
+        "rejected": "已拒絕"
+      }
+    }
   },
   "home": {
     "badge": "香港卡牌開箱平台",
