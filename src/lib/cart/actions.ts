@@ -112,7 +112,7 @@ async function addSlotToCartDirect(
     return { ok: false, code: "SLOT_UNAVAILABLE" };
   }
 
-  let { data: cart, error: cartError } = await admin
+  const { data: fetchedCart, error: cartError } = await admin
     .from("carts")
     .select("id, expires_at, status")
     .eq("user_id", userId)
@@ -129,6 +129,7 @@ async function addSlotToCartDirect(
 
   let isNewCart = false;
   let expiresAt: string;
+  let cart = fetchedCart;
 
   if (!cart) {
     isNewCart = true;
