@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "进行中的开箱",
     "account": "我的账户",
+    "cart": "购物车",
     "admin": "后台",
     "withdrawals": "提现",
     "login": "登录",
@@ -156,6 +157,21 @@
     "slotsTitle": "选择你的位置",
     "slotsSubtitle": "可用位置可点击 Checkout。已售出或锁定中的位置无法购买。",
     "checkout": "Checkout",
+    "buyNow": "⚡ 直接购买",
+    "continueBuyNow": "⚡ 继续直接购买",
+    "addToCart": "+ 加入购物车",
+    "addingToCart": "加入中…",
+    "addToCartError": "无法加入购物车，请稍后再试。",
+    "addToCartErrors": {
+      "lockedByOther": "此位置已被其他买家锁定。",
+      "unavailable": "此位置目前无法加入购物车。",
+      "alreadyInCart": "此位置已在你的购物车中。",
+      "breakInactive": "此开箱活动已结束或暂停。",
+      "cartExpired": "购物车计时已过期，请刷新后再试。",
+      "lockExpired": "位置锁定已过期，请刷新后再试。",
+      "migrationRequired": "购物车尚未设置完成，请执行 Phase 8 数据库 migration。",
+      "walletCleanupFailed": "钱包状态更新失败，请稍后再试或联系客服。"
+    },
     "continueCheckout": "继续结账",
     "liveConnected": "实时更新中（每 8 秒）",
     "liveUpdating": "正在更新…",
@@ -177,6 +193,11 @@
   },
   "checkout": {
     "lockedBadge": "位置已锁定",
+    "buyNowBadge": "⚡ 直接购买",
+    "buyNowTitle": "直接购买确认",
+    "buyNowSubtitle": "此流程与购物车完全独立。请在 1 分钟内完成付款。",
+    "buyNowTimerLabel": "直接购买倒数",
+    "buyNowTimerHint": "此位置为你保留 1 分钟。逾时将自动释放。",
     "authenticatedBadge": "已登录 — 准备结账",
     "title": "你的位置已锁定",
     "subtitle": "请在倒数结束前完成付款。可使用网站钱包余额或 Stripe。",
@@ -198,13 +219,15 @@
       "INSUFFICIENT_CREDIT": "钱包余额不足。",
       "CREDIT_EXCEEDS_PRICE": "使用余额不能超过位置价格。",
       "LOCK_EXPIRED": "锁定已过期，请返回重新选择位置。",
-      "SLOT_UNAVAILABLE": "此位置目前无法购买。"
+      "SLOT_UNAVAILABLE": "此位置目前无法购买。",
+      "CART_EMPTY": "购物车是空的。",
+      "CART_EXPIRED": "购物车计时已过期，请重新加入位置。"
     },
     "breakLabel": "开箱",
     "slotLabel": "位置",
     "priceLabel": "价格",
     "lockTimerLabel": "剩余锁定时间",
-    "lockActive": "此位置为你保留 8 分钟。倒数结束后将自动释放。",
+    "lockActive": "此位置为你保留 1 分钟。倒数结束后将自动释放。",
     "lockExpired": "锁定时间已过，位置已释放。请返回开箱页重新选择。",
     "backToBreak": "返回开箱页面",
     "phaseNote": "Phase 6：网站钱包、混合付款及流局退款已接入。",
@@ -226,6 +249,18 @@
       "viewBreak": "查看开箱",
       "viewAccount": "我的账户"
     },
+    "failed": {
+      "title": "付款未完成",
+      "default": "付款已取消或超时。位置已释放，钱包冻结金额已退回（如有）。",
+      "timeout": "付款超时。位置已释放，请重新选购。",
+      "cancelled": "你已取消付款。位置已释放。",
+      "buyNowNote": "直接购买失败不会影响你的购物车。",
+      "cartNote": "购物车内其他未结账的位置仍保留至购物车倒数结束。",
+      "backToCart": "返回购物车",
+      "backToBreak": "返回开箱",
+      "browseBreaks": "浏览开箱",
+      "viewAccount": "我的账户"
+    },
     "errors": {
       "title": "无法锁定此位置",
       "SLOT_LOCKED_BY_OTHER": "另一位用户正在结账此位置，请选择其他位置或稍后再试。",
@@ -235,6 +270,29 @@
       "SLOT_UNAVAILABLE": "此位置目前不可购买。",
       "UNKNOWN": "发生未知错误，请稍后再试。",
       "backToBreak": "返回开箱页面"
+    }
+  },
+  "cart": {
+    "title": "购物车",
+    "subtitle": "多个位置可一次结账。所有项目共用同一个 5 分钟倒数。",
+    "empty": "购物车是空的。",
+    "browseBreaks": "浏览开箱",
+    "backToBreaks": "← 返回开箱列表",
+    "timerLabel": "购物车保留时间",
+    "timerActive": "新增的位置会同步至此剩余时间（不会重新计时 5 分钟）。",
+    "timerExpired": "购物车已超时，所有位置已释放。",
+    "total": "合计",
+    "removeItem": "移除",
+    "paymentWarning": "⚠️ 点击付款后，系统将为您保留位置 5 分钟，请尽快完成付款。",
+    "cancelNotice": "付款已取消。购物车内的位置仍为您保留，请在倒数结束前重新结账。",
+    "expiredNotice": "付款进行中购物车已超时，所有位置已释放，钱包冻结金额已退回。",
+    "addModal": {
+      "title": "已加入购物车",
+      "subtitle": "位置已锁定并加入购物车。",
+      "continueShopping": "继续购物",
+      "goToCart": "前往购物车结账",
+      "backToBreak": "返回此开箱",
+      "close": "关闭"
     }
   },
   "admin": {

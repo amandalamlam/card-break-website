@@ -1,17 +1,18 @@
-import { SLOT_LOCK_DURATION_MS } from "./constants";
-import { uuidEquals } from "./time";
+import type { SlotLockType } from "./constants";
+import { getLockExpiresAtIsoFromSlot, uuidEquals } from "./time";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
 
-export function getSlotLockExpiresAt(slot: Pick<BreakSlot, "locked_at">): Date | null {
-  if (!slot.locked_at) {
-    return null;
-  }
-
-  return new Date(new Date(slot.locked_at).getTime() + SLOT_LOCK_DURATION_MS);
+export function getSlotLockExpiresAt(
+  slot: Pick<BreakSlot, "locked_at" | "lock_expires_at">
+): Date | null {
+  const iso = getLockExpiresAtIsoFromSlot(slot);
+  return iso ? new Date(iso) : null;
 }
 
-export function isSlotLockActive(slot: Pick<BreakSlot, "status" | "locked_at">): boolean {
-  if (slot.status !== "locked" || !slot.locked_at) {
+export function isSlotLockActive(
+  slot: Pick<BreakSlot, "status" | "locked_at" | "lock_expires_at">
+): boolean {
+  if (slot.status !== "locked") {
     return false;
   }
 
@@ -20,24 +21,29 @@ export function isSlotLockActive(slot: Pick<BreakSlot, "status" | "locked_at">):
 }
 
 export function isSlotLockedByUser(
-  slot: Pick<BreakSlot, "status" | "user_id" | "locked_at">,
+  slot: Pick<BreakSlot, "status" | "user_id" | "locked_at" | "lock_expires_at">,
   userId: string | null | undefined
 ): boolean {
   return (
     Boolean(userId) &&
     slot.status === "locked" &&
+    isSlotLockActive(slot) &&
     uuidEquals(slot.user_id, userId)
   );
 }
 
 export function isSlotLockedByOtherUser(
-  slot: Pick<BreakSlot, "status" | "user_id">,
+  slot: Pick<BreakSlot, "status" | "user_id" | "locked_at" | "lock_expires_at">,
   userId: string | null | undefined
 ): boolean {
-  return slot.status === "locked" && Boolean(slot.user_id) && !uuidEquals(slot.user_id, userId);
+  return (
+    isSlotLockActive(slot) &&
+    Boolean(slot.user_id) &&
+    !uuidEquals(slot.user_id, userId)
+  );
 }
 
-export function canUserCheckoutSlot(
+export function isSlotAvailableForCart(
   slot: BreakSlot,
   breakStatus: BreakStatus,
   userId: string | null | undefined
@@ -46,11 +52,43 @@ export function canUserCheckoutSlot(
     return false;
   }
 
-  if (slot.status === "locked") {
-    return isSlotLockedByUser(slot, userId);
+  if (slot.status === "available") {
+    return true;
   }
 
-  return slot.status === "available";
+  return (
+    slot.status === "locked" &&
+    slot.lock_type === "cart" &&
+    isSlotLockedByUser(slot, userId)
+  );
+}
+
+export function isSlotAvailableForBuyNow(
+  slot: BreakSlot,
+  breakStatus: BreakStatus,
+  userId: string | null | undefined
+): boolean {
+  if (breakStatus !== "active") {
+    return false;
+  }
+
+  if (slot.status === "available") {
+    return true;
+  }
+
+  return (
+    slot.status === "locked" &&
+    slot.lock_type === "buy_now" &&
+    isSlotLockedByUser(slot, userId)
+  );
+}
+
+export function canUserCheckoutSlot(
+  slot: BreakSlot,
+  breakStatus: BreakStatus,
+  userId: string | null | undefined
+): boolean {
+  return isSlotAvailableForBuyNow(slot, breakStatus, userId);
 }
 
 export function normalizeSlotForDisplay(slot: BreakSlot): BreakSlot {
@@ -60,8 +98,14 @@ export function normalizeSlotForDisplay(slot: BreakSlot): BreakSlot {
       status: "available",
       user_id: null,
       locked_at: null,
+      lock_type: null,
+      lock_expires_at: null,
     };
   }
 
   return slot;
+}
+
+export function getSlotLockTypeLabel(slot: Pick<BreakSlot, "lock_type">): SlotLockType | null {
+  return slot.lock_type ?? null;
 }

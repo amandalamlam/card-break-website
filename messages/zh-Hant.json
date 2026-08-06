@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "進行中的開箱",
     "account": "我的帳戶",
+    "cart": "購物車",
     "admin": "後台",
     "withdrawals": "提現",
     "login": "登入",
@@ -156,6 +157,21 @@
     "slotsTitle": "選擇你的位置",
     "slotsSubtitle": "可用位置可點擊 Checkout。已售出或鎖定中的位置無法購買。",
     "checkout": "Checkout",
+    "buyNow": "⚡ 直接購買",
+    "continueBuyNow": "⚡ 繼續直接購買",
+    "addToCart": "+ 加入購物車",
+    "addingToCart": "加入中…",
+    "addToCartError": "無法加入購物車，請稍後再試。",
+    "addToCartErrors": {
+      "lockedByOther": "此位置已被其他買家鎖定。",
+      "unavailable": "此位置目前無法加入購物車。",
+      "alreadyInCart": "此位置已在你的購物車中。",
+      "breakInactive": "此開箱活動已結束或暫停。",
+      "cartExpired": "購物車計時已過期，請重新整理後再試。",
+      "lockExpired": "位置鎖定已過期，請重新整理後再試。",
+      "migrationRequired": "購物車尚未設定完成，請執行 Phase 8 資料庫 migration。",
+      "walletCleanupFailed": "錢包狀態更新失敗，請稍後再試或聯絡客服。"
+    },
     "continueCheckout": "繼續結帳",
     "liveConnected": "即時更新中（每 8 秒）",
     "liveUpdating": "正在更新…",
@@ -177,6 +193,11 @@
   },
   "checkout": {
     "lockedBadge": "位置已鎖定",
+    "buyNowBadge": "⚡ 直接購買",
+    "buyNowTitle": "直接購買確認",
+    "buyNowSubtitle": "此流程與購物車完全獨立。請在 1 分鐘內完成付款。",
+    "buyNowTimerLabel": "直接購買倒數",
+    "buyNowTimerHint": "此位置為你保留 1 分鐘。逾時將自動釋放。",
     "authenticatedBadge": "已登入 — 準備結帳",
     "title": "你的位置已鎖定",
     "subtitle": "請在倒數結束前完成付款。可使用網站錢包餘額或 Stripe。",
@@ -198,13 +219,15 @@
       "INSUFFICIENT_CREDIT": "錢包餘額不足。",
       "CREDIT_EXCEEDS_PRICE": "使用餘額不能超過位置價格。",
       "LOCK_EXPIRED": "鎖定已過期，請返回重新選擇位置。",
-      "SLOT_UNAVAILABLE": "此位置目前無法購買。"
+      "SLOT_UNAVAILABLE": "此位置目前無法購買。",
+      "CART_EMPTY": "購物車是空的。",
+      "CART_EXPIRED": "購物車計時已過期，請重新加入位置。"
     },
     "breakLabel": "開箱",
     "slotLabel": "位置",
     "priceLabel": "價格",
     "lockTimerLabel": "剩餘鎖定時間",
-    "lockActive": "此位置為你保留 8 分鐘。倒數結束後將自動釋放。",
+    "lockActive": "此位置為你保留 1 分鐘。倒數結束後將自動釋放。",
     "lockExpired": "鎖定時間已過，位置已釋放。請返回開箱頁重新選擇。",
     "backToBreak": "返回開箱頁面",
     "phaseNote": "Phase 6：網站錢包、混合付款及流局退款已接入。",
@@ -226,6 +249,18 @@
       "viewBreak": "查看開箱",
       "viewAccount": "我的帳戶"
     },
+    "failed": {
+      "title": "付款未完成",
+      "default": "付款已取消或逾時。位置已釋放，錢包凍結金額已退回（如有）。",
+      "timeout": "付款逾時。位置已釋放，請重新選購。",
+      "cancelled": "你已取消付款。位置已釋放。",
+      "buyNowNote": "直接購買失敗不會影響你的購物車。",
+      "cartNote": "購物車內其他未結帳的位置仍保留至購物車倒數結束。",
+      "backToCart": "返回購物車",
+      "backToBreak": "返回開箱",
+      "browseBreaks": "瀏覽開箱",
+      "viewAccount": "我的帳戶"
+    },
     "errors": {
       "title": "無法鎖定此位置",
       "SLOT_LOCKED_BY_OTHER": "另一位用戶正在結帳此位置，請選擇其他位置或稍後再試。",
@@ -235,6 +270,29 @@
       "SLOT_UNAVAILABLE": "此位置目前不可購買。",
       "UNKNOWN": "發生未知錯誤，請稍後再試。",
       "backToBreak": "返回開箱頁面"
+    }
+  },
+  "cart": {
+    "title": "購物車",
+    "subtitle": "多個位置可一次結帳。所有項目共用同一個 5 分鐘倒數。",
+    "empty": "購物車是空的。",
+    "browseBreaks": "瀏覽開箱",
+    "backToBreaks": "← 返回開箱列表",
+    "timerLabel": "購物車保留時間",
+    "timerActive": "新增的位置會同步至此剩餘時間（不會重新計時 5 分鐘）。",
+    "timerExpired": "購物車已逾時，所有位置已釋放。",
+    "total": "合計",
+    "removeItem": "移除",
+    "paymentWarning": "⚠️ 點擊付款後，系統將為您保留位置 5 分鐘，請儘快完成付款。",
+    "cancelNotice": "付款已取消。購物車內的位置仍為您保留，請在倒數結束前重新結帳。",
+    "expiredNotice": "付款進行中購物車已逾時，所有位置已釋放，錢包凍結金額已退回。",
+    "addModal": {
+      "title": "已加入購物車",
+      "subtitle": "位置已鎖定並加入購物車。",
+      "continueShopping": "繼續購物",
+      "goToCart": "前往購物車結帳",
+      "backToBreak": "返回此開箱",
+      "close": "關閉"
     }
   },
   "admin": {

@@ -11,6 +11,7 @@
   "nav": {
     "breaks": "Live Breaks",
     "account": "My Account",
+    "cart": "Cart",
     "admin": "Admin",
     "withdrawals": "Withdrawals",
     "login": "Log in",
@@ -156,6 +157,21 @@
     "slotsTitle": "Pick your slot",
     "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
     "checkout": "Checkout",
+    "buyNow": "⚡ Buy Now",
+    "continueBuyNow": "⚡ Continue Buy Now",
+    "addToCart": "+ Add to Cart",
+    "addingToCart": "Adding…",
+    "addToCartError": "Could not add to cart. Please try again.",
+    "addToCartErrors": {
+      "lockedByOther": "This slot is locked by another buyer.",
+      "unavailable": "This slot is not available right now.",
+      "alreadyInCart": "This slot is already in your cart.",
+      "breakInactive": "This break is no longer active.",
+      "cartExpired": "Your cart timer expired. Refresh and try again.",
+      "lockExpired": "The slot lock expired. Refresh and try again.",
+      "migrationRequired": "Cart is not set up yet. Run the Phase 8 database migration.",
+      "walletCleanupFailed": "Could not update wallet state. Please try again or contact support."
+    },
     "continueCheckout": "Continue checkout",
     "liveConnected": "Live updates every 8 seconds",
     "liveUpdating": "Updating…",
@@ -177,6 +193,11 @@
   },
   "checkout": {
     "lockedBadge": "Slot locked",
+    "buyNowBadge": "⚡ Buy Now",
+    "buyNowTitle": "Buy Now checkout",
+    "buyNowSubtitle": "This flow is isolated from your cart. Complete payment within 1 minute.",
+    "buyNowTimerLabel": "Buy Now countdown",
+    "buyNowTimerHint": "This slot is held for 1 minute. It releases automatically when time runs out.",
     "authenticatedBadge": "Signed in — ready for checkout",
     "title": "Your slot is locked",
     "subtitle": "Complete payment before the timer expires. Use wallet credit, Stripe, or both.",
@@ -198,13 +219,15 @@
       "INSUFFICIENT_CREDIT": "Insufficient wallet balance.",
       "CREDIT_EXCEEDS_PRICE": "Credit cannot exceed the slot price.",
       "LOCK_EXPIRED": "Your lock expired. Go back and pick a slot again.",
-      "SLOT_UNAVAILABLE": "This slot is not available for purchase."
+      "SLOT_UNAVAILABLE": "This slot is not available for purchase.",
+      "CART_EMPTY": "Your cart is empty.",
+      "CART_EXPIRED": "Your cart timer expired. Add slots again to continue."
     },
     "breakLabel": "Break",
     "slotLabel": "Slot",
     "priceLabel": "Price",
     "lockTimerLabel": "Lock time remaining",
-    "lockActive": "This slot is reserved for you for 8 minutes. It releases automatically when the timer ends.",
+    "lockActive": "This slot is reserved for you for 1 minute. It releases automatically when the timer ends.",
     "lockExpired": "The lock expired and the slot was released. Go back and pick a slot again.",
     "backToBreak": "Back to break",
     "phaseNote": "Phase 6: wallet credit, mixed checkout, and cancellation refunds are live.",
@@ -226,6 +249,18 @@
       "viewBreak": "View break",
       "viewAccount": "My account"
     },
+    "failed": {
+      "title": "Payment not completed",
+      "default": "Payment was cancelled or timed out. Holds were released and wallet credit restored (if any).",
+      "timeout": "Payment timed out. The slot was released — please try again.",
+      "cancelled": "You cancelled payment. The hold was released.",
+      "buyNowNote": "Buy Now failure does not affect items in your cart.",
+      "cartNote": "Other cart items remain held until the cart timer expires.",
+      "backToCart": "Back to cart",
+      "backToBreak": "Back to break",
+      "browseBreaks": "Browse breaks",
+      "viewAccount": "My account"
+    },
     "errors": {
       "title": "Could not lock this slot",
       "SLOT_LOCKED_BY_OTHER": "Another customer is checking out this slot. Pick a different one or try again later.",
@@ -235,6 +270,29 @@
       "SLOT_UNAVAILABLE": "This slot is not available for purchase.",
       "UNKNOWN": "Something went wrong. Please try again.",
       "backToBreak": "Back to break"
+    }
+  },
+  "cart": {
+    "title": "Shopping cart",
+    "subtitle": "Check out multiple slots in one payment. All items share one 5-minute timer.",
+    "empty": "Your cart is empty.",
+    "browseBreaks": "Browse breaks",
+    "backToBreaks": "← Back to breaks",
+    "timerLabel": "Cart hold timer",
+    "timerActive": "New items sync to this remaining time (the 5-minute timer does not reset).",
+    "timerExpired": "Cart expired. All slots were released.",
+    "total": "Total",
+    "removeItem": "Remove",
+    "paymentWarning": "⚠️ After you click pay, your slots are held for 5 minutes — please complete payment promptly.",
+    "cancelNotice": "Payment was cancelled. Your cart items are still held — you can retry checkout before the timer expires.",
+    "expiredNotice": "Your cart session timed out while payment was in progress. All slots were released and wallet credit was restored.",
+    "addModal": {
+      "title": "Added to cart",
+      "subtitle": "This slot is locked and added to your cart.",
+      "continueShopping": "Continue shopping",
+      "goToCart": "Go to cart checkout",
+      "backToBreak": "Back to this break",
+      "close": "Close"
     }
   },
   "admin": {

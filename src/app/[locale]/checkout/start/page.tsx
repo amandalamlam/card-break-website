@@ -6,14 +6,14 @@ import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { formatPrice } from "@/lib/breaks/format";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
-import { resumeOrLockBreakSlot } from "@/lib/slots/locking";
+import { resumeOrLockBuyNowSlot } from "@/lib/slots/locking";
 import { parseWalletBalance } from "@/lib/wallet/types";
 import { redirect } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
 type CheckoutStartPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ breakId?: string; slotId?: string }>;
+  searchParams: Promise<{ breakId?: string; slotId?: string; mode?: string }>;
 };
 
 export default async function CheckoutStartPage({
@@ -23,13 +23,13 @@ export default async function CheckoutStartPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { breakId, slotId } = await searchParams;
+  const { breakId, slotId, mode = "buy_now" } = await searchParams;
 
-  if (!breakId || !slotId) {
+  if (!breakId || !slotId || mode !== "buy_now") {
     notFound();
   }
 
-  const checkoutPath = `/${locale}/checkout/start?breakId=${breakId}&slotId=${slotId}`;
+  const checkoutPath = `/${locale}/checkout/start?mode=buy_now&breakId=${breakId}&slotId=${slotId}`;
 
   const user = await getCurrentUser();
   if (!user) {
@@ -40,7 +40,9 @@ export default async function CheckoutStartPage({
   }
 
   const profile = await getCurrentProfile();
-  const wallet = profile ? parseWalletBalance(profile) : { availableCredit: 0, storeCredit: 0, creditReserved: 0 };
+  const wallet = profile
+    ? parseWalletBalance(profile)
+    : { availableCredit: 0, storeCredit: 0, creditReserved: 0 };
 
   const breakItem = await getBreakById(breakId);
   const slot = await getSlotById(slotId, breakId);
@@ -49,7 +51,7 @@ export default async function CheckoutStartPage({
     notFound();
   }
 
-  const lockResult = await resumeOrLockBreakSlot(slotId, user!.id);
+  const lockResult = await resumeOrLockBuyNowSlot(slotId, user!.id);
   const t = await getTranslations("checkout");
 
   if (!lockResult.ok) {
@@ -64,10 +66,10 @@ export default async function CheckoutStartPage({
     <div className="mx-auto w-full max-w-2xl px-6 py-12 md:py-16">
       <div className="glass-panel rounded-3xl p-8">
         <span className="inline-flex rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs text-success">
-          {t("lockedBadge")}
+          {t("buyNowBadge")}
         </span>
-        <h1 className="mt-4 text-2xl font-semibold">{t("title")}</h1>
-        <p className="mt-3 text-sm leading-7 text-muted">{t("subtitle")}</p>
+        <h1 className="mt-4 text-2xl font-semibold">{t("buyNowTitle")}</h1>
+        <p className="mt-3 text-sm leading-7 text-muted">{t("buyNowSubtitle")}</p>
 
         {wallet.availableCredit > 0 ? (
           <p className="mt-4 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent-soft">
@@ -92,6 +94,7 @@ export default async function CheckoutStartPage({
 
         <CheckoutCountdown
           lockedAt={lockResult.lockedAt}
+          lockExpiresAt={lockResult.expiresAt}
           slotId={slotId}
           breakId={breakId}
           locale={locale as AppLocale}

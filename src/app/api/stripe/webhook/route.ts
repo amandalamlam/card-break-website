@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe, getStripeWebhookSecret } from "@/lib/stripe/server";
-import { cancelPendingOrder, fulfillSlotPurchase } from "@/lib/stripe/orders";
+import { handleCheckoutCancellation } from "@/lib/stripe/checkout-cancel";
+import { fulfillSlotPurchase } from "@/lib/stripe/orders";
 
 export const runtime = "nodejs";
 
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session;
         const orderId = session.metadata?.order_id;
         if (orderId) {
-          await cancelPendingOrder(orderId);
+          await handleCheckoutCancellation(orderId, session.metadata?.user_id ?? null);
         }
         break;
       }
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const orderId = paymentIntent.metadata?.order_id;
         if (orderId) {
-          await cancelPendingOrder(orderId);
+          await handleCheckoutCancellation(orderId, paymentIntent.metadata?.user_id ?? null);
         }
         break;
       }

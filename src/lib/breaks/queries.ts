@@ -71,7 +71,7 @@ export async function getSlotById(slotId: string, breakId: string): Promise<Brea
 
   const { data, error } = await supabase
     .from("break_slots")
-    .select("id, break_id, name, price, status, user_id, locked_at")
+    .select("id, break_id, name, price, status, user_id, locked_at, lock_type, lock_expires_at")
     .eq("id", slotId)
     .eq("break_id", breakId)
     .single();

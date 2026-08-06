@@ -4,8 +4,8 @@ import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, toStripeAmount } from "@/lib/stripe/server";
 import {
-  buildCheckoutCancelUrl,
   buildCheckoutSuccessUrl,
+  buildLegacyCheckoutCancelUrl,
 } from "@/lib/stripe/checkout-urls";
 import { validateUserLock } from "@/lib/stripe/orders";
 import type { AppLocale } from "@/i18n/routing";
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         },
       ],
       success_url: buildCheckoutSuccessUrl(locale, order.id),
-      cancel_url: buildCheckoutCancelUrl(locale, breakId, slotId),
+      cancel_url: buildLegacyCheckoutCancelUrl(locale, breakId, slotId),
       client_reference_id: order.id,
       metadata: {
         order_id: order.id,

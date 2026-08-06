@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { STRIPE_SESSION_EXPIRY_MINUTES } from "@/lib/slots/constants";
 
 let stripeClient: Stripe | null = null;
 
@@ -32,4 +33,8 @@ export function getAppUrl(): string {
 
 export function toStripeAmount(amount: number): number {
   return Math.round(amount * 100);
+}
+
+export function getStripeSessionExpiresAtUnix(): number {
+  return Math.floor(Date.now() / 1000) + STRIPE_SESSION_EXPIRY_MINUTES * 60;
 }

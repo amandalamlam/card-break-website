@@ -24,6 +24,11 @@ export async function SiteHeader() {
           <Link href="/account" className="transition hover:text-foreground">
             {t("account")}
           </Link>
+          {user ? (
+            <Link href="/cart" className="transition hover:text-foreground">
+              {t("cart")}
+            </Link>
+          ) : null}
           {profile?.role === "admin" ? (
             <>
               <Link href="/admin/breaks" className="transition hover:text-accent-soft">

@@ -19,6 +19,8 @@ export type BreakSlot = {
   status: SlotStatus;
   user_id: string | null;
   locked_at: string | null;
+  lock_type?: "buy_now" | "cart" | null;
+  lock_expires_at?: string | null;
 };
 
 export type BreakWithSlots = Break & {

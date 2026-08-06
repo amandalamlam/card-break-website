@@ -18,7 +18,7 @@ export async function fetchBreakSlotsWithLazyRelease(breakId: string): Promise<B
 
   const { data, error } = await admin
     .from("break_slots")
-    .select("id, break_id, name, price, status, user_id, locked_at")
+    .select("id, break_id, name, price, status, user_id, locked_at, lock_type, lock_expires_at")
     .eq("break_id", breakId)
     .order("name");
 

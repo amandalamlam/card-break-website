@@ -1,21 +1,63 @@
-import { SLOT_LOCK_DURATION_MS, SLOT_LOCK_DURATION_MINUTES } from "./constants";
+import {
+  BUY_NOW_LOCK_MINUTES,
+  BUY_NOW_LOCK_MS,
+  CART_LOCK_MINUTES,
+  SLOT_LOCK_DURATION_MS,
+  SLOT_LOCK_DURATION_MINUTES,
+} from "./constants";
 
 export const SLOT_LOCK_DURATION_SECONDS = SLOT_LOCK_DURATION_MINUTES * 60;
 
-/** Compare UUIDs case-insensitively (Supabase/auth may differ in casing). */
-export function uuidEquals(a: string | null | undefined, b: string | null | undefined): boolean {
+export function uuidEquals(
+  a: string | null | undefined,
+  b: string | null | undefined
+): boolean {
   if (!a || !b) {
     return false;
   }
   return a.toLowerCase() === b.toLowerCase();
 }
 
-export function getLockExpiresAtIso(lockedAt: string): string {
-  return new Date(new Date(lockedAt).getTime() + SLOT_LOCK_DURATION_MS).toISOString();
+export function getLockExpiresAtIso(
+  lockedAt: string,
+  lockExpiresAt?: string | null
+): string {
+  if (lockExpiresAt) {
+    return lockExpiresAt;
+  }
+  return new Date(new Date(lockedAt).getTime() + BUY_NOW_LOCK_MS).toISOString();
 }
 
-export function getLockRemainingSeconds(lockedAt: string): number {
-  const expiresMs = new Date(lockedAt).getTime() + SLOT_LOCK_DURATION_MS;
-  const remaining = Math.floor((expiresMs - Date.now()) / 1000);
-  return Math.max(0, Math.min(SLOT_LOCK_DURATION_SECONDS, remaining));
+export function getLockRemainingSeconds(
+  lockedAt: string,
+  lockExpiresAt?: string | null
+): number {
+  const expiresMs = lockExpiresAt
+    ? new Date(lockExpiresAt).getTime()
+    : new Date(lockedAt).getTime() + SLOT_LOCK_DURATION_MS;
+
+  const remaining = Math.ceil((expiresMs - Date.now()) / 1000);
+  const maxSeconds = lockExpiresAt
+    ? Math.max(BUY_NOW_LOCK_MINUTES * 60, CART_LOCK_MINUTES * 60)
+    : SLOT_LOCK_DURATION_SECONDS;
+
+  return Math.max(0, Math.min(maxSeconds, remaining));
+}
+
+export function getCartRemainingSeconds(expiresAt: string): number {
+  const remaining = Math.ceil((new Date(expiresAt).getTime() - Date.now()) / 1000);
+  return Math.max(0, Math.min(CART_LOCK_MINUTES * 60, remaining));
+}
+
+export function getLockExpiresAtIsoFromSlot(slot: {
+  locked_at: string | null;
+  lock_expires_at?: string | null;
+}): string | null {
+  if (slot.lock_expires_at) {
+    return slot.lock_expires_at;
+  }
+  if (!slot.locked_at) {
+    return null;
+  }
+  return getLockExpiresAtIso(slot.locked_at);
 }

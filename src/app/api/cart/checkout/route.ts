@@ -1,23 +1,23 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, getCurrentProfile } from "@/lib/auth/session";
-import { getBreakById, getSlotById } from "@/lib/breaks/queries";
+import { getActiveCart, createCartCheckoutOrder } from "@/lib/cart/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStripe, getStripeSessionExpiresAtUnix, toStripeAmount } from "@/lib/stripe/server";
+import { buildCartStripeLineItems } from "@/lib/stripe/cart-line-items";
+import { getStripe, getStripeSessionExpiresAtUnix } from "@/lib/stripe/server";
 import {
-  buildCheckoutCancelUrl,
+  buildCartCheckoutCancelUrl,
   buildCheckoutSuccessUrl,
   buildCheckoutSuccessUrlCreditOnly,
 } from "@/lib/stripe/checkout-urls";
-import { validateBuyNowLock } from "@/lib/stripe/orders-core";
-import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
-import { createCheckoutOrder, fulfillCreditOnlyOrder } from "@/lib/wallet/credit";
+import { fulfillCreditOnlyOrder } from "@/lib/wallet/credit";
+import { clampCreditAmount, parseWalletBalance, roundMoney } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
 
-type CheckoutPayBody = {
-  breakId?: string;
-  slotId?: string;
+type CartCheckoutBody = {
   locale?: AppLocale;
+  /** @deprecated Use appliedCredit */
   creditAmount?: number;
+  appliedCredit?: number;
 };
 
 export async function POST(request: Request) {
@@ -32,32 +32,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const body = (await request.json()) as CheckoutPayBody;
-    const { breakId, slotId, locale = "zh-Hant", creditAmount = 0 } = body;
+    const body = (await request.json()) as CartCheckoutBody;
+    const { locale = "zh-Hant" } = body;
+    const requestedCredit = body.appliedCredit ?? body.creditAmount ?? 0;
 
-    if (!breakId || !slotId) {
-      return NextResponse.json({ error: "MISSING_PARAMS" }, { status: 400 });
+    const cart = await getActiveCart(user.id);
+    if (!cart || cart.items.length === 0) {
+      return NextResponse.json({ error: "CART_EMPTY" }, { status: 409 });
     }
 
-    const hasValidLock = await validateBuyNowLock(slotId, user.id);
-    if (!hasValidLock) {
-      return NextResponse.json({ error: "LOCK_EXPIRED" }, { status: 409 });
+    if (cart.remainingSeconds <= 0) {
+      return NextResponse.json({ error: "CART_EXPIRED" }, { status: 409 });
     }
 
-    const breakItem = await getBreakById(breakId);
-    const slot = await getSlotById(slotId, breakId);
-
-    if (!breakItem || !slot || breakItem.status !== "active" || slot.status !== "locked") {
-      return NextResponse.json({ error: "SLOT_UNAVAILABLE" }, { status: 409 });
-    }
-
-    const slotPrice = Number(slot.price);
+    const wallet = parseWalletBalance(profile);
+    const total = roundMoney(cart.totalAmount);
     const appliedCredit = roundMoney(
-      clampCreditAmount(Number(creditAmount), slotPrice, Number(profile.store_credit))
+      clampCreditAmount(Number(requestedCredit), total, wallet.availableCredit)
     );
-    const stripeAmount = roundMoney(slotPrice - appliedCredit);
+    const stripeAmount = roundMoney(Math.max(0, total - appliedCredit));
 
-    const orderResult = await createCheckoutOrder(user.id, breakId, slotId, appliedCredit);
+    const orderResult = await createCartCheckoutOrder(user.id, appliedCredit);
     if (!orderResult.ok) {
       return NextResponse.json({ error: orderResult.code }, { status: 409 });
     }
@@ -70,42 +65,36 @@ export async function POST(request: Request) {
         type: "credit",
         orderId,
         successUrl: buildCheckoutSuccessUrlCreditOnly(locale, orderId),
+        creditAmount: appliedCredit,
+        stripeAmount: 0,
       });
     }
 
     const stripe = getStripe();
     const admin = createAdminClient();
 
+    const lineItems = buildCartStripeLineItems(
+      cart.items,
+      total,
+      stripeAmount,
+      appliedCredit
+    );
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       expires_at: getStripeSessionExpiresAtUnix(),
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "hkd",
-            unit_amount: toStripeAmount(stripeAmount),
-            product_data: {
-              name: `${breakItem.title} — ${slot.name}`,
-              description:
-                appliedCredit > 0
-                  ? `Buy Now (store credit applied: HK$${appliedCredit.toFixed(2)})`
-                  : `Buy Now: ${slot.name}`,
-            },
-          },
-        },
-      ],
+      line_items: lineItems,
       success_url: buildCheckoutSuccessUrl(locale, orderId),
-      cancel_url: buildCheckoutCancelUrl(locale, orderId, "buy_now"),
+      cancel_url: buildCartCheckoutCancelUrl(locale, orderId),
       client_reference_id: orderId,
       metadata: {
         order_id: orderId,
-        break_id: breakId,
-        slot_id: slotId,
         user_id: user.id,
         credit_amount: String(appliedCredit),
-        checkout_mode: "buy_now",
+        stripe_amount: String(stripeAmount),
+        checkout_mode: "cart",
+        cart_id: cart.id,
       },
     });
 

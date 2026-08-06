@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getLockExpiresAtIso, uuidEquals } from "@/lib/slots/time";
+import { BUY_NOW_LOCK_MINUTES } from "./constants";
+import { getLockExpiresAtIso, uuidEquals } from "./time";
 import type { LockErrorCode, LockResult } from "./constants";
 
 function mapErrorMessage(code: LockErrorCode): string {
@@ -31,9 +32,11 @@ type SlotRow = {
   status: string;
   user_id: string | null;
   locked_at: string | null;
+  lock_type?: string | null;
+  lock_expires_at?: string | null;
 };
 
-function buildLockSuccess(row: Pick<SlotRow, "id" | "break_id" | "locked_at">): LockResult {
+function buildLockSuccess(row: SlotRow): LockResult {
   if (!row.locked_at) {
     return { ok: false, code: "UNKNOWN", message: mapErrorMessage("UNKNOWN") };
   }
@@ -43,22 +46,18 @@ function buildLockSuccess(row: Pick<SlotRow, "id" | "break_id" | "locked_at">): 
     slotId: row.id,
     breakId: row.break_id,
     lockedAt: row.locked_at,
-    expiresAt: getLockExpiresAtIso(row.locked_at),
+    expiresAt: getLockExpiresAtIso(row.locked_at, row.lock_expires_at),
   };
 }
 
-/**
- * Resumes an existing active lock for the same user when possible, otherwise acquires a new lock.
- * Pre-check avoids false SLOT_LOCKED_BY_OTHER when the user returns via "Continue checkout".
- */
-export async function resumeOrLockBreakSlot(slotId: string, userId: string): Promise<LockResult> {
+export async function resumeOrLockBuyNowSlot(slotId: string, userId: string): Promise<LockResult> {
   await releaseExpiredSlotLocks();
 
   const admin = createAdminClient();
 
   const { data: slot, error: slotError } = await admin
     .from("break_slots")
-    .select("id, break_id, status, user_id, locked_at")
+    .select("id, break_id, status, user_id, locked_at, lock_type, lock_expires_at")
     .eq("id", slotId)
     .maybeSingle();
 
@@ -68,19 +67,31 @@ export async function resumeOrLockBreakSlot(slotId: string, userId: string): Pro
 
   const row = slot as SlotRow;
 
-  if (row.status === "locked" && row.locked_at && uuidEquals(row.user_id, userId)) {
-    return buildLockSuccess(row);
+  if (
+    row.status === "locked" &&
+    row.lock_type === "buy_now" &&
+    row.locked_at &&
+    uuidEquals(row.user_id, userId)
+  ) {
+    const remaining = new Date(getLockExpiresAtIso(row.locked_at, row.lock_expires_at)).getTime() - Date.now();
+    if (remaining > 0) {
+      return buildLockSuccess(row);
+    }
   }
 
-  return lockBreakSlot(slotId, userId);
+  return lockSlotBuyNow(slotId, userId);
 }
 
-export async function lockBreakSlot(slotId: string, userId: string): Promise<LockResult> {
+/** @deprecated Use resumeOrLockBuyNowSlot */
+export const resumeOrLockBreakSlot = resumeOrLockBuyNowSlot;
+
+export async function lockSlotBuyNow(slotId: string, userId: string): Promise<LockResult> {
   const admin = createAdminClient();
 
-  const { data, error } = await admin.rpc("lock_break_slot", {
+  const { data, error } = await admin.rpc("lock_slot_buy_now", {
     p_slot_id: slotId,
     p_user_id: userId,
+    p_duration_minutes: BUY_NOW_LOCK_MINUTES,
   });
 
   if (error) {
@@ -99,9 +110,12 @@ export async function lockBreakSlot(slotId: string, userId: string): Promise<Loc
     slotId: row.slot_id,
     breakId: row.break_id,
     lockedAt: row.locked_at,
-    expiresAt: getLockExpiresAtIso(row.locked_at),
+    expiresAt: row.expires_at,
   };
 }
+
+/** @deprecated Use lockSlotBuyNow */
+export const lockBreakSlot = lockSlotBuyNow;
 
 export async function releaseSlotLock(slotId: string, userId: string): Promise<boolean> {
   const admin = createAdminClient();
@@ -124,7 +138,11 @@ export async function releaseExpiredSlotLocks(): Promise<number> {
   const { data, error } = await admin.rpc("release_expired_slot_locks");
 
   if (error) {
-    throw new Error(error.message);
+    // Wallet cleanup bugs (credit_reserved_check) must never crash page loads / checkout.
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[releaseExpiredSlotLocks]", error.message);
+    }
+    return 0;
   }
 
   return typeof data === "number" ? data : 0;

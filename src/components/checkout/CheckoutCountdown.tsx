@@ -9,6 +9,7 @@ import type { AppLocale } from "@/i18n/routing";
 
 type CheckoutCountdownProps = {
   lockedAt: string;
+  lockExpiresAt: string;
   slotId: string;
   breakId: string;
   locale: AppLocale;
@@ -24,6 +25,7 @@ function formatRemaining(totalSeconds: number): string {
 
 export function CheckoutCountdown({
   lockedAt,
+  lockExpiresAt,
   slotId,
   breakId,
   locale,
@@ -31,30 +33,26 @@ export function CheckoutCountdown({
   availableCredit,
 }: CheckoutCountdownProps) {
   const t = useTranslations("checkout");
-  // null = not yet synced on client (avoids SSR/hydration mismatch + false expiry)
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [released, setReleased] = useState(false);
 
   useEffect(() => {
     const tick = () => {
-      setRemainingSeconds(getLockRemainingSeconds(lockedAt));
+      setRemainingSeconds(getLockRemainingSeconds(lockedAt, lockExpiresAt));
     };
 
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [lockedAt]);
+  }, [lockedAt, lockExpiresAt]);
 
   useEffect(() => {
-    // Only release after the client has synced the real remaining time and it hit zero.
     if (remainingSeconds === null || remainingSeconds > 0 || released) {
       return;
     }
 
     async function notifyExpired() {
       try {
-        // Lazy-release expired locks only — do NOT force-release via /api/slots/release
-        // (that endpoint clears the caller's lock even when still active).
         await fetch(`/api/slots?breakId=${breakId}`, { cache: "no-store" });
       } finally {
         setReleased(true);
@@ -66,7 +64,7 @@ export function CheckoutCountdown({
 
   const mounted = remainingSeconds !== null;
   const isExpired = mounted && remainingSeconds <= 0;
-  const isUrgent = mounted && remainingSeconds > 0 && remainingSeconds <= 60;
+  const isUrgent = mounted && remainingSeconds > 0 && remainingSeconds <= 30;
   const timerDisplay = !mounted
     ? "--:--"
     : isExpired
@@ -84,7 +82,7 @@ export function CheckoutCountdown({
               : "border-success/30 bg-success/10"
         }`}
       >
-        <p className="text-xs uppercase tracking-[0.18em] text-muted">{t("lockTimerLabel")}</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-muted">{t("buyNowTimerLabel")}</p>
         <p
           className={`mt-2 font-mono text-4xl font-semibold ${
             isExpired ? "text-red-200" : isUrgent ? "text-accent-soft" : "text-success"
@@ -93,7 +91,7 @@ export function CheckoutCountdown({
           {timerDisplay}
         </p>
         <p className="mt-2 text-sm text-muted">
-          {!mounted ? t("lockActive") : isExpired ? t("lockExpired") : t("lockActive")}
+          {!mounted ? t("lockActive") : isExpired ? t("lockExpired") : t("buyNowTimerHint")}
         </p>
       </div>
 

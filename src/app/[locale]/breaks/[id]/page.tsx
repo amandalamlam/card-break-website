@@ -56,6 +56,7 @@ export default async function BreakDetailPage({
           breakStatus={breakItem.status}
           initialSlots={breakItem.break_slots}
           currentUserId={user?.id ?? null}
+          locale={locale}
         />
       </section>
     </div>
