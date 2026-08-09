@@ -93,6 +93,4 @@ Users may submit at most **3 withdrawal requests per hour** (API returns `429`).
 
 ## Next phase
 
-**Phase 8 — Post-break shipping** (delivery option submission after break completes)
-
-When Phase 7 is working, reply: **"Phase 7 is working"**
+**Phase 8 — Post-break shipping** — see `PHASE8_POST_BREAK_SHIPPING.md`

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
+import { stripHtmlToPlainText } from "@/lib/breaks/sanitize-html";
 import type { BreakListItem } from "@/lib/breaks/types";
 
 type BreakCardProps = {
@@ -45,7 +46,9 @@ export async function BreakCard({ breakItem }: BreakCardProps) {
         <h3 className="text-lg font-semibold tracking-tight group-hover:text-accent-soft">
           {breakItem.title}
         </h3>
-        <p className="line-clamp-2 text-sm leading-6 text-muted">{breakItem.description}</p>
+        <p className="line-clamp-2 text-sm leading-6 text-muted">
+          {stripHtmlToPlainText(breakItem.description) || breakItem.description}
+        </p>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted">{lowestPrice}</span>
           <span className="font-medium text-accent-soft">{t("viewBreak")}</span>

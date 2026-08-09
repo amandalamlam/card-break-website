@@ -14,8 +14,12 @@ export type CancelBreakResult =
     }
   | { ok: false; code: string; message: string };
 
-function parseRpcError(error: { message?: string }): string {
-  const message = error.message ?? "UNKNOWN";
+function parseRpcError(error: { message?: string; details?: string; hint?: string }): string {
+  const message = [error.message, error.details, error.hint].filter(Boolean).join(" ");
+
+  if (!message) {
+    return "UNKNOWN";
+  }
 
   if (message.includes("INSUFFICIENT_CREDIT")) return "INSUFFICIENT_CREDIT";
   if (message.includes("CREDIT_EXCEEDS_PRICE")) return "CREDIT_EXCEEDS_PRICE";
@@ -26,6 +30,10 @@ function parseRpcError(error: { message?: string }): string {
   if (message.includes("NOT_CREDIT_ONLY_ORDER")) return "NOT_CREDIT_ONLY_ORDER";
   if (message.includes("BREAK_NOT_FOUND")) return "BREAK_NOT_FOUND";
   if (message.includes("BREAK_CANNOT_BE_CANCELLED")) return "BREAK_CANNOT_BE_CANCELLED";
+  if (message.includes("PENDING_ORDER_CANCEL_FAILED")) return "PENDING_ORDER_CANCEL_FAILED";
+  if (message.includes("FOR UPDATE is not allowed with DISTINCT")) return "CANCEL_QUERY_FAILED";
+  if (message.includes("cannot cast type record to orders")) return "CANCEL_QUERY_FAILED";
+  if (message.includes("credit_reserved")) return "WALLET_CLEANUP_FAILED";
 
   return "UNKNOWN";
 }
@@ -80,7 +88,8 @@ export async function cancelBreakAndRefund(breakId: string): Promise<CancelBreak
 
   if (error) {
     const code = parseRpcError(error);
-    return { ok: false, code, message: code };
+    console.error("[cancelBreakAndRefund]", error.message, error.details, error.hint);
+    return { ok: false, code, message: error.message ?? code };
   }
 
   const result = data as {

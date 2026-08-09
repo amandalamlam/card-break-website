@@ -14,6 +14,7 @@
     "cart": "购物车",
     "admin": "后台",
     "withdrawals": "提现",
+    "shipping": "物流",
     "login": "登录",
     "signup": "注册"
   },
@@ -52,6 +53,14 @@
     "transactionsSubtitle": "最近的退款、消费及释放记录",
     "noTransactions": "暂时没有钱包记录。",
     "viewFullHistory": "查看完整历史记录 →",
+    "shippingTitle": "已完成开箱 — 物流安排",
+    "shippingSubtitle": "开箱完成后，请选择卡片寄送方式。此步骤不会收取任何费用。",
+    "tabs": {
+      "ariaLabel": "账户分页",
+      "overview": "账户总览",
+      "shipping": "物流安排",
+      "wallet": "钱包记录"
+    },
     "walletHistory": {
       "title": "钱包完整记录",
       "subtitle": "筛选及查阅过去 24 个月的钱包交易记录。",
@@ -295,10 +304,58 @@
       "close": "关闭"
     }
   },
+  "shipping": {
+    "noCompletedBreaks": "暂无需要选择物流的已完成开箱。",
+    "slotsWon": "中标位置",
+    "selectDelivery": "选择寄送方式",
+    "viewReceipt": "查看提交纪录",
+    "actionNeeded": "请选择寄送方式",
+    "statusSubmitted": "已提交：{option}",
+    "backToAccount": "← 返回我的账户",
+    "pageSubtitle": "请为此开箱选择寄送方式。无需付款 — 顺丰到付或自取。",
+    "optionLabel": "寄送方式",
+    "detailsLabel": "详情／地址／智能柜编号",
+    "detailsPlaceholder": "例如：顺丰智能柜 H852XX，或完整海外地址",
+    "detailsHint": "支持英文长地址及国际邮政编码。",
+    "confirm": "确认寄送选择",
+    "submitting": "提交中…",
+    "noPaymentNote": "此步骤仅记录你的物流意愿，不会触发任何付款。",
+    "watchReplay": "观看开箱重播",
+    "errors": {
+      "SHIPPING_ALREADY_REQUESTED": "你已为此开箱提交过物流选择。",
+      "MISSING_SHIPPING_DETAILS": "请填写寄送详情。",
+      "INVALID_SHIPPING_OPTION": "请选择有效的寄送方式。",
+      "BREAK_NOT_COMPLETED": "此开箱尚未完成。",
+      "NO_PAID_SLOTS": "找不到此开箱的已付款位置。",
+      "UNKNOWN": "无法提交，请稍后再试。"
+    },
+    "receipt": {
+      "submitted": "已提交物流选择",
+      "lockedNote": "此提交为只读。如需更改请联系客服。",
+      "slots": "位置",
+      "option": "方式",
+      "details": "详情",
+      "statusLabel": "状态",
+      "statusValues": {
+        "pending": "待发货",
+        "shipped": "已发货",
+        "completed": "已完成"
+      }
+    }
+  },
   "admin": {
+    "unifiedTitle": "后台管理",
+    "unifiedSubtitle": "开箱、提现及物流一站式管理",
     "dashboardTitle": "开箱管理",
     "dashboardSubtitle": "创建及管理 Card Break 活动",
     "createBreak": "新增开箱",
+    "noBreaks": "暂无开箱活动。",
+    "tabs": {
+      "ariaLabel": "后台分页",
+      "breaks": "开箱管理",
+      "withdrawals": "提现审核",
+      "shipping": "物流管理"
+    },
     "newBreakTitle": "新增开箱",
     "newBreakSubtitle": "创建活动并加入球队／球员位置",
     "titleLabel": "标题",
@@ -310,12 +367,44 @@
     "slotsHint": "每行一个位置：名称,价格（例如 Lakers,300）",
     "submitting": "创建中…",
     "viewPublicPage": "查看公开页面",
+    "editBreak": {
+      "action": "编辑",
+      "title": "编辑开箱",
+      "subtitle": "更新标题、描述、封面及位置设定。",
+      "videoLabel": "重播视频 URL",
+      "videoHint": "已完成开箱必须提供重播链接。",
+      "slotsHint": "每行一个位置：名称,价格。已售出或锁定中的位置请保留在列表中。",
+      "save": "保存变更",
+      "saving": "保存中…",
+      "saveSuccess": "开箱资料已更新。",
+      "saveError": "无法保存变更，请稍后再试。",
+      "close": "关闭"
+    },
     "slotsSummary": "{available} / {total} 个可售",
     "cancelBreak": "取消开箱（流局退款）",
     "cancellingBreak": "正在取消…",
     "cancelBreakConfirm": "确定要取消「{title}」吗？所有已付款将 100% 退回用户钱包（不经 Stripe 退款）。",
     "cancelBreakSuccess": "已取消开箱，并退回 {count} 笔订单至用户钱包。",
     "cancelBreakError": "无法取消此开箱，请稍后再试。",
+    "cancelBreakErrors": {
+      "UNKNOWN": "无法取消此开箱，请稍后再试。",
+      "BREAK_NOT_FOUND": "找不到此开箱。",
+      "BREAK_CANNOT_BE_CANCELLED": "此开箱已完成或已取消，无法再次流局。",
+      "PENDING_ORDER_CANCEL_FAILED": "释放待结账订单时发生错误，请稍后再试。",
+      "WALLET_CLEANUP_FAILED": "钱包冻结余额清理失败，请联系技术支持。",
+      "CANCEL_QUERY_FAILED": "取消流程查询错误，请在 Supabase 执行 phase8f_cancel_break_fix.sql。"
+    },
+    "breakSections": {
+      "inProgressTitle": "进行中开箱",
+      "inProgressSubtitle": "可编辑、取消流局及查看公开页面。",
+      "noInProgress": "暂无进行中的开箱。",
+      "completedTitle": "已完成开箱",
+      "completedSubtitle": "已完结的开箱记录（只读）。",
+      "noCompleted": "暂无已完成的开箱。",
+      "cancelledTitle": "已取消 / 流局记录",
+      "cancelledSubtitle": "历史流局记录存档。",
+      "noCancelled": "暂无已取消的开箱。"
+    },
     "manageWithdrawals": "管理提现",
     "withdrawals": {
       "title": "提现申请",
@@ -326,6 +415,13 @@
       "noPending": "暂无待审批提现。",
       "recentTitle": "最近记录",
       "recentSubtitle": "已完成及已拒绝的申请",
+      "table": {
+        "amount": "金额",
+        "user": "用户",
+        "method": "方式",
+        "status": "状态",
+        "date": "日期"
+      },
       "userLabel": "用户",
       "methodLabel": "方式",
       "detailsLabel": "收款资料",
@@ -348,6 +444,74 @@
         "completed": "已完成",
         "rejected": "已拒绝"
       }
+    },
+    "shipping": {
+      "title": "物流申请",
+      "subtitle": "按开箱查看所有参与者的物流状态，并在侧栏编辑详情或备注。",
+      "backToBreaks": "返回开箱管理",
+      "manageOptions": "寄送方式设置",
+      "selectBreak": "选择开箱",
+      "noBreaks": "暂无已完成的开箱。",
+      "noParticipants": "此开箱暂无已付款参与者。",
+      "userLabel": "用户",
+      "slotsLabel": "中标位置",
+      "optionLabel": "寄送方式",
+      "detailsLabel": "用户详情",
+      "statusLabel": "状态",
+      "adminNotesLabel": "管理员备注",
+      "watchReplay": "观看重播",
+      "save": "保存变更",
+      "saving": "保存中…",
+      "saveSuccess": "物流申请已更新。",
+      "saveError": "无法保存变更。",
+      "displayStatus": {
+        "unrequested": "未申请",
+        "pending": "待发货",
+        "shipped": "已发货",
+        "completed": "已完成"
+      },
+      "status": {
+        "pending": "待发货",
+        "shipped": "已发货",
+        "completed": "已完成"
+      },
+      "table": {
+        "user": "用户",
+        "positions": "中标位置",
+        "method": "寄送方式",
+        "status": "状态",
+        "actions": "操作",
+        "detailsAction": "详情/备注"
+      },
+      "summary": {
+        "participants": "参与者 {count}",
+        "unrequested": "未申请 {count}",
+        "pending": "待发货 {count}"
+      },
+      "drawer": {
+        "title": "物流详情",
+        "edit": "编辑",
+        "cancelEdit": "取消",
+        "close": "关闭",
+        "notSubmitted": "尚未提交",
+        "noAdminNotes": "暂无备注",
+        "unrequestedNote": "此用户尚未提交物流申请。",
+        "submittedAt": "提交时间：{date}",
+        "trackingPlaceholder": "追踪编号、备注等"
+      }
+    },
+    "shippingOptions": {
+      "title": "寄送方式",
+      "subtitle": "切换用户可见选项。永不删除 — 仅可停用。",
+      "backToShipping": "← 返回物流",
+      "active": "启用中",
+      "inactive": "已停用",
+      "saving": "保存中…",
+      "saveError": "无法保存选项。",
+      "addTitle": "新增寄送方式",
+      "namePlaceholder": "方式名称",
+      "instructionsPlaceholder": "显示给用户的说明",
+      "addButton": "新增"
     }
   },
   "home": {

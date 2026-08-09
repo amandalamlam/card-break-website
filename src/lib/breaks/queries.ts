@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchBreakSlotsWithLazyRelease } from "@/lib/slots/fetch-slots";
 import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
-import type { Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
+import type { AdminBreakDetail, Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
 
 function mapBreakListItem(
   row: Break & { break_slots: Pick<BreakSlot, "status">[] }
@@ -81,6 +81,42 @@ export async function getSlotById(slotId: string, breakId: string): Promise<Brea
   }
 
   return data as BreakSlot;
+}
+
+export async function getAllBreaksWithSlotsForAdmin(): Promise<AdminBreakDetail[]> {
+  await releaseExpiredSlotLocks();
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("breaks")
+    .select(
+      "id, title, description, image_url, status, video_url, created_at, break_slots(id, break_id, name, price, status, user_id, locked_at)"
+    )
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row) => {
+    const breakRow = row as Break & { break_slots: BreakSlot[] };
+    const breakSlots = breakRow.break_slots ?? [];
+    const available_count = breakSlots.filter((slot) => slot.status === "available").length;
+
+    return {
+      id: breakRow.id,
+      title: breakRow.title,
+      description: breakRow.description,
+      image_url: breakRow.image_url,
+      status: breakRow.status,
+      video_url: breakRow.video_url,
+      created_at: breakRow.created_at,
+      available_count,
+      total_count: breakSlots.length,
+      break_slots: breakSlots.sort((left, right) => left.name.localeCompare(right.name)),
+    };
+  });
 }
 
 export async function getAllBreaksForAdmin(): Promise<BreakListItem[]> {

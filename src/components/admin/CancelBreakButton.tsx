@@ -40,7 +40,10 @@ export function CancelBreakButton({ breakId, breakTitle }: CancelBreakButtonProp
       };
 
       if (!response.ok || !data.ok) {
-        setError(data.error ?? t("cancelBreakError"));
+        const errorCode = data.error ?? "UNKNOWN";
+        const errorKey = `cancelBreakErrors.${errorCode}`;
+        const translated = t(errorKey);
+        setError(translated === errorKey ? t("cancelBreakError") : translated);
         setLoading(false);
         return;
       }

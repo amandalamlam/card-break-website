@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import type { AppLocale } from "@/i18n/routing";
 
-export default async function AdminBreaksRedirectPage({
+export default async function AdminShippingRedirectPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -12,5 +12,5 @@ export default async function AdminBreaksRedirectPage({
   setRequestLocale(locale);
   await requireAdmin(locale as AppLocale);
 
-  redirect({ href: "/admin?tab=breaks", locale: locale as AppLocale });
+  redirect({ href: "/admin?tab=shipping", locale: locale as AppLocale });
 }

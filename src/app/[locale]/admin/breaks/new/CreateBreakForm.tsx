@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { createBreakAction, type CreateBreakState } from "./actions";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -13,6 +14,7 @@ type CreateBreakFormProps = {
 
 export function CreateBreakForm({ locale }: CreateBreakFormProps) {
   const t = useTranslations("admin");
+  const [description, setDescription] = useState("");
   const [state, formAction, pending] = useActionState(
     createBreakAction.bind(null, locale),
     initialState
@@ -34,16 +36,13 @@ export function CreateBreakForm({ locale }: CreateBreakFormProps) {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium">
-          {t("descriptionLabel")}
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={4}
-          className="w-full rounded-xl border border-border bg-background/70 px-4 py-3 text-sm outline-none focus:border-accent"
+        <span className="text-sm font-medium">{t("descriptionLabel")}</span>
+        <RichTextEditor
+          value={description}
+          onChange={setDescription}
           placeholder={t("descriptionPlaceholder")}
         />
+        <input type="hidden" name="description" value={description} />
       </div>
 
       <div className="space-y-2">

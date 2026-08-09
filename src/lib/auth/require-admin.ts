@@ -8,7 +8,7 @@ export async function requireAdmin(locale: AppLocale) {
 
   if (!profile) {
     redirect({
-      href: buildAuthRedirectPath(locale, `/${locale}/admin/breaks`, "login"),
+      href: buildAuthRedirectPath(locale, `/${locale}/admin`, "login"),
       locale,
     });
     throw new Error("Admin access requires login.");

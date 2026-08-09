@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
+import { RichTextContent } from "@/components/breaks/RichTextContent";
 import { SlotGridLive } from "@/components/breaks/SlotGridLive";
 import { getBreakById } from "@/lib/breaks/queries";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -27,7 +28,7 @@ export default async function BreakDetailPage({
         <div className="space-y-5">
           <BreakStatusBadge status={breakItem.status} />
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{breakItem.title}</h1>
-          <p className="text-base leading-7 text-muted">{breakItem.description}</p>
+          <RichTextContent html={breakItem.description} />
         </div>
 
         <div className="glass-panel overflow-hidden rounded-3xl">

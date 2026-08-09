@@ -14,6 +14,7 @@
     "cart": "購物車",
     "admin": "後台",
     "withdrawals": "提現",
+    "shipping": "物流",
     "login": "登入",
     "signup": "註冊"
   },
@@ -52,6 +53,14 @@
     "transactionsSubtitle": "最近的退款、消費及釋放紀錄",
     "noTransactions": "暫時沒有錢包紀錄。",
     "viewFullHistory": "查看完整歷史紀錄 →",
+    "shippingTitle": "已完成開箱 — 物流安排",
+    "shippingSubtitle": "開箱完成後，請選擇卡片寄送方式。此步驟不會收取任何費用。",
+    "tabs": {
+      "ariaLabel": "帳戶分頁",
+      "overview": "帳戶總覽",
+      "shipping": "物流安排",
+      "wallet": "錢包紀錄"
+    },
     "walletHistory": {
       "title": "錢包完整紀錄",
       "subtitle": "篩選及查閱過去 24 個月的錢包交易紀錄。",
@@ -295,10 +304,58 @@
       "close": "關閉"
     }
   },
+  "shipping": {
+    "noCompletedBreaks": "暫無需要選擇物流的已完成開箱。",
+    "slotsWon": "中標位置",
+    "selectDelivery": "選擇寄送方式",
+    "viewReceipt": "查看提交紀錄",
+    "actionNeeded": "請選擇寄送方式",
+    "statusSubmitted": "已提交：{option}",
+    "backToAccount": "← 返回我的帳戶",
+    "pageSubtitle": "請為此開箱選擇寄送方式。無需付款 — 順豐到付或自取。",
+    "optionLabel": "寄送方式",
+    "detailsLabel": "詳情／地址／智能櫃編號",
+    "detailsPlaceholder": "例如：順豐智能櫃 H852XX，或完整海外地址",
+    "detailsHint": "支援英文長地址及國際郵遞區號。",
+    "confirm": "確認寄送選擇",
+    "submitting": "提交中…",
+    "noPaymentNote": "此步驟僅記錄你的物流意願，不會觸發任何付款。",
+    "watchReplay": "觀看開箱重播",
+    "errors": {
+      "SHIPPING_ALREADY_REQUESTED": "你已為此開箱提交過物流選擇。",
+      "MISSING_SHIPPING_DETAILS": "請填寫寄送詳情。",
+      "INVALID_SHIPPING_OPTION": "請選擇有效的寄送方式。",
+      "BREAK_NOT_COMPLETED": "此開箱尚未完成。",
+      "NO_PAID_SLOTS": "找不到此開箱的已付款位置。",
+      "UNKNOWN": "無法提交，請稍後再試。"
+    },
+    "receipt": {
+      "submitted": "已提交物流選擇",
+      "lockedNote": "此提交為唯讀。如需更改請聯絡客服。",
+      "slots": "位置",
+      "option": "方式",
+      "details": "詳情",
+      "statusLabel": "狀態",
+      "statusValues": {
+        "pending": "待發貨",
+        "shipped": "已發貨",
+        "completed": "已完成"
+      }
+    }
+  },
   "admin": {
+    "unifiedTitle": "後台管理",
+    "unifiedSubtitle": "開箱、提現及物流一站式管理",
     "dashboardTitle": "開箱管理",
     "dashboardSubtitle": "建立及管理 Card Break 活動",
     "createBreak": "新增開箱",
+    "noBreaks": "暫無開箱活動。",
+    "tabs": {
+      "ariaLabel": "後台分頁",
+      "breaks": "開箱管理",
+      "withdrawals": "提現審核",
+      "shipping": "物流管理"
+    },
     "newBreakTitle": "新增開箱",
     "newBreakSubtitle": "建立活動並加入球隊／球員位置",
     "titleLabel": "標題",
@@ -310,12 +367,44 @@
     "slotsHint": "每行一個位置：名稱,價格（例如 Lakers,300）",
     "submitting": "建立中…",
     "viewPublicPage": "查看公開頁面",
+    "editBreak": {
+      "action": "編輯",
+      "title": "編輯開箱",
+      "subtitle": "更新標題、描述、封面及位置設定。",
+      "videoLabel": "重播影片 URL",
+      "videoHint": "已完成開箱必須提供重播連結。",
+      "slotsHint": "每行一個位置：名稱,價格。已售出或鎖定中的位置請保留在列表中。",
+      "save": "儲存變更",
+      "saving": "儲存中…",
+      "saveSuccess": "開箱資料已更新。",
+      "saveError": "無法儲存變更，請稍後再試。",
+      "close": "關閉"
+    },
     "slotsSummary": "{available} / {total} 個可售",
     "cancelBreak": "取消開箱（流局退款）",
     "cancellingBreak": "正在取消…",
     "cancelBreakConfirm": "確定要取消「{title}」嗎？所有已付款將 100% 退回用戶錢包（不經 Stripe 退款）。",
     "cancelBreakSuccess": "已取消開箱，並退回 {count} 筆訂單至用戶錢包。",
     "cancelBreakError": "無法取消此開箱，請稍後再試。",
+    "cancelBreakErrors": {
+      "UNKNOWN": "無法取消此開箱，請稍後再試。",
+      "BREAK_NOT_FOUND": "找不到此開箱。",
+      "BREAK_CANNOT_BE_CANCELLED": "此開箱已完成或已取消，無法再次流局。",
+      "PENDING_ORDER_CANCEL_FAILED": "釋放待結帳訂單時發生錯誤，請稍後再試。",
+      "WALLET_CLEANUP_FAILED": "錢包凍結餘額清理失敗，請聯絡技術支援。",
+      "CANCEL_QUERY_FAILED": "取消流程查詢錯誤，請在 Supabase 執行 phase8f_cancel_break_fix.sql。"
+    },
+    "breakSections": {
+      "inProgressTitle": "進行中開箱",
+      "inProgressSubtitle": "可編輯、取消流局及查看公開頁面。",
+      "noInProgress": "暫無進行中的開箱。",
+      "completedTitle": "已完成開箱",
+      "completedSubtitle": "已完結的開箱紀錄（只讀）。",
+      "noCompleted": "暫無已完成的開箱。",
+      "cancelledTitle": "已取消 / 流局紀錄",
+      "cancelledSubtitle": "歷史流局紀錄存檔。",
+      "noCancelled": "暫無已取消的開箱。"
+    },
     "manageWithdrawals": "管理提現",
     "withdrawals": {
       "title": "提現申請",
@@ -326,6 +415,13 @@
       "noPending": "暫無待審批提現。",
       "recentTitle": "最近紀錄",
       "recentSubtitle": "已完成及已拒絕的申請",
+      "table": {
+        "amount": "金額",
+        "user": "用戶",
+        "method": "方式",
+        "status": "狀態",
+        "date": "日期"
+      },
       "userLabel": "用戶",
       "methodLabel": "方式",
       "detailsLabel": "收款資料",
@@ -348,6 +444,74 @@
         "completed": "已完成",
         "rejected": "已拒絕"
       }
+    },
+    "shipping": {
+      "title": "物流申請",
+      "subtitle": "按開箱檢視所有參與者的物流狀態，並在側欄編輯詳情或備註。",
+      "backToBreaks": "返回開箱管理",
+      "manageOptions": "寄送方式設定",
+      "selectBreak": "選擇開箱",
+      "noBreaks": "暫無已完成的開箱。",
+      "noParticipants": "此開箱暫無已付款參與者。",
+      "userLabel": "用戶",
+      "slotsLabel": "中標位置",
+      "optionLabel": "寄送方式",
+      "detailsLabel": "用戶詳情",
+      "statusLabel": "狀態",
+      "adminNotesLabel": "管理員備註",
+      "watchReplay": "觀看重播",
+      "save": "儲存變更",
+      "saving": "儲存中…",
+      "saveSuccess": "物流申請已更新。",
+      "saveError": "無法儲存變更。",
+      "displayStatus": {
+        "unrequested": "未申請",
+        "pending": "待發貨",
+        "shipped": "已發貨",
+        "completed": "已完成"
+      },
+      "status": {
+        "pending": "待發貨",
+        "shipped": "已發貨",
+        "completed": "已完成"
+      },
+      "table": {
+        "user": "用戶",
+        "positions": "中標位置",
+        "method": "寄送方式",
+        "status": "狀態",
+        "actions": "操作",
+        "detailsAction": "詳情/備註"
+      },
+      "summary": {
+        "participants": "參與者 {count}",
+        "unrequested": "未申請 {count}",
+        "pending": "待發貨 {count}"
+      },
+      "drawer": {
+        "title": "物流詳情",
+        "edit": "編輯",
+        "cancelEdit": "取消",
+        "close": "關閉",
+        "notSubmitted": "尚未提交",
+        "noAdminNotes": "暫無備註",
+        "unrequestedNote": "此用戶尚未提交物流申請。",
+        "submittedAt": "提交時間：{date}",
+        "trackingPlaceholder": "追蹤編號、備註等"
+      }
+    },
+    "shippingOptions": {
+      "title": "寄送方式",
+      "subtitle": "切換用戶可見選項。永不刪除 — 僅可停用。",
+      "backToShipping": "← 返回物流",
+      "active": "啟用中",
+      "inactive": "已停用",
+      "saving": "儲存中…",
+      "saveError": "無法儲存選項。",
+      "addTitle": "新增寄送方式",
+      "namePlaceholder": "方式名稱",
+      "instructionsPlaceholder": "顯示給用戶的說明",
+      "addButton": "新增"
     }
   },
   "home": {

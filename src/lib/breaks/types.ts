@@ -31,3 +31,7 @@ export type BreakListItem = Break & {
   available_count: number;
   total_count: number;
 };
+
+export type AdminBreakDetail = BreakListItem & {
+  break_slots: BreakSlot[];
+};

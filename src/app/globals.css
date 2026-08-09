@@ -82,4 +82,50 @@
   .withdraw-action-link:active .withdraw-action-link__label {
     @apply bg-transparent text-slate-950;
   }
+
+  .rich-text-content p + p {
+    @apply mt-4;
+  }
+
+  .rich-text-content ul {
+    @apply my-4 list-disc space-y-2 pl-6;
+  }
+
+  .rich-text-content ol {
+    @apply my-4 list-decimal space-y-2 pl-6;
+  }
+
+  .rich-text-content a {
+    @apply text-accent-soft underline underline-offset-2 transition hover:text-accent;
+  }
+
+  .rich-text-content table {
+    @apply my-4 w-full border-collapse overflow-hidden rounded-xl border border-border text-sm;
+  }
+
+  .rich-text-content th,
+  .rich-text-content td {
+    @apply border border-border px-3 py-2 text-left align-top;
+  }
+
+  .rich-text-content th {
+    @apply bg-background/60 font-medium text-foreground;
+  }
+
+  .rich-text-editor__content p + p {
+    @apply mt-3;
+  }
+
+  .rich-text-editor__content ul {
+    @apply my-3 list-disc space-y-1 pl-5;
+  }
+
+  .rich-text-editor__content table {
+    @apply my-3 w-full border-collapse border border-border text-sm;
+  }
+
+  .rich-text-editor__content th,
+  .rich-text-editor__content td {
+    @apply border border-border px-2 py-1;
+  }
 }

@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
 import { requireAdmin } from "@/lib/auth/require-admin";
+import { sanitizeBreakDescription } from "@/lib/breaks/sanitize-html";
+import { parseSlotsInput } from "@/lib/breaks/slots-input";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -10,23 +12,6 @@ export type CreateBreakState = {
   error?: string;
   success?: boolean;
 };
-
-function parseSlotsInput(raw: string): { name: string; price: number }[] {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [name, priceText] = line.split(",").map((part) => part.trim());
-      const price = Number(priceText);
-
-      if (!name || Number.isNaN(price) || price < 0) {
-        throw new Error(`Invalid slot line: "${line}". Use format: Team Name,300`);
-      }
-
-      return { name, price };
-    });
-}
 
 export async function createBreakAction(
   locale: AppLocale,
@@ -36,7 +21,7 @@ export async function createBreakAction(
   await requireAdmin(locale);
 
   const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
+  const description = sanitizeBreakDescription(String(formData.get("description") ?? ""));
   const imageUrl = String(formData.get("image_url") ?? "").trim();
   const slotsRaw = String(formData.get("slots") ?? "").trim();
 
@@ -44,7 +29,7 @@ export async function createBreakAction(
     return { error: "Title is required." };
   }
 
-  let slots: { name: string; price: number }[];
+  let slots: ReturnType<typeof parseSlotsInput>;
   try {
     slots = parseSlotsInput(slotsRaw);
   } catch (error) {

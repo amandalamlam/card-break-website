@@ -14,6 +14,7 @@
     "cart": "Cart",
     "admin": "Admin",
     "withdrawals": "Withdrawals",
+    "shipping": "Shipping",
     "login": "Log in",
     "signup": "Sign up"
   },
@@ -52,6 +53,14 @@
     "transactionsSubtitle": "Recent refunds, purchases, and releases",
     "noTransactions": "No wallet activity yet.",
     "viewFullHistory": "View full history →",
+    "shippingTitle": "Completed breaks — delivery",
+    "shippingSubtitle": "After a break finishes, choose how you want your cards delivered. No payment is charged here.",
+    "tabs": {
+      "ariaLabel": "Account sections",
+      "overview": "Overview",
+      "shipping": "Shipping",
+      "wallet": "Wallet log"
+    },
     "walletHistory": {
       "title": "Wallet history",
       "subtitle": "Browse and filter wallet transactions from the past 24 months.",
@@ -295,10 +304,58 @@
       "close": "Close"
     }
   },
+  "shipping": {
+    "noCompletedBreaks": "No completed breaks awaiting delivery selection.",
+    "slotsWon": "Slots won",
+    "selectDelivery": "Select delivery option",
+    "viewReceipt": "View submission",
+    "actionNeeded": "Delivery option required",
+    "statusSubmitted": "Submitted: {option}",
+    "backToAccount": "← Back to My Account",
+    "pageSubtitle": "Choose a delivery method for this break. No payment is required — SF collect-on-delivery or pickup only.",
+    "optionLabel": "Delivery method",
+    "detailsLabel": "Details / address / locker code",
+    "detailsPlaceholder": "e.g. SF locker H852XX, or full international address",
+    "detailsHint": "Supports long English addresses and international postal codes.",
+    "confirm": "Confirm delivery choice",
+    "submitting": "Submitting…",
+    "noPaymentNote": "This step records your delivery preference only. No payment gateway is triggered.",
+    "watchReplay": "Watch break replay",
+    "errors": {
+      "SHIPPING_ALREADY_REQUESTED": "You already submitted delivery for this break.",
+      "MISSING_SHIPPING_DETAILS": "Please enter delivery details.",
+      "INVALID_SHIPPING_OPTION": "Please select a valid delivery option.",
+      "BREAK_NOT_COMPLETED": "This break is not completed yet.",
+      "NO_PAID_SLOTS": "No paid slots found for this break.",
+      "UNKNOWN": "Could not submit. Please try again."
+    },
+    "receipt": {
+      "submitted": "Delivery choice submitted",
+      "lockedNote": "This submission is read-only. Contact support if you need to change details.",
+      "slots": "Slots",
+      "option": "Method",
+      "details": "Details",
+      "statusLabel": "Status",
+      "statusValues": {
+        "pending": "Pending shipment",
+        "shipped": "Shipped",
+        "completed": "Completed"
+      }
+    }
+  },
   "admin": {
+    "unifiedTitle": "Admin dashboard",
+    "unifiedSubtitle": "Manage breaks, withdrawals, and shipping in one place.",
     "dashboardTitle": "Break management",
     "dashboardSubtitle": "Create and manage card break events",
     "createBreak": "New break",
+    "noBreaks": "No breaks yet.",
+    "tabs": {
+      "ariaLabel": "Admin sections",
+      "breaks": "Breaks",
+      "withdrawals": "Withdrawals",
+      "shipping": "Shipping"
+    },
     "newBreakTitle": "Create a break",
     "newBreakSubtitle": "Add an event and team/player slots",
     "titleLabel": "Title",
@@ -310,12 +367,44 @@
     "slotsHint": "One slot per line: Name,Price (e.g. Lakers,300)",
     "submitting": "Creating…",
     "viewPublicPage": "View public page",
+    "editBreak": {
+      "action": "Edit",
+      "title": "Edit break",
+      "subtitle": "Update title, description, cover image, and slot settings.",
+      "videoLabel": "Replay video URL",
+      "videoHint": "Completed breaks must include a replay link.",
+      "slotsHint": "One slot per line: Name,Price. Keep sold or locked slots in the list.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saveSuccess": "Break updated.",
+      "saveError": "Could not save changes. Please try again.",
+      "close": "Close"
+    },
     "slotsSummary": "{available} / {total} available",
     "cancelBreak": "Cancel break (refund to wallet)",
     "cancellingBreak": "Cancelling…",
     "cancelBreakConfirm": "Cancel \"{title}\"? All paid orders will be refunded 100% to user wallets (no Stripe refund).",
     "cancelBreakSuccess": "Break cancelled. Refunded {count} order(s) to user wallets.",
     "cancelBreakError": "Could not cancel this break. Please try again.",
+    "cancelBreakErrors": {
+      "UNKNOWN": "Could not cancel this break. Please try again.",
+      "BREAK_NOT_FOUND": "Break not found.",
+      "BREAK_CANNOT_BE_CANCELLED": "This break is already completed or cancelled.",
+      "PENDING_ORDER_CANCEL_FAILED": "Failed while releasing pending checkout orders.",
+      "WALLET_CLEANUP_FAILED": "Wallet reserved credit cleanup failed. Contact support.",
+      "CANCEL_QUERY_FAILED": "Cancel query failed. Run phase8f_cancel_break_fix.sql in Supabase."
+    },
+    "breakSections": {
+      "inProgressTitle": "In-progress breaks",
+      "inProgressSubtitle": "Editable — cancel, edit, or view the public page.",
+      "noInProgress": "No in-progress breaks.",
+      "completedTitle": "Completed breaks",
+      "completedSubtitle": "Finalized breaks (read-only).",
+      "noCompleted": "No completed breaks.",
+      "cancelledTitle": "Cancelled / failed breaks",
+      "cancelledSubtitle": "Historical cancellation archive.",
+      "noCancelled": "No cancelled breaks."
+    },
     "manageWithdrawals": "Manage withdrawals",
     "withdrawals": {
       "title": "Withdrawal requests",
@@ -326,6 +415,13 @@
       "noPending": "No pending withdrawal requests.",
       "recentTitle": "Recent history",
       "recentSubtitle": "Completed and rejected requests",
+      "table": {
+        "amount": "Amount",
+        "user": "User",
+        "method": "Method",
+        "status": "Status",
+        "date": "Date"
+      },
       "userLabel": "User",
       "methodLabel": "Method",
       "detailsLabel": "Recipient details",
@@ -348,6 +444,74 @@
         "completed": "Completed",
         "rejected": "Rejected"
       }
+    },
+    "shipping": {
+      "title": "Shipping requests",
+      "subtitle": "Review all participants per completed break and edit details in the side drawer.",
+      "backToBreaks": "Back to breaks",
+      "manageOptions": "Shipping options",
+      "selectBreak": "Select break",
+      "noBreaks": "No completed breaks yet.",
+      "noParticipants": "No paid participants for this break.",
+      "userLabel": "User",
+      "slotsLabel": "Won positions",
+      "optionLabel": "Shipping method",
+      "detailsLabel": "User details",
+      "statusLabel": "Status",
+      "adminNotesLabel": "Admin notes",
+      "watchReplay": "Watch replay",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saveSuccess": "Shipping request updated.",
+      "saveError": "Could not save changes.",
+      "displayStatus": {
+        "unrequested": "Unrequested",
+        "pending": "Pending shipment",
+        "shipped": "Shipped",
+        "completed": "Completed"
+      },
+      "status": {
+        "pending": "Pending shipment",
+        "shipped": "Shipped",
+        "completed": "Completed"
+      },
+      "table": {
+        "user": "User",
+        "positions": "Won positions",
+        "method": "Shipping method",
+        "status": "Status",
+        "actions": "Actions",
+        "detailsAction": "Details / notes"
+      },
+      "summary": {
+        "participants": "{count} participants",
+        "unrequested": "{count} unrequested",
+        "pending": "{count} pending"
+      },
+      "drawer": {
+        "title": "Shipping details",
+        "edit": "Edit",
+        "cancelEdit": "Cancel",
+        "close": "Close",
+        "notSubmitted": "Not submitted",
+        "noAdminNotes": "No notes yet",
+        "unrequestedNote": "This user has not submitted a shipping request yet.",
+        "submittedAt": "Submitted: {date}",
+        "trackingPlaceholder": "Tracking number, notes, etc."
+      }
+    },
+    "shippingOptions": {
+      "title": "Shipping options",
+      "subtitle": "Toggle visibility for users. Options are never deleted — only disabled.",
+      "backToShipping": "← Back to shipping",
+      "active": "Active",
+      "inactive": "Disabled",
+      "saving": "Saving…",
+      "saveError": "Could not save option.",
+      "addTitle": "Add new option",
+      "namePlaceholder": "Option name",
+      "instructionsPlaceholder": "Instructions shown to users",
+      "addButton": "Add option"
     }
   },
   "home": {

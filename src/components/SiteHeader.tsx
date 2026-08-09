@@ -30,14 +30,9 @@ export async function SiteHeader() {
             </Link>
           ) : null}
           {profile?.role === "admin" ? (
-            <>
-              <Link href="/admin/breaks" className="transition hover:text-accent-soft">
-                {t("admin")}
-              </Link>
-              <Link href="/admin/withdrawals" className="transition hover:text-accent-soft">
-                {t("withdrawals")}
-              </Link>
-            </>
+            <Link href="/admin" className="transition hover:text-accent-soft">
+              {t("admin")}
+            </Link>
           ) : null}
         </nav>
 
