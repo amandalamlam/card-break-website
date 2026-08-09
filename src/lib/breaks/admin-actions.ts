@@ -23,7 +23,6 @@ async function syncBreakSlots(
 ): Promise<UpdateBreakAdminResult> {
   const admin = createAdminClient();
   const parsedByName = new Map(parsedSlots.map((slot) => [slot.name.toLowerCase(), slot]));
-  const parsedNames = new Set(parsedSlots.map((slot) => slot.name.toLowerCase()));
 
   for (const slot of existingSlots) {
     const parsed = parsedByName.get(slot.name.toLowerCase());

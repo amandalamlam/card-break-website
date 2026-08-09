@@ -19,11 +19,11 @@
     "@tiptap/pm": "^3.29.2",
     "@tiptap/react": "^3.29.2",
     "@tiptap/starter-kit": "^3.29.2",
-    "isomorphic-dompurify": "^3.22.0",
     "next": "^15.4.2",
     "next-intl": "^4.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "sanitize-html": "^2.17.6",
     "stripe": "^18.0.0"
   },
   "devDependencies": {
@@ -32,6 +32,7 @@
     "@types/node": "^24.0.15",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/sanitize-html": "^2.16.1",
     "eslint": "^9.31.0",
     "eslint-config-next": "^15.4.2",
     "tailwindcss": "^4.1.11",

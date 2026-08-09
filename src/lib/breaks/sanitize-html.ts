@@ -1,39 +1,40 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
-const ALLOWED_TAGS = [
-  "p",
-  "br",
-  "strong",
-  "b",
-  "em",
-  "i",
-  "ul",
-  "ol",
-  "li",
-  "a",
-  "table",
-  "thead",
-  "tbody",
-  "tr",
-  "th",
-  "td",
-];
-
-const ALLOWED_ATTR = ["href", "target", "rel", "colspan", "rowspan"];
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [
+    "p",
+    "br",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "ul",
+    "ol",
+    "li",
+    "a",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    th: ["colspan", "rowspan"],
+    td: ["colspan", "rowspan"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+};
 
 export function sanitizeBreakDescription(html: string): string {
-  const cleaned = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
-  });
-
-  return cleaned.trim();
+  return sanitizeHtml(html, SANITIZE_OPTIONS).trim();
 }
 
 export function stripHtmlToPlainText(html: string): string {
-  const plain = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] });
-  return plain.replace(/\s+/g, " ").trim();
+  return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function isEmptyRichText(html: string): boolean {
