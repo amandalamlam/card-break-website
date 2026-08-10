@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
+import { CompletedBreakBanner } from "@/components/breaks/CompletedBreakBanner";
 import { RichTextContent } from "@/components/breaks/RichTextContent";
 import { SlotGridLive } from "@/components/breaks/SlotGridLive";
+import { userPurchasedBreak } from "@/lib/breaks/complete";
 import { getBreakById } from "@/lib/breaks/queries";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -21,6 +23,9 @@ export default async function BreakDetailPage({
 
   const user = await getCurrentUser();
   const t = await getTranslations("breaks");
+  const isCompleted = breakItem.status === "completed";
+  const hasPurchased =
+    isCompleted && user ? await userPurchasedBreak(user.id, breakItem.id) : false;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
@@ -47,10 +52,24 @@ export default async function BreakDetailPage({
         </div>
       </div>
 
+      {isCompleted ? (
+        <div className="mt-8">
+          <CompletedBreakBanner
+            breakId={breakItem.id}
+            locale={locale}
+            isLoggedIn={Boolean(user)}
+            hasPurchased={hasPurchased}
+            videoUrl={breakItem.video_url}
+          />
+        </div>
+      ) : null}
+
       <section className="mt-12 space-y-6">
         <div>
           <h2 className="text-2xl font-semibold">{t("slotsTitle")}</h2>
-          <p className="mt-2 text-sm text-muted">{t("slotsSubtitle")}</p>
+          <p className="mt-2 text-sm text-muted">
+            {isCompleted ? t("slotsSubtitleCompleted") : t("slotsSubtitle")}
+          </p>
         </div>
         <SlotGridLive
           breakId={breakItem.id}

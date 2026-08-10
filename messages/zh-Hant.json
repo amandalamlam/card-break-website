@@ -9,7 +9,7 @@
     "comingSoon": "即將推出"
   },
   "nav": {
-    "breaks": "進行中的開箱",
+    "breaks": "開箱活動",
     "account": "我的帳戶",
     "cart": "購物車",
     "admin": "後台",
@@ -154,17 +154,40 @@
     "phaseNote": "Phase 6：網站錢包及流局退款已接入。"
   },
   "breaks": {
-    "listTitle": "進行中的開箱",
-    "listSubtitle": "選擇球隊或球員位置。結帳時將鎖定位置 8 分鐘。",
+    "listTitle": "開箱活動",
+    "listSubtitle": "瀏覽進行中及已完成的開箱紀錄。進行中可鎖定位置結帳；已完成可查看重播及物流安排。",
     "featuredTitle": "最新開箱",
     "featuredSubtitle": "從資料庫載入的進行中活動",
+    "recentlyCompletedTitle": "精彩回顧",
+    "recentlyCompletedSubtitle": "最近完成的開箱活動",
     "viewAll": "查看全部",
+    "viewAllHistory": "查看全部歷史紀錄 →",
     "viewBreak": "查看詳情",
     "empty": "暫時沒有進行中的開箱。",
+    "emptyCompleted": "暫時沒有已完成的開箱。",
+    "completedCardHint": "已完成 · 可查看重播",
+    "publicTabs": {
+      "inProgress": "進行中",
+      "completed": "已完成",
+      "prevPage": "上一頁",
+      "nextPage": "下一頁",
+      "pageStatus": "第 {page} / {total} 頁（共 {count} 筆）"
+    },
     "noSlots": "尚未設定位置",
     "slotsSummary": "{available} / {total} 個可售",
     "slotsTitle": "選擇你的位置",
     "slotsSubtitle": "可用位置可點擊 Checkout。已售出或鎖定中的位置無法購買。",
+    "slotsSubtitleCompleted": "此開箱已完成，位置僅供查閱，無法再購買。",
+    "completedSlot": "已結束",
+    "completedBanner": {
+      "title": "📦 開箱已完成",
+      "purchasedHint": "你已參與此開箱，請選擇寄送方式。",
+      "endedText": "此開箱已結束。",
+      "guestHint": "有參與此開箱的會員，請登入後選擇寄送方式。",
+      "selectShipping": "選擇寄送方式",
+      "login": "登入",
+      "watchReplay": "觀看重播"
+    },
     "checkout": "Checkout",
     "buyNow": "⚡ 直接購買",
     "continueBuyNow": "⚡ 繼續直接購買",
@@ -404,6 +427,40 @@
       "cancelledTitle": "已取消 / 流局紀錄",
       "cancelledSubtitle": "歷史流局紀錄存檔。",
       "noCancelled": "暫無已取消的開箱。"
+    },
+    "breakSubTabs": {
+      "inProgress": "進行中",
+      "completed": "已完成",
+      "cancelled": "已取消/流局",
+      "searchLabel": "搜尋開箱",
+      "searchPlaceholder": "以標題搜尋…",
+      "prevPage": "上一頁",
+      "nextPage": "下一頁",
+      "pageStatus": "第 {page} / {total} 頁（共 {count} 筆）",
+      "empty": {
+        "inProgress": "暫無進行中的開箱。",
+        "completed": "暫無已完成的開箱。",
+        "cancelled": "暫無已取消的開箱。"
+      }
+    },
+    "completeBreak": {
+      "action": "標記為已完成",
+      "title": "標記開箱為已完成",
+      "confirm": "確定將「{title}」標記為已完成？完成後將無法再購買位置。",
+      "videoLabel": "重播影片 URL（必填）",
+      "videoHint": "資料庫要求已完成開箱必須提供重播連結。",
+      "cancel": "取消",
+      "confirmAction": "確認完成",
+      "saving": "儲存中…",
+      "close": "關閉",
+      "error": "無法標記為已完成，請稍後再試。",
+      "errors": {
+        "MISSING_VIDEO_URL": "請輸入有效的重播影片連結。",
+        "BREAK_NOT_FOUND": "找不到此開箱。",
+        "BREAK_CANNOT_BE_COMPLETED": "此開箱無法標記為已完成。",
+        "BREAK_UPDATE_FAILED": "更新失敗，請稍後再試。",
+        "UNKNOWN": "無法標記為已完成，請稍後再試。"
+      }
     },
     "manageWithdrawals": "管理提現",
     "withdrawals": {

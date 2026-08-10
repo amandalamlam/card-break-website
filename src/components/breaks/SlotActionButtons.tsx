@@ -79,11 +79,13 @@ export function SlotActionButtons({
         disabled
         className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl border border-border px-4 py-3 text-sm text-muted"
       >
-        {slot.status === "sold"
-          ? t("soldOutSlot")
-          : slot.status === "locked"
-            ? t("lockedSlot")
-            : t("unavailable")}
+        {breakStatus === "completed"
+          ? t("completedSlot")
+          : slot.status === "sold"
+            ? t("soldOutSlot")
+            : slot.status === "locked"
+              ? t("lockedSlot")
+              : t("unavailable")}
       </button>
     );
   }

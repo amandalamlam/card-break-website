@@ -9,7 +9,7 @@
     "comingSoon": "Coming soon"
   },
   "nav": {
-    "breaks": "Live Breaks",
+    "breaks": "All Breaks",
     "account": "My Account",
     "cart": "Cart",
     "admin": "Admin",
@@ -154,17 +154,40 @@
     "phaseNote": "Phase 6: on-site wallet and cancellation credits are live."
   },
   "breaks": {
-    "listTitle": "Live Breaks",
-    "listSubtitle": "Pick a team or player slot. Checkout holds the slot for 8 minutes.",
+    "listTitle": "All Breaks",
+    "listSubtitle": "Browse live and completed breaks. Lock slots on active events, or review replays and shipping on completed ones.",
     "featuredTitle": "Latest breaks",
     "featuredSubtitle": "Active listings loaded from your database",
+    "recentlyCompletedTitle": "Recently Completed",
+    "recentlyCompletedSubtitle": "Latest finished breaks",
     "viewAll": "View all",
+    "viewAllHistory": "View All History →",
     "viewBreak": "View details",
     "empty": "No active breaks right now.",
+    "emptyCompleted": "No completed breaks yet.",
+    "completedCardHint": "Completed · Replay available",
+    "publicTabs": {
+      "inProgress": "In-Progress",
+      "completed": "Completed",
+      "prevPage": "Previous",
+      "nextPage": "Next",
+      "pageStatus": "Page {page} / {total} ({count} total)"
+    },
     "noSlots": "No slots configured yet",
     "slotsSummary": "{available} / {total} available",
     "slotsTitle": "Pick your slot",
     "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
+    "slotsSubtitleCompleted": "This break is completed. Slots are view-only and can no longer be purchased.",
+    "completedSlot": "Ended",
+    "completedBanner": {
+      "title": "📦 Break Completed",
+      "purchasedHint": "You participated in this break — select your shipping method.",
+      "endedText": "This break has ended.",
+      "guestHint": "Members who participated in this break, please log in to select your shipping method.",
+      "selectShipping": "Select Shipping Method",
+      "login": "Log In",
+      "watchReplay": "Watch replay"
+    },
     "checkout": "Checkout",
     "buyNow": "⚡ Buy Now",
     "continueBuyNow": "⚡ Continue Buy Now",
@@ -404,6 +427,40 @@
       "cancelledTitle": "Cancelled / failed breaks",
       "cancelledSubtitle": "Historical cancellation archive.",
       "noCancelled": "No cancelled breaks."
+    },
+    "breakSubTabs": {
+      "inProgress": "In-Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled / Refunded",
+      "searchLabel": "Search breaks",
+      "searchPlaceholder": "Search by title…",
+      "prevPage": "Previous",
+      "nextPage": "Next",
+      "pageStatus": "Page {page} / {total} ({count} total)",
+      "empty": {
+        "inProgress": "No in-progress breaks.",
+        "completed": "No completed breaks.",
+        "cancelled": "No cancelled breaks."
+      }
+    },
+    "completeBreak": {
+      "action": "Mark as Completed",
+      "title": "Mark break as completed",
+      "confirm": "Mark \"{title}\" as completed? Purchasing will be disabled afterward.",
+      "videoLabel": "Replay video URL (required)",
+      "videoHint": "Completed breaks must include a replay link.",
+      "cancel": "Cancel",
+      "confirmAction": "Confirm completed",
+      "saving": "Saving…",
+      "close": "Close",
+      "error": "Could not mark as completed. Please try again.",
+      "errors": {
+        "MISSING_VIDEO_URL": "Enter a valid replay video URL.",
+        "BREAK_NOT_FOUND": "Break not found.",
+        "BREAK_CANNOT_BE_COMPLETED": "This break cannot be marked as completed.",
+        "BREAK_UPDATE_FAILED": "Update failed. Please try again.",
+        "UNKNOWN": "Could not mark as completed. Please try again."
+      }
     },
     "manageWithdrawals": "Manage withdrawals",
     "withdrawals": {

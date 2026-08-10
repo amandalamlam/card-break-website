@@ -1,17 +1,19 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BreakStatusBadge } from "@/components/breaks/StatusBadge";
+import { BreakStatusBadgeClient } from "@/components/breaks/BreakStatusBadgeClient";
 import { stripHtmlToPlainText } from "@/lib/breaks/sanitize-html";
 import type { BreakListItem } from "@/lib/breaks/types";
 
-type BreakCardProps = {
+type BreakCardClientProps = {
   breakItem: BreakListItem;
 };
 
-export async function BreakCard({ breakItem }: BreakCardProps) {
-  const t = await getTranslations("breaks");
+export function BreakCardClient({ breakItem }: BreakCardClientProps) {
+  const t = useTranslations("breaks");
 
-  const lowestPrice =
+  const summary =
     breakItem.status === "completed"
       ? t("completedCardHint")
       : breakItem.total_count > 0
@@ -24,7 +26,7 @@ export async function BreakCard({ breakItem }: BreakCardProps) {
   return (
     <Link
       href={`/breaks/${breakItem.id}`}
-      className="glass-panel group block rounded-3xl overflow-hidden transition hover:border-accent/40"
+      className="glass-panel group block overflow-hidden rounded-3xl transition hover:border-accent/40"
     >
       <div className="relative aspect-[16/10] bg-surface-elevated">
         {breakItem.image_url ? (
@@ -40,7 +42,7 @@ export async function BreakCard({ breakItem }: BreakCardProps) {
           </div>
         )}
         <div className="absolute left-4 top-4">
-          <BreakStatusBadge status={breakItem.status} />
+          <BreakStatusBadgeClient status={breakItem.status} />
         </div>
       </div>
 
@@ -52,7 +54,7 @@ export async function BreakCard({ breakItem }: BreakCardProps) {
           {stripHtmlToPlainText(breakItem.description) || breakItem.description}
         </p>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted">{lowestPrice}</span>
+          <span className="text-muted">{summary}</span>
           <span className="font-medium text-accent-soft">{t("viewBreak")}</span>
         </div>
       </div>

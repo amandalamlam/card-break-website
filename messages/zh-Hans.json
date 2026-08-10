@@ -9,7 +9,7 @@
     "comingSoon": "即将推出"
   },
   "nav": {
-    "breaks": "进行中的开箱",
+    "breaks": "开箱活动",
     "account": "我的账户",
     "cart": "购物车",
     "admin": "后台",
@@ -154,17 +154,40 @@
     "phaseNote": "Phase 6：网站钱包及流局退款已接入。"
   },
   "breaks": {
-    "listTitle": "进行中的开箱",
-    "listSubtitle": "选择球队或球员位置。结账时将锁定位置 8 分钟。",
+    "listTitle": "开箱活动",
+    "listSubtitle": "浏览进行中及已完成的开箱记录。进行中可锁定位置结账；已完成可查看重播及物流安排。",
     "featuredTitle": "最新开箱",
     "featuredSubtitle": "从数据库加载的进行中活动",
+    "recentlyCompletedTitle": "精彩回顾",
+    "recentlyCompletedSubtitle": "最近完成的开箱活动",
     "viewAll": "查看全部",
+    "viewAllHistory": "查看全部历史记录 →",
     "viewBreak": "查看详情",
     "empty": "暂时没有进行中的开箱。",
+    "emptyCompleted": "暂时没有已完成的开箱。",
+    "completedCardHint": "已完成 · 可查看重播",
+    "publicTabs": {
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "pageStatus": "第 {page} / {total} 页（共 {count} 笔）"
+    },
     "noSlots": "尚未设定位置",
     "slotsSummary": "{available} / {total} 个可售",
     "slotsTitle": "选择你的位置",
     "slotsSubtitle": "可用位置可点击 Checkout。已售出或锁定中的位置无法购买。",
+    "slotsSubtitleCompleted": "此开箱已完成，位置仅供查阅，无法再购买。",
+    "completedSlot": "已结束",
+    "completedBanner": {
+      "title": "📦 开箱已完成",
+      "purchasedHint": "你已参与此开箱，请选择寄送方式。",
+      "endedText": "此开箱已结束。",
+      "guestHint": "有参与此开箱的会员，请登录后选择寄送方式。",
+      "selectShipping": "选择寄送方式",
+      "login": "登录",
+      "watchReplay": "观看重播"
+    },
     "checkout": "Checkout",
     "buyNow": "⚡ 直接购买",
     "continueBuyNow": "⚡ 继续直接购买",
@@ -404,6 +427,40 @@
       "cancelledTitle": "已取消 / 流局记录",
       "cancelledSubtitle": "历史流局记录存档。",
       "noCancelled": "暂无已取消的开箱。"
+    },
+    "breakSubTabs": {
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "cancelled": "已取消/流局",
+      "searchLabel": "搜索开箱",
+      "searchPlaceholder": "以标题搜索…",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "pageStatus": "第 {page} / {total} 页（共 {count} 笔）",
+      "empty": {
+        "inProgress": "暂无进行中的开箱。",
+        "completed": "暂无已完成的开箱。",
+        "cancelled": "暂无已取消的开箱。"
+      }
+    },
+    "completeBreak": {
+      "action": "标记为已完成",
+      "title": "标记开箱为已完成",
+      "confirm": "确定将「{title}」标记为已完成？完成后将无法再购买位置。",
+      "videoLabel": "重播视频 URL（必填）",
+      "videoHint": "数据库要求已完成开箱必须提供重播链接。",
+      "cancel": "取消",
+      "confirmAction": "确认完成",
+      "saving": "保存中…",
+      "close": "关闭",
+      "error": "无法标记为已完成，请稍后再试。",
+      "errors": {
+        "MISSING_VIDEO_URL": "请输入有效的重播视频链接。",
+        "BREAK_NOT_FOUND": "找不到此开箱。",
+        "BREAK_CANNOT_BE_COMPLETED": "此开箱无法标记为已完成。",
+        "BREAK_UPDATE_FAILED": "更新失败，请稍后再试。",
+        "UNKNOWN": "无法标记为已完成，请稍后再试。"
+      }
     },
     "manageWithdrawals": "管理提现",
     "withdrawals": {

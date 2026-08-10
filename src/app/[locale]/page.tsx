@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BreakCard } from "@/components/breaks/BreakCard";
-import { getPublicBreaks } from "@/lib/breaks/queries";
+import { getCompletedBreaks, getPublicBreaks } from "@/lib/breaks/queries";
 
 export default async function HomePage({
   params,
@@ -13,7 +13,10 @@ export default async function HomePage({
 
   const t = await getTranslations("home");
   const breaksT = await getTranslations("breaks");
-  const breaks = await getPublicBreaks();
+  const [breaks, completedBreaks] = await Promise.all([
+    getPublicBreaks(),
+    getCompletedBreaks(3),
+  ]);
   const featuredBreaks = breaks.slice(0, 3);
 
   const stats = [
@@ -69,6 +72,33 @@ export default async function HomePage({
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {featuredBreaks.map((breakItem) => (
+              <BreakCard key={breakItem.id} breakItem={breakItem} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="recently-completed" className="space-y-6">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold">{breaksT("recentlyCompletedTitle")}</h2>
+            <p className="mt-2 text-sm text-muted">{breaksT("recentlyCompletedSubtitle")}</p>
+          </div>
+          <Link
+            href="/breaks?tab=completed"
+            className="shrink-0 text-sm font-medium text-accent-soft hover:text-accent"
+          >
+            {breaksT("viewAllHistory")}
+          </Link>
+        </div>
+
+        {completedBreaks.length === 0 ? (
+          <div className="glass-panel rounded-3xl px-6 py-12 text-center text-muted">
+            {breaksT("emptyCompleted")}
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {completedBreaks.map((breakItem) => (
               <BreakCard key={breakItem.id} breakItem={breakItem} />
             ))}
           </div>
