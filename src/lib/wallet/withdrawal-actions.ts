@@ -113,6 +113,38 @@ export async function countRecentWithdrawals(userId: string, hours = 1): Promise
   return count ?? 0;
 }
 
+export async function getWithdrawalWithProfile(
+  withdrawalId: number
+): Promise<WithdrawalWithProfile | null> {
+  const admin = createAdminClient();
+
+  const { data, error } = await admin
+    .from("withdrawals")
+    .select(
+      "id, user_id, amount, method, details, status, created_at, updated_at, profiles (email, phone)"
+    )
+    .eq("id", withdrawalId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const withdrawal = normalizeWithdrawal(data);
+  const profiles = (data as { profiles: WithdrawalWithProfile["profiles"] | WithdrawalWithProfile["profiles"][] })
+    .profiles;
+  const profile = Array.isArray(profiles) ? (profiles[0] ?? null) : profiles;
+
+  return {
+    ...withdrawal,
+    profiles: profile,
+  };
+}
+
 export async function getUserWithdrawals(userId: string, limit = 10): Promise<Withdrawal[]> {
   const admin = createAdminClient();
 

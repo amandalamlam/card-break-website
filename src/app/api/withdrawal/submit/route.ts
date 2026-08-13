@@ -8,7 +8,7 @@ import {
 import type { WithdrawalMethod } from "@/lib/wallet/withdrawals";
 
 const WITHDRAWAL_METHODS: WithdrawalMethod[] = ["FPS", "PayMe", "PayPal"];
-const MAX_WITHDRAWALS_PER_HOUR = 3;
+const MAX_WITHDRAWALS_PER_HOUR = 2;
 
 type SubmitBody = {
   amount?: number;

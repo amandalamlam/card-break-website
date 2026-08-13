@@ -75,7 +75,7 @@ This adds ledger types, `withdrawal_id` on `wallet_transactions`, and RPCs:
 
 ## Rate limit
 
-Users may submit at most **3 withdrawal requests per hour** (API returns `429`).
+Users may submit at most **2 withdrawal requests per hour** (API returns `429`).
 
 ---
 
