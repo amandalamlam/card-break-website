@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser, getCurrentProfile } from "@/lib/auth/session";
+import { getCurrentProfile } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { getActiveCart, createCartCheckoutOrder } from "@/lib/cart/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildCartStripeLineItems } from "@/lib/stripe/cart-line-items";
@@ -22,9 +24,19 @@ type CartCheckoutBody = {
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    const authSession = await requireSessionUser();
+    if (!authSession.ok) {
+      return authSession.response;
+    }
+
+    const rateLimited = enforceRateLimit(
+      request,
+      "cart-checkout",
+      authSession.userId,
+      RATE_LIMITS.checkoutPerUserMinute
+    );
+    if (rateLimited) {
+      return rateLimited;
     }
 
     const profile = await getCurrentProfile();
@@ -36,7 +48,7 @@ export async function POST(request: Request) {
     const { locale = "zh-Hant" } = body;
     const requestedCredit = body.appliedCredit ?? body.creditAmount ?? 0;
 
-    const cart = await getActiveCart(user.id);
+    const cart = await getActiveCart(authSession.userId);
     if (!cart || cart.items.length === 0) {
       return NextResponse.json({ error: "CART_EMPTY" }, { status: 409 });
     }
@@ -52,7 +64,7 @@ export async function POST(request: Request) {
     );
     const stripeAmount = roundMoney(Math.max(0, total - appliedCredit));
 
-    const orderResult = await createCartCheckoutOrder(user.id, appliedCredit);
+    const orderResult = await createCartCheckoutOrder(authSession.userId, appliedCredit);
     if (!orderResult.ok) {
       return NextResponse.json({ error: orderResult.code }, { status: 409 });
     }
@@ -80,7 +92,7 @@ export async function POST(request: Request) {
       appliedCredit
     );
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       expires_at: getStripeSessionExpiresAtUnix(),
@@ -90,7 +102,7 @@ export async function POST(request: Request) {
       client_reference_id: orderId,
       metadata: {
         order_id: orderId,
-        user_id: user.id,
+        user_id: authSession.userId,
         credit_amount: String(appliedCredit),
         stripe_amount: String(stripeAmount),
         checkout_mode: "cart",
@@ -100,17 +112,18 @@ export async function POST(request: Request) {
 
     await admin
       .from("orders")
-      .update({ stripe_checkout_session_id: session.id })
-      .eq("id", orderId);
+      .update({ stripe_checkout_session_id: checkoutSession.id })
+      .eq("id", orderId)
+      .eq("user_id", authSession.userId);
 
-    if (!session.url) {
+    if (!checkoutSession.url) {
       return NextResponse.json({ error: "STRIPE_SESSION_FAILED" }, { status: 500 });
     }
 
     return NextResponse.json({
       type: "stripe",
       orderId,
-      url: session.url,
+      url: checkoutSession.url,
       creditAmount: appliedCredit,
       stripeAmount,
     });

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser, getCurrentProfile } from "@/lib/auth/session";
+import { getCurrentProfile } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, getStripeSessionExpiresAtUnix, toStripeAmount } from "@/lib/stripe/server";
@@ -22,9 +24,19 @@ type CheckoutPayBody = {
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    const authSession = await requireSessionUser();
+    if (!authSession.ok) {
+      return authSession.response;
+    }
+
+    const rateLimited = enforceRateLimit(
+      request,
+      "checkout-pay",
+      authSession.userId,
+      RATE_LIMITS.checkoutPerUserMinute
+    );
+    if (rateLimited) {
+      return rateLimited;
     }
 
     const profile = await getCurrentProfile();
@@ -39,7 +51,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "MISSING_PARAMS" }, { status: 400 });
     }
 
-    const hasValidLock = await validateBuyNowLock(slotId, user.id);
+    const hasValidLock = await validateBuyNowLock(slotId, authSession.userId);
     if (!hasValidLock) {
       return NextResponse.json({ error: "LOCK_EXPIRED" }, { status: 409 });
     }
@@ -57,7 +69,7 @@ export async function POST(request: Request) {
     );
     const stripeAmount = roundMoney(slotPrice - appliedCredit);
 
-    const orderResult = await createCheckoutOrder(user.id, breakId, slotId, appliedCredit);
+    const orderResult = await createCheckoutOrder(authSession.userId, breakId, slotId, appliedCredit);
     if (!orderResult.ok) {
       return NextResponse.json({ error: orderResult.code }, { status: 409 });
     }
@@ -76,7 +88,7 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     const admin = createAdminClient();
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       expires_at: getStripeSessionExpiresAtUnix(),
@@ -103,7 +115,7 @@ export async function POST(request: Request) {
         order_id: orderId,
         break_id: breakId,
         slot_id: slotId,
-        user_id: user.id,
+        user_id: authSession.userId,
         credit_amount: String(appliedCredit),
         checkout_mode: "buy_now",
       },
@@ -111,17 +123,18 @@ export async function POST(request: Request) {
 
     await admin
       .from("orders")
-      .update({ stripe_checkout_session_id: session.id })
-      .eq("id", orderId);
+      .update({ stripe_checkout_session_id: checkoutSession.id })
+      .eq("id", orderId)
+      .eq("user_id", authSession.userId);
 
-    if (!session.url) {
+    if (!checkoutSession.url) {
       return NextResponse.json({ error: "STRIPE_SESSION_FAILED" }, { status: 500 });
     }
 
     return NextResponse.json({
       type: "stripe",
       orderId,
-      url: session.url,
+      url: checkoutSession.url,
       creditAmount: appliedCredit,
       stripeAmount,
     });

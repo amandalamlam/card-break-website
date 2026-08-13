@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { addSlotToCart, getActiveCart } from "@/lib/cart/actions";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  const session = await requireSessionUser();
+  if (!session.ok) {
+    return session.response;
   }
 
-  const cart = await getActiveCart(user.id);
+  const cart = await getActiveCart(session.userId);
   return NextResponse.json({ cart });
 }
 
@@ -18,9 +19,19 @@ type AddItemBody = {
 };
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  const session = await requireSessionUser();
+  if (!session.ok) {
+    return session.response;
+  }
+
+  const rateLimited = enforceRateLimit(
+    request,
+    "cart-add",
+    session.userId,
+    RATE_LIMITS.cartAddPerUserMinute
+  );
+  if (rateLimited) {
+    return rateLimited;
   }
 
   const body = (await request.json()) as AddItemBody;
@@ -30,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "MISSING_PARAMS" }, { status: 400 });
   }
 
-  const result = await addSlotToCart(user.id, breakId, slotId);
+  const result = await addSlotToCart(session.userId, breakId, slotId);
 
   if (!result.ok) {
     return NextResponse.json(

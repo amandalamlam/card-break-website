@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSlotLockActive } from "@/lib/slots/helpers";
 import { releaseExpiredSlotLocks, releaseSlotLock } from "@/lib/slots/locking";
@@ -12,10 +12,9 @@ import { releaseExpiredSlotLocks, releaseSlotLock } from "@/lib/slots/locking";
  * lazy-release). Pass force:true only for explicit user cancel.
  */
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const session = await requireSessionUser();
+  if (!session.ok) {
+    return session.response;
   }
 
   const body = (await request.json()) as { slotId?: string; force?: boolean };
@@ -49,7 +48,7 @@ export async function POST(request: Request) {
     }
   }
 
-  const released = await releaseSlotLock(slotId, user.id);
+  const released = await releaseSlotLock(slotId, session.userId);
 
   return NextResponse.json({ ok: true, released });
 }

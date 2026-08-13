@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { submitShippingRequest } from "@/lib/shipping/actions";
 
 type SubmitBody = {
@@ -9,10 +10,19 @@ type SubmitBody = {
 };
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const session = await requireSessionUser();
+  if (!session.ok) {
+    return session.response;
+  }
 
-  if (!user) {
-    return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  const rateLimited = enforceRateLimit(
+    request,
+    "shipping-submit",
+    session.userId,
+    RATE_LIMITS.shippingSubmitPerUserHour
+  );
+  if (rateLimited) {
+    return rateLimited;
   }
 
   const body = (await request.json()) as SubmitBody;
@@ -29,7 +39,7 @@ export async function POST(request: Request) {
   }
 
   const result = await submitShippingRequest(
-    user.id,
+    session.userId,
     breakId,
     shippingOptionId,
     shippingDetails

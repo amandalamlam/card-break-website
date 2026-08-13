@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { getBreakById, getSlotById } from "@/lib/breaks/queries";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, toStripeAmount } from "@/lib/stripe/server";
@@ -18,10 +19,19 @@ type CheckoutBody = {
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
+    const authSession = await requireSessionUser();
+    if (!authSession.ok) {
+      return authSession.response;
+    }
 
-    if (!user) {
-      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    const rateLimited = enforceRateLimit(
+      request,
+      "stripe-checkout",
+      authSession.userId,
+      RATE_LIMITS.checkoutPerUserMinute
+    );
+    if (rateLimited) {
+      return rateLimited;
     }
 
     const body = (await request.json()) as CheckoutBody;
@@ -31,7 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "MISSING_PARAMS" }, { status: 400 });
     }
 
-    const hasValidLock = await validateUserLock(slotId, user.id);
+    const hasValidLock = await validateUserLock(slotId, authSession.userId);
     if (!hasValidLock) {
       return NextResponse.json({ error: "LOCK_EXPIRED" }, { status: 409 });
     }
@@ -48,7 +58,7 @@ export async function POST(request: Request) {
     const { data: order, error: orderError } = await admin
       .from("orders")
       .insert({
-        user_id: user.id,
+        user_id: authSession.userId,
         break_id: breakId,
         slot_id: slotId,
         amount: slot.price,
@@ -64,7 +74,7 @@ export async function POST(request: Request) {
 
     const stripe = getStripe();
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [
@@ -87,20 +97,21 @@ export async function POST(request: Request) {
         order_id: order.id,
         break_id: breakId,
         slot_id: slotId,
-        user_id: user.id,
+        user_id: authSession.userId,
       },
     });
 
     await admin
       .from("orders")
-      .update({ stripe_checkout_session_id: session.id })
-      .eq("id", order.id);
+      .update({ stripe_checkout_session_id: checkoutSession.id })
+      .eq("id", order.id)
+      .eq("user_id", authSession.userId);
 
-    if (!session.url) {
+    if (!checkoutSession.url) {
       return NextResponse.json({ error: "STRIPE_SESSION_FAILED" }, { status: 500 });
     }
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });

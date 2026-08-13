@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
-import { buildWalletActivityViewModel, type WalletActivityCopy } from "@/lib/wallet/display";
+import { requireSessionUser } from "@/lib/security/require-session-user";
+import {
+  buildWalletActivityViewModel,
+  type WalletActivityCopy,
+} from "@/lib/wallet/display";
 import {
   getDefaultMonthRange,
   normalizeMonthRange,
@@ -11,10 +14,9 @@ import type { AppLocale } from "@/i18n/routing";
 import { getTranslations } from "next-intl/server";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  const session = await requireSessionUser();
+  if (!session.ok) {
+    return session.response;
   }
 
   const url = new URL(request.url);
@@ -30,7 +32,7 @@ export async function GET(request: Request) {
   const locale = (url.searchParams.get("locale") ?? "zh-Hant") as AppLocale;
 
   const result = await queryWalletHistory({
-    userId: user.id,
+    userId: session.userId,
     startMonth: startMonth ?? defaults.startMonth,
     endMonth: endMonth ?? defaults.endMonth,
     type,

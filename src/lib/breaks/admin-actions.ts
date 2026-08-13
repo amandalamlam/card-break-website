@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeBreakDescription } from "./sanitize-html";
+import { isSafeHttpUrl } from "@/lib/shipping/sanitize";
+import { sanitizePlainText } from "@/lib/security/sanitize-plain-text";
 import { parseSlotsInput } from "./slots-input";
 import type { BreakSlot } from "./types";
 
@@ -74,7 +76,7 @@ async function syncBreakSlots(
 
 export async function updateBreakAdmin(input: UpdateBreakAdminInput): Promise<UpdateBreakAdminResult> {
   const admin = createAdminClient();
-  const title = input.title.trim();
+  const title = sanitizePlainText(input.title, 200);
 
   if (!title) {
     return { ok: false, code: "MISSING_TITLE" };
@@ -117,6 +119,14 @@ export async function updateBreakAdmin(input: UpdateBreakAdminInput): Promise<Up
   const description = sanitizeBreakDescription(input.description);
   const imageUrl = input.imageUrl?.trim() || null;
   const videoUrl = input.videoUrl?.trim() || null;
+
+  if (imageUrl && !isSafeHttpUrl(imageUrl)) {
+    return { ok: false, code: "INVALID_IMAGE_URL" };
+  }
+
+  if (videoUrl && !isSafeHttpUrl(videoUrl)) {
+    return { ok: false, code: "INVALID_VIDEO_URL" };
+  }
 
   if (breakRow.status === "completed" && !videoUrl) {
     return { ok: false, code: "COMPLETED_REQUIRES_VIDEO" };
