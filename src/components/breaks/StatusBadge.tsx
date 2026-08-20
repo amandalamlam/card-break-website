@@ -1,5 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import type { BreakStatus, SlotStatus } from "@/lib/breaks/types";
+import {
+  BREAK_CARD_BADGE_BASE,
+  BREAK_CARD_BADGE_STYLES,
+} from "@/components/breaks/break-card-badge-styles";
 
 const slotStyles: Record<SlotStatus, string> = {
   available: "border-success/40 bg-success/10 text-success",
@@ -20,6 +24,16 @@ export async function SlotStatusBadge({ status }: { status: SlotStatus }) {
 
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${slotStyles[status]}`}>
+      {t(status)}
+    </span>
+  );
+}
+
+export async function BreakCardStatusBadge({ status }: { status: BreakStatus }) {
+  const t = await getTranslations("breaks.status");
+
+  return (
+    <span className={`${BREAK_CARD_BADGE_BASE} ${BREAK_CARD_BADGE_STYLES[status]}`}>
       {t(status)}
     </span>
   );

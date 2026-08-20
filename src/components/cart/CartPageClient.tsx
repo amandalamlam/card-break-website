@@ -6,7 +6,9 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/breaks/format";
 import { CartCheckoutPayment } from "@/components/cart/CartCheckoutPayment";
-import { getCartRemainingSeconds } from "@/lib/slots/time";
+import { useCart } from "@/context/CartContext";
+import { dispatchCartUpdated } from "@/lib/cart/events";
+import { formatRemainingSeconds, getCartRemainingSeconds } from "@/lib/slots/time";
 import type { CartWithItems } from "@/lib/cart/types";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -17,12 +19,6 @@ type CartPageClientProps = {
   notice?: "cancelled" | "expired" | null;
 };
 
-function formatRemaining(totalSeconds: number): string {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
 export function CartPageClient({
   locale,
   initialCart,
@@ -31,45 +27,60 @@ export function CartPageClient({
 }: CartPageClientProps) {
   const t = useTranslations("cart");
   const router = useRouter();
-  const [cart, setCart] = useState(initialCart);
-  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(
+  const { cart: contextCart, refreshCart, remainingSeconds: contextRemainingSeconds } = useCart();
+  const [localRemainingSeconds, setLocalRemainingSeconds] = useState<number | null>(
     initialCart ? initialCart.remainingSeconds : null
   );
+  const [removeError, setRemoveError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
+  const cart = contextCart ?? initialCart;
+  const remainingSeconds =
+    contextCart != null ? contextRemainingSeconds : localRemainingSeconds;
+
   useEffect(() => {
-    if (!cart?.expires_at) {
+    void refreshCart();
+  }, [refreshCart]);
+
+  useEffect(() => {
+    if (contextCart != null || !cart?.expires_at) {
       return;
     }
 
-    const tick = () => setRemainingSeconds(getCartRemainingSeconds(cart.expires_at));
+    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(cart.expires_at));
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [cart?.expires_at]);
-
-  useEffect(() => {
-    if (remainingSeconds === 0 && cart) {
-      void fetch("/api/cart/items", { cache: "no-store" }).then(() => router.refresh());
-    }
-  }, [remainingSeconds, cart, router]);
+  }, [cart?.expires_at, contextCart]);
 
   async function handleRemove(itemId: string) {
     setRemovingId(itemId);
+    setRemoveError(null);
+
     try {
       const response = await fetch(`/api/cart/items/${itemId}`, { method: "DELETE" });
       if (response.ok) {
+        dispatchCartUpdated();
+        await refreshCart();
+        router.refresh();
+        return;
+      }
+
+      const data = (await response.json()) as { error?: string };
+      if (data.error === "CART_ITEM_NOT_FOUND") {
+        await refreshCart();
         router.refresh();
       }
+      setRemoveError(t("removeError"));
+    } catch {
+      setRemoveError(t("removeError"));
     } finally {
       setRemovingId(null);
     }
   }
 
-  async function refreshCart() {
-    const response = await fetch("/api/cart/items", { cache: "no-store" });
-    const data = (await response.json()) as { cart: CartWithItems | null };
-    setCart(data.cart);
+  async function handleCheckoutRefresh() {
+    await refreshCart();
   }
 
   if (!cart || cart.items.length === 0) {
@@ -100,7 +111,11 @@ export function CartPageClient({
 
   const isExpired = remainingSeconds !== null && remainingSeconds <= 0;
   const timerDisplay =
-    remainingSeconds === null ? "--:--" : isExpired ? "00:00" : formatRemaining(remainingSeconds);
+    remainingSeconds === null
+      ? "--:--"
+      : isExpired
+        ? "00:00"
+        : formatRemainingSeconds(remainingSeconds);
 
   return (
     <div className="space-y-6">
@@ -124,6 +139,8 @@ export function CartPageClient({
         <p className="mt-2 font-mono text-3xl font-semibold text-accent-soft">{timerDisplay}</p>
         <p className="mt-2 text-sm text-muted">{isExpired ? t("timerExpired") : t("timerActive")}</p>
       </div>
+
+      {removeError ? <p className="text-sm text-red-300">{removeError}</p> : null}
 
       <div className="space-y-3">
         {cart.items.map((item) => (
@@ -165,7 +182,7 @@ export function CartPageClient({
           locale={locale}
           totalAmount={cart.totalAmount}
           availableCredit={availableCredit}
-          onPaid={refreshCart}
+          onPaid={handleCheckoutRefresh}
         />
       ) : (
         <Link

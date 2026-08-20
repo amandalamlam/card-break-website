@@ -300,11 +300,25 @@ export async function addSlotToCart(
 export async function removeCartItem(userId: string, cartItemId: string) {
   const admin = createAdminClient();
 
+  const { data: activeCart, error: cartError } = await admin
+    .from("carts")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (cartError) {
+    return { ok: false as const, code: parseCartRpcError(cartError) };
+  }
+  if (!activeCart) {
+    return { ok: false as const, code: "CART_ITEM_NOT_FOUND" };
+  }
+
   const { data: item, error: fetchError } = await admin
     .from("cart_items")
     .select("id, cart_id, slot_id, user_id")
     .eq("id", cartItemId)
-    .eq("user_id", userId)
+    .eq("cart_id", activeCart.id)
     .maybeSingle();
 
   if (fetchError) {
@@ -331,8 +345,8 @@ export async function removeCartItem(userId: string, cartItemId: string) {
   const { error: deleteError } = await admin
     .from("cart_items")
     .delete()
-    .eq("id", cartItemId)
-    .eq("user_id", userId);
+    .eq("id", item.id)
+    .eq("cart_id", activeCart.id);
 
   if (deleteError) {
     return { ok: false as const, code: parseCartRpcError(deleteError) };
@@ -341,13 +355,13 @@ export async function removeCartItem(userId: string, cartItemId: string) {
   const { count } = await admin
     .from("cart_items")
     .select("id", { count: "exact", head: true })
-    .eq("cart_id", item.cart_id);
+    .eq("cart_id", activeCart.id);
 
   if ((count ?? 0) === 0) {
     await admin
       .from("carts")
       .update({ status: "expired", updated_at: new Date().toISOString() })
-      .eq("id", item.cart_id);
+      .eq("id", activeCart.id);
   }
 
   return { ok: true as const };

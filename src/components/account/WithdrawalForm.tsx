@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/breaks/format";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
 import type { WithdrawalMethod } from "@/lib/wallet/withdrawals";
 
@@ -145,13 +146,15 @@ export function WithdrawalForm({ availableCredit, disabled = false }: Withdrawal
         />
       </div>
 
-      <button
+      <LoadingButton
         type="submit"
-        disabled={disabled || loading || !canSubmit}
+        loading={loading}
+        loadingText={t("submitting")}
+        disabled={disabled || !canSubmit}
         className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? t("submitting") : t("submit")}
-      </button>
+        {t("submit")}
+      </LoadingButton>
 
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
       {success ? <p className="text-sm text-success">{success}</p> : null}

@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "@/i18n/navigation";
+import { Filter } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { WalletHistorySkeleton } from "@/components/ui/skeletons/WalletHistorySkeleton";
 import { WalletActivityList } from "@/components/account/WalletActivityList";
 import type { WalletActivityViewModel } from "@/lib/wallet/display";
 import type { WalletHistoryTypeFilter } from "@/lib/wallet/history";
@@ -44,6 +46,7 @@ export function WalletHistoryPanel({
   defaultEndMonth,
 }: WalletHistoryPanelProps) {
   const t = useTranslations("account.walletHistory");
+  const tCommon = useTranslations("common");
 
   const [startMonth, setStartMonth] = useState(defaultStartMonth);
   const [endMonth, setEndMonth] = useState(defaultEndMonth);
@@ -54,6 +57,7 @@ export function WalletHistoryPanel({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<HistoryResponse | null>(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const fetchHistory = useCallback(async () => {
     setLoading(true);
@@ -95,6 +99,7 @@ export function WalletHistoryPanel({
     event.preventDefault();
     setPage(1);
     setSearch(searchInput.trim());
+    setMobileFiltersOpen(false);
   }
 
   function handleStartMonthChange(value: string) {
@@ -113,6 +118,25 @@ export function WalletHistoryPanel({
     setPage(1);
   }
 
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+
+    if (startMonth !== defaultStartMonth) {
+      count += 1;
+    }
+    if (endMonth !== defaultEndMonth) {
+      count += 1;
+    }
+    if (type !== "all") {
+      count += 1;
+    }
+    if (search) {
+      count += 1;
+    }
+
+    return count;
+  }, [defaultEndMonth, defaultStartMonth, endMonth, search, startMonth, type]);
+
   const pageNumbers = useMemo(() => {
     const totalPages = data?.totalPages ?? 1;
     const current = data?.page ?? 1;
@@ -129,82 +153,121 @@ export function WalletHistoryPanel({
   }, [data?.page, data?.totalPages]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <form
         onSubmit={handleApplyFilters}
-        className="glass-panel space-y-4 rounded-3xl p-6"
+        className="glass-panel space-y-3 rounded-3xl p-4 sm:space-y-4 sm:p-6"
       >
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="text-xs uppercase tracking-[0.18em] text-muted">{t("startMonth")}</label>
-            <select
-              value={startMonth}
-              onChange={(event) => handleStartMonthChange(event.target.value)}
-              className="form-select mt-2 w-full"
-            >
-              {monthOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs uppercase tracking-[0.18em] text-muted">{t("endMonth")}</label>
-            <select
-              value={endMonth}
-              onChange={(event) => handleEndMonthChange(event.target.value)}
-              className="form-select mt-2 w-full"
-            >
-              {monthOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="flex gap-2 md:hidden">
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("searchLabel")}
+            className="min-w-0 flex-1 rounded-xl border border-border bg-background/50 px-3 py-2.5 text-sm outline-none transition focus:border-accent/50"
+          />
+          <button
+            type="button"
+            onClick={() => setMobileFiltersOpen((current) => !current)}
+            aria-expanded={mobileFiltersOpen}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-border px-3 py-2.5 text-sm text-muted transition hover:text-foreground"
+          >
+            <Filter className="h-4 w-4" aria-hidden />
+            <span>{t("filterToggle")}</span>
+            {activeFilterCount > 0 ? (
+              <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-accent/20 px-1.5 py-0.5 text-xs font-semibold text-accent-soft">
+                {activeFilterCount}
+              </span>
+            ) : null}
+          </button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="text-xs uppercase tracking-[0.18em] text-muted">{t("typeFilter")}</label>
-            <select
-              value={type}
-              onChange={(event) => {
-                setType(event.target.value as WalletHistoryTypeFilter);
-                setPage(1);
-              }}
-              className="form-select mt-2 w-full"
-            >
-              {TYPE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {t(`types.${option}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs uppercase tracking-[0.18em] text-muted">{t("searchLabel")}</label>
-            <input
-              type="search"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder={t("searchPlaceholder")}
-              className="mt-2 w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-accent/50"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="rounded-xl border border-border px-5 py-2.5 text-sm text-muted transition hover:text-foreground"
+        <div
+          className={`space-y-3 sm:space-y-4 ${mobileFiltersOpen ? "block" : "hidden"} md:block`}
         >
-          {t("applyFilters")}
-        </button>
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div>
+              <label className="text-xs uppercase tracking-[0.18em] text-muted">
+                {t("startMonth")}
+              </label>
+              <select
+                value={startMonth}
+                onChange={(event) => handleStartMonthChange(event.target.value)}
+                className="form-select mt-2 w-full"
+              >
+                {monthOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-[0.18em] text-muted">
+                {t("endMonth")}
+              </label>
+              <select
+                value={endMonth}
+                onChange={(event) => handleEndMonthChange(event.target.value)}
+                className="form-select mt-2 w-full"
+              >
+                {monthOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+            <div>
+              <label className="text-xs uppercase tracking-[0.18em] text-muted">
+                {t("typeFilter")}
+              </label>
+              <select
+                value={type}
+                onChange={(event) => {
+                  setType(event.target.value as WalletHistoryTypeFilter);
+                  setPage(1);
+                }}
+                className="form-select mt-2 w-full"
+              >
+                {TYPE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {t(`types.${option}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="hidden md:block">
+              <label className="text-xs uppercase tracking-[0.18em] text-muted">
+                {t("searchLabel")}
+              </label>
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t("searchPlaceholder")}
+                className="mt-2 w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-sm outline-none transition focus:border-accent/50"
+              />
+            </div>
+          </div>
+
+          <LoadingButton
+            type="submit"
+            loading={loading}
+            loadingText={tCommon("processing")}
+            className="rounded-xl border border-border px-5 py-2.5 text-sm text-muted transition hover:text-foreground disabled:opacity-60"
+          >
+            {t("applyFilters")}
+          </LoadingButton>
+        </div>
       </form>
 
       {loading ? (
-        <p className="text-sm text-muted">{t("loading")}</p>
+        <WalletHistorySkeleton />
       ) : error ? (
         <p className="text-sm text-red-300">{error}</p>
       ) : (
@@ -252,13 +315,6 @@ export function WalletHistoryPanel({
           ) : null}
         </>
       )}
-
-      <Link
-        href="/account"
-        className="inline-flex text-sm text-muted transition hover:text-foreground"
-      >
-        {t("backToAccount")}
-      </Link>
     </div>
   );
 }

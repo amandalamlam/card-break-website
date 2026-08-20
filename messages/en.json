@@ -6,12 +6,13 @@
   "common": {
     "brand": "Card Break HK",
     "language": "Language",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "processing": "Processing…"
   },
   "nav": {
     "breaks": "All Breaks",
     "account": "My Account",
-    "cart": "Cart",
+    "cart": "Shopping Cart",
     "admin": "Admin",
     "withdrawals": "Withdrawals",
     "shipping": "Shipping",
@@ -53,13 +54,13 @@
     "transactionsSubtitle": "Recent refunds, purchases, and releases",
     "noTransactions": "No wallet activity yet.",
     "viewFullHistory": "View full history →",
-    "shippingTitle": "Completed breaks — delivery",
-    "shippingSubtitle": "After a break finishes, choose how you want your cards delivered. No payment is charged here.",
+    "shippingTitle": "Completed Breaks — Delivery",
+    "shippingSubtitle": "After a break finishes, choose how you want your cards delivered. No payment is charged here at this step.",
     "tabs": {
       "ariaLabel": "Account sections",
       "overview": "Overview",
       "shipping": "Shipping",
-      "wallet": "Wallet log"
+      "wallet": "Wallet Log"
     },
     "walletHistory": {
       "title": "Wallet history",
@@ -70,6 +71,7 @@
       "typeFilter": "Transaction type",
       "searchLabel": "Keyword search",
       "searchPlaceholder": "Break title, position, or description",
+      "filterToggle": "Filters",
       "applyFilters": "Apply filters",
       "loading": "Loading transactions…",
       "loadError": "Could not load wallet history. Please try again.",
@@ -155,30 +157,34 @@
   },
   "breaks": {
     "listTitle": "All Breaks",
-    "listSubtitle": "Browse live and completed breaks. Lock slots on active events, or review replays and shipping on completed ones.",
-    "featuredTitle": "Latest breaks",
+    "listSubtitle": "Browse live, completed, and cancelled breaks. Lock slots on active events, or review replays and refund notices on past events.",
+    "featuredTitle": "Latest Breaks",
     "featuredSubtitle": "Active listings loaded from your database",
     "recentlyCompletedTitle": "Recently Completed",
     "recentlyCompletedSubtitle": "Latest finished breaks",
-    "viewAll": "View all",
+    "viewAll": "View All →",
     "viewAllHistory": "View All History →",
     "viewBreak": "View details",
     "empty": "No active breaks right now.",
     "emptyCompleted": "No completed breaks yet.",
+    "emptyCancelled": "No cancelled breaks yet.",
     "completedCardHint": "Completed · Replay available",
     "publicTabs": {
       "inProgress": "In-Progress",
       "completed": "Completed",
+      "cancelled": "Cancelled",
       "prevPage": "Previous",
       "nextPage": "Next",
       "pageStatus": "Page {page} / {total} ({count} total)"
     },
     "noSlots": "No slots configured yet",
     "slotsSummary": "{available} / {total} available",
-    "slotsTitle": "Pick your slot",
+    "slotsTitle": "Pick Your Slot",
     "slotsSubtitle": "Available slots can be checked out. Sold or locked slots cannot be purchased.",
     "slotsSubtitleCompleted": "This break is completed. Slots are view-only and can no longer be purchased.",
+    "slotsSubtitleCancelled": "This break was cancelled. Slots are view-only and checkout is disabled.",
     "completedSlot": "Ended",
+    "cancelledSlot": "Cancelled",
     "completedBanner": {
       "title": "📦 Break Completed",
       "purchasedHint": "You participated in this break — select your shipping method.",
@@ -186,13 +192,19 @@
       "guestHint": "Members who participated in this break, please log in to select your shipping method.",
       "selectShipping": "Select Shipping Method",
       "login": "Log In",
-      "watchReplay": "Watch replay"
+      "watchReplay": "Watch Replay"
+    },
+    "cancelledBanner": {
+      "title": "[Break Cancelled]",
+      "body": "This break was cancelled due to insufficient participants. Your payment has been fully refunded to your Account Shopping Credit and can be used for future purchases."
     },
     "checkout": "Checkout",
     "buyNow": "⚡ Buy Now",
     "continueBuyNow": "⚡ Continue Buy Now",
     "addToCart": "+ Add to Cart",
     "addingToCart": "Adding…",
+    "alreadyInCart": "Added to Cart",
+    "addToCartSuccess": "Added {slotName} to cart",
     "addToCartError": "Could not add to cart. Please try again.",
     "addToCartErrors": {
       "lockedByOther": "This slot is locked by another buyer.",
@@ -204,7 +216,7 @@
       "migrationRequired": "Cart is not set up yet. Run the Phase 8 database migration.",
       "walletCleanupFailed": "Could not update wallet state. Please try again or contact support."
     },
-    "continueCheckout": "Continue checkout",
+    "continueCheckout": "Continue Checkout",
     "liveConnected": "Live updates every 8 seconds",
     "liveUpdating": "Updating…",
     "soldOutSlot": "Sold",
@@ -224,9 +236,9 @@
     }
   },
   "checkout": {
-    "lockedBadge": "Slot locked",
+    "lockedBadge": "Slot Locked",
     "buyNowBadge": "⚡ Buy Now",
-    "buyNowTitle": "Buy Now checkout",
+    "buyNowTitle": "Buy Now Checkout",
     "buyNowSubtitle": "This flow is isolated from your cart. Complete payment within 1 minute.",
     "buyNowTimerLabel": "Buy Now countdown",
     "buyNowTimerHint": "This slot is held for 1 minute. It releases automatically when time runs out.",
@@ -305,19 +317,25 @@
     }
   },
   "cart": {
-    "title": "Shopping cart",
+    "title": "Shopping Cart",
     "subtitle": "Check out multiple slots in one payment. All items share one 5-minute timer.",
     "empty": "Your cart is empty.",
-    "browseBreaks": "Browse breaks",
+    "browseBreaks": "Browse Breaks",
     "backToBreaks": "← Back to breaks",
     "timerLabel": "Cart hold timer",
     "timerActive": "New items sync to this remaining time (the 5-minute timer does not reset).",
     "timerExpired": "Cart expired. All slots were released.",
     "total": "Total",
     "removeItem": "Remove",
-    "paymentWarning": "⚠️ After you click pay, your slots are held for 5 minutes — please complete payment promptly.",
+    "removeError": "Could not remove this item. Your cart has been refreshed.",
+    "paymentWarning": "⚠️ After you click pay button, your slots will be held for 5 minutes — please complete payment promptly.",
     "cancelNotice": "Payment was cancelled. Your cart items are still held — you can retry checkout before the timer expires.",
     "expiredNotice": "Your cart session timed out while payment was in progress. All slots were released and wallet credit was restored.",
+    "banner": {
+      "holdingPrefix": "Slots reserved: ",
+      "checkoutLink": "Go to checkout →",
+      "expired": "⚠️ Slots released"
+    },
     "addModal": {
       "title": "Added to cart",
       "subtitle": "This slot is locked and added to your cart.",
@@ -331,9 +349,11 @@
     "noCompletedBreaks": "No completed breaks awaiting delivery selection.",
     "slotsWon": "Slots won",
     "selectDelivery": "Select delivery option",
-    "viewReceipt": "View submission",
+    "viewReceipt": "View Submission",
     "actionNeeded": "Delivery option required",
     "statusSubmitted": "Submitted: {option}",
+    "prevPage": "← Previous",
+    "nextPage": "Next →",
     "backToAccount": "← Back to My Account",
     "pageSubtitle": "Choose a delivery method for this break. No payment is required — SF collect-on-delivery or pickup only.",
     "optionLabel": "Delivery method",
@@ -360,7 +380,7 @@
       "details": "Details",
       "statusLabel": "Status",
       "statusValues": {
-        "pending": "Pending shipment",
+        "pending": "Pending",
         "shipped": "Shipped",
         "completed": "Completed"
       }
@@ -558,7 +578,7 @@
       }
     },
     "shippingOptions": {
-      "title": "Shipping options",
+      "title": "Shipping Options",
       "subtitle": "Toggle visibility for users. Options are never deleted — only disabled.",
       "backToShipping": "← Back to shipping",
       "active": "Active",
@@ -573,10 +593,10 @@
   },
   "home": {
     "badge": "Hong Kong Card Break Platform",
-    "headline": "Clean, fast, secure breaks",
-    "subheadline": "Browse active breaks and claim your favourite team or player slot. Pay securely, watch the live reveal, then choose SF Express collect-on-delivery, pickup, or international shipping from your account.",
-    "ctaBrowse": "Browse breaks",
-    "ctaLearn": "See latest breaks",
+    "headline": "Card Breaking Platform Built for Card Enthusiasts",
+    "subheadline": "Home to top sports card releases. Join live streaming breaks, track your collection, and get cards delivered straight to your doorstep safely.",
+    "ctaBrowse": "Browse Breaks",
+    "ctaLearn": "See Latest Breaks",
     "stats": {
       "secure": "Stripe secure payments",
       "wallet": "Wallet credits on cancellation",

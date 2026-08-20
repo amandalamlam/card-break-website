@@ -1,6 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
-import { AccountPageTabs } from "@/components/account/AccountPageTabs";
+import {
+  AccountPageTabs,
+  type AccountTabId,
+} from "@/components/account/AccountPageTabs";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
 import { getUserCompletedBreaksForShipping } from "@/lib/shipping/actions";
@@ -8,12 +11,24 @@ import { getDefaultMonthRange, getMonthOptions } from "@/lib/wallet/history";
 import { parseWalletBalance } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
 
+const VALID_TABS = new Set<AccountTabId>(["overview", "shipping", "wallet"]);
+
+function parseAccountTab(tab: string | undefined): AccountTabId {
+  if (tab && VALID_TABS.has(tab as AccountTabId)) {
+    return tab as AccountTabId;
+  }
+
+  return "overview";
+}
+
 type AccountPageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
-export default async function AccountPage({ params }: AccountPageProps) {
+export default async function AccountPage({ params, searchParams }: AccountPageProps) {
   const { locale } = await params;
+  const { tab } = await searchParams;
   setRequestLocale(locale);
 
   const user = await getCurrentUser();
@@ -43,6 +58,7 @@ export default async function AccountPage({ params }: AccountPageProps) {
       </div>
 
       <AccountPageTabs
+        defaultTab={parseAccountTab(tab)}
         locale={locale}
         email={email}
         phone={phone}

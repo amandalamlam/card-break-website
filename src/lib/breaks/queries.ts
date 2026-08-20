@@ -66,6 +66,30 @@ export async function getCompletedBreaks(limit?: number): Promise<BreakListItem[
   );
 }
 
+export async function getCancelledBreaks(limit?: number): Promise<BreakListItem[]> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("breaks")
+    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
+    .eq("status", "cancelled")
+    .order("updated_at", { ascending: false });
+
+  if (typeof limit === "number" && limit > 0) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row) =>
+    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
+  );
+}
+
 export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
   const supabase = await createClient();
 
@@ -73,7 +97,7 @@ export async function getBreakById(id: string): Promise<BreakWithSlots | null> {
     .from("breaks")
     .select("id, title, description, image_url, status, video_url, created_at")
     .eq("id", id)
-    .in("status", ["active", "sold_out", "completed"])
+    .in("status", ["active", "sold_out", "completed", "cancelled"])
     .single();
 
   if (error) {

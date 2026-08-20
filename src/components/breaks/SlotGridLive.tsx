@@ -23,7 +23,8 @@ export function SlotGridLive({
   locale,
 }: SlotGridLiveProps) {
   const t = useTranslations("breaks");
-  const { slots, isRefreshing, error } = useSlotPolling(breakId, initialSlots);
+  const isLiveBreak = breakStatus === "active" || breakStatus === "sold_out";
+  const { slots, isRefreshing, error } = useSlotPolling(breakId, initialSlots, isLiveBreak);
 
   if (slots.length === 0) {
     return (
@@ -35,10 +36,12 @@ export function SlotGridLive({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between text-xs text-muted">
-        <span>{isRefreshing ? t("liveUpdating") : t("liveConnected")}</span>
-        {error ? <span className="text-red-300">{error}</span> : null}
-      </div>
+      {isLiveBreak ? (
+        <div className="flex items-center justify-between text-xs text-muted">
+          <span>{isRefreshing ? t("liveUpdating") : t("liveConnected")}</span>
+          {error ? <span className="text-red-300">{error}</span> : null}
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {slots.map((slot) => (

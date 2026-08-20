@@ -43,6 +43,29 @@ export function isSlotLockedByOtherUser(
   );
 }
 
+export function isSlotInUserCart(
+  slot: BreakSlot,
+  userId: string | null | undefined
+): boolean {
+  return (
+    slot.status === "locked" &&
+    slot.lock_type === "cart" &&
+    isSlotLockedByUser(slot, userId)
+  );
+}
+
+export function canAddSlotToCart(
+  slot: BreakSlot,
+  breakStatus: BreakStatus,
+  userId: string | null | undefined
+): boolean {
+  if (breakStatus !== "active" || !userId) {
+    return false;
+  }
+
+  return slot.status === "available";
+}
+
 export function isSlotAvailableForCart(
   slot: BreakSlot,
   breakStatus: BreakStatus,
@@ -56,11 +79,7 @@ export function isSlotAvailableForCart(
     return true;
   }
 
-  return (
-    slot.status === "locked" &&
-    slot.lock_type === "cart" &&
-    isSlotLockedByUser(slot, userId)
-  );
+  return isSlotInUserCart(slot, userId);
 }
 
 export function isSlotAvailableForBuyNow(

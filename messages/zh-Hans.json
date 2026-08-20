@@ -6,7 +6,8 @@
   "common": {
     "brand": "Card Break HK",
     "language": "语言",
-    "comingSoon": "即将推出"
+    "comingSoon": "即将推出",
+    "processing": "处理中…"
   },
   "nav": {
     "breaks": "开箱活动",
@@ -54,7 +55,7 @@
     "noTransactions": "暂时没有钱包记录。",
     "viewFullHistory": "查看完整历史记录 →",
     "shippingTitle": "已完成开箱 — 物流安排",
-    "shippingSubtitle": "开箱完成后，请选择卡片寄送方式。此步骤不会收取任何费用。",
+    "shippingSubtitle": "开箱完成后，请选择卡片寄送方式。此步骤网站不会收取任何费用。",
     "tabs": {
       "ariaLabel": "账户分页",
       "overview": "账户总览",
@@ -70,6 +71,7 @@
       "typeFilter": "交易类型",
       "searchLabel": "关键字搜索",
       "searchPlaceholder": "开箱标题、位置或描述",
+      "filterToggle": "筛选",
       "applyFilters": "应用筛选",
       "loading": "加载记录中…",
       "loadError": "无法加载钱包记录，请稍后再试。",
@@ -155,20 +157,22 @@
   },
   "breaks": {
     "listTitle": "开箱活动",
-    "listSubtitle": "浏览进行中及已完成的开箱记录。进行中可锁定位置结账；已完成可查看重播及物流安排。",
+    "listSubtitle": "浏览进行中、已完成及已取消的开箱记录。进行中可锁定位置结账；已完成可查看重播；已取消可查看退款通知。",
     "featuredTitle": "最新开箱",
     "featuredSubtitle": "从数据库加载的进行中活动",
     "recentlyCompletedTitle": "精彩回顾",
     "recentlyCompletedSubtitle": "最近完成的开箱活动",
-    "viewAll": "查看全部",
+    "viewAll": "查看全部 →",
     "viewAllHistory": "查看全部历史记录 →",
     "viewBreak": "查看详情",
     "empty": "暂时没有进行中的开箱。",
     "emptyCompleted": "暂时没有已完成的开箱。",
+    "emptyCancelled": "暂时没有已取消的开箱。",
     "completedCardHint": "已完成 · 可查看重播",
     "publicTabs": {
       "inProgress": "进行中",
       "completed": "已完成",
+      "cancelled": "已取消",
       "prevPage": "上一页",
       "nextPage": "下一页",
       "pageStatus": "第 {page} / {total} 页（共 {count} 笔）"
@@ -178,7 +182,9 @@
     "slotsTitle": "选择你的位置",
     "slotsSubtitle": "可用位置可点击 Checkout。已售出或锁定中的位置无法购买。",
     "slotsSubtitleCompleted": "此开箱已完成，位置仅供查阅，无法再购买。",
+    "slotsSubtitleCancelled": "此开箱已取消，位置仅供查阅，无法再购买。",
     "completedSlot": "已结束",
+    "cancelledSlot": "已取消",
     "completedBanner": {
       "title": "📦 开箱已完成",
       "purchasedHint": "你已参与此开箱，请选择寄送方式。",
@@ -188,11 +194,17 @@
       "login": "登录",
       "watchReplay": "观看重播"
     },
+    "cancelledBanner": {
+      "title": "【活动取消通知】",
+      "body": "本开箱活动因未达最低参与人数已取消。您的参与费用已全额退回至您的平台购物金（Shopping Credit），可用于未来的任何消费。如有疑问请联系客服。"
+    },
     "checkout": "Checkout",
     "buyNow": "⚡ 直接购买",
     "continueBuyNow": "⚡ 继续直接购买",
     "addToCart": "+ 加入购物车",
     "addingToCart": "加入中…",
+    "alreadyInCart": "已在购物车",
+    "addToCartSuccess": "已将 {slotName} 加入购物车",
     "addToCartError": "无法加入购物车，请稍后再试。",
     "addToCartErrors": {
       "lockedByOther": "此位置已被其他买家锁定。",
@@ -315,9 +327,15 @@
     "timerExpired": "购物车已超时，所有位置已释放。",
     "total": "合计",
     "removeItem": "移除",
+    "removeError": "无法移除此项目，购物车已重新整理。",
     "paymentWarning": "⚠️ 点击付款后，系统将为您保留位置 5 分钟，请尽快完成付款。",
     "cancelNotice": "付款已取消。购物车内的位置仍为您保留，请在倒数结束前重新结账。",
     "expiredNotice": "付款进行中购物车已超时，所有位置已释放，钱包冻结金额已退回。",
+    "banner": {
+      "holdingPrefix": "位置保留中：",
+      "checkoutLink": "前往结账 →",
+      "expired": "⚠️ 位置已释放"
+    },
     "addModal": {
       "title": "已加入购物车",
       "subtitle": "位置已锁定并加入购物车。",
@@ -334,6 +352,8 @@
     "viewReceipt": "查看提交纪录",
     "actionNeeded": "请选择寄送方式",
     "statusSubmitted": "已提交：{option}",
+    "prevPage": "← 上一页",
+    "nextPage": "下一页 →",
     "backToAccount": "← 返回我的账户",
     "pageSubtitle": "请为此开箱选择寄送方式。无需付款 — 顺丰到付或自取。",
     "optionLabel": "寄送方式",
@@ -573,8 +593,8 @@
   },
   "home": {
     "badge": "香港卡牌开箱平台",
-    "headline": "干净、快速、安全的开箱体验",
-    "subheadline": "浏览进行中的开箱活动，选择你支持的球队或球员位置。付款后等待直播开箱，再在账户内选择顺丰到付、自取或海外寄送。",
+    "headline": "为卡牌爱好者而设的开箱平台",
+    "subheadline": "汇集热门球员与经典系列。随时参与线上直播拆盒，从选位到收卡，为你提供最高品质的拆卡与配送服务。",
     "ctaBrowse": "浏览开箱",
     "ctaLearn": "查看最新活动",
     "stats": {

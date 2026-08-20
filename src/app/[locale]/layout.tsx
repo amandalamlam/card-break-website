@@ -4,8 +4,12 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { CartCountdownBanner } from "@/components/cart/CartCountdownBanner";
+import { SiteHeaderClient } from "@/components/SiteHeaderClient";
 import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ToastProvider } from "@/components/ui/ToastProvider";
+import { CartProvider } from "@/context/CartContext";
+import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -51,16 +55,28 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const messages = await getMessages();
+  const user = await getCurrentUser();
+  const profile = user ? await getCurrentProfile() : null;
 
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans`}>
         <NextIntlClientProvider messages={messages}>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
+          <CartProvider isLoggedIn={!!user}>
+            <ToastProvider>
+              <div className="flex min-h-screen flex-col">
+                <div className="sticky top-0 z-50 bg-background">
+                  <SiteHeaderClient
+                    isLoggedIn={!!user}
+                    isAdmin={profile?.role === "admin"}
+                  />
+                  <CartCountdownBanner />
+                </div>
+                <main className="flex-1">{children}</main>
+                <SiteFooter />
+              </div>
+            </ToastProvider>
+          </CartProvider>
         </NextIntlClientProvider>
       </body>
     </html>

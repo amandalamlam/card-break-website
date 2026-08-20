@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import type { AppLocale } from "@/i18n/routing";
 
 type CheckoutPayButtonProps = {
@@ -49,14 +50,16 @@ export function CheckoutPayButton({
 
   return (
     <div className="space-y-3">
-      <button
+      <LoadingButton
         type="button"
         onClick={handlePay}
-        disabled={disabled || loading}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-60"
+        loading={loading}
+        loadingText={t("payProcessing")}
+        disabled={disabled}
+        className="inline-flex w-full rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? t("payProcessing") : t("payButton")}
-      </button>
+        {t("payButton")}
+      </LoadingButton>
 
       {error ? (
         <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">

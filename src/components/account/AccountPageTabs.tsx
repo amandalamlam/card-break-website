@@ -13,9 +13,10 @@ type MonthOption = {
   label: string;
 };
 
-type AccountTabId = "overview" | "shipping" | "wallet";
+export type AccountTabId = "overview" | "shipping" | "wallet";
 
 type AccountPageTabsProps = {
+  defaultTab?: AccountTabId;
   locale: string;
   email: string;
   phone: string;
@@ -36,6 +37,7 @@ type TabConfig = {
 };
 
 export function AccountPageTabs({
+  defaultTab = "overview",
   locale,
   email,
   phone,
@@ -49,7 +51,7 @@ export function AccountPageTabs({
   defaultEndMonth,
 }: AccountPageTabsProps) {
   const t = useTranslations("account");
-  const [activeTab, setActiveTab] = useState<AccountTabId>("overview");
+  const [activeTab, setActiveTab] = useState<AccountTabId>(defaultTab);
   const containerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });

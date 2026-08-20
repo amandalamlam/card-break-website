@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/breaks/format";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -161,20 +162,19 @@ export function CartCheckoutPayment({
         </p>
       )}
 
-      <button
+      <LoadingButton
         type="button"
         onClick={handlePay}
-        disabled={loading}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:opacity-60"
+        loading={loading}
+        loadingText={t("payProcessing")}
+        className="inline-flex w-full rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:opacity-60"
       >
-        {loading
-          ? t("payProcessing")
-          : isCreditOnly
-            ? t("payWithCredit")
-            : appliedCredit > 0
-              ? t("payMixed")
-              : t("payButton", { amount: formatPrice(stripeAmount) })}
-      </button>
+        {isCreditOnly
+          ? t("payWithCredit")
+          : appliedCredit > 0
+            ? t("payMixed")
+            : t("payButton", { amount: formatPrice(stripeAmount) })}
+      </LoadingButton>
 
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 

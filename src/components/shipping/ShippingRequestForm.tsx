@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import type { ShippingOption } from "@/lib/shipping/types";
 import type { CompletedBreakShipping } from "@/lib/shipping/types";
 
@@ -125,13 +126,15 @@ export function ShippingRequestForm({ breakItem, options }: ShippingRequestFormP
         <p className="text-xs text-muted">{t("detailsHint")}</p>
       </div>
 
-      <button
+      <LoadingButton
         type="submit"
-        disabled={loading || !selectedOptionId}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:opacity-60"
+        loading={loading}
+        loadingText={t("submitting")}
+        disabled={!selectedOptionId}
+        className="inline-flex w-full rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft disabled:opacity-60"
       >
-        {loading ? t("submitting") : t("confirm")}
-      </button>
+        {t("confirm")}
+      </LoadingButton>
 
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 

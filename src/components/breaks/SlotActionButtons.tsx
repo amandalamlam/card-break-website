@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { AddToCartModal } from "@/components/cart/AddToCartModal";
+import { useToast } from "@/components/ui/ToastProvider";
+import { LoadingButton } from "@/components/ui/LoadingButton";
+import { dispatchCartUpdated, useCart } from "@/context/CartContext";
 import { CART_RPC_ERROR_I18N_KEYS } from "@/lib/cart/rpc-errors";
 import {
+  canAddSlotToCart,
   isSlotAvailableForBuyNow,
-  isSlotAvailableForCart,
+  isSlotInUserCart,
   isSlotLockedByUser,
 } from "@/lib/slots/helpers";
 import type { BreakSlot, BreakStatus } from "@/lib/breaks/types";
@@ -28,19 +31,22 @@ export function SlotActionButtons({
   locale,
 }: SlotActionButtonsProps) {
   const t = useTranslations("breaks");
+  const { showToast } = useToast();
+  const { cartSlotIds, refreshCart, triggerBadgePulse } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
 
   const canBuyNow = isSlotAvailableForBuyNow(slot, breakStatus, currentUserId);
-  const canAddToCart = isSlotAvailableForCart(slot, breakStatus, currentUserId);
+  const canAddToCart = canAddSlotToCart(slot, breakStatus, currentUserId);
+  const inCart =
+    isSlotInUserCart(slot, currentUserId) || cartSlotIds.has(slot.id);
   const isBuyNowResume =
     slot.lock_type === "buy_now" && isSlotLockedByUser(slot, currentUserId);
 
   const loginRedirect = `/auth/login?redirect=/${locale}/breaks/${breakId}`;
 
   async function handleAddToCart() {
-    if (!currentUserId) {
+    if (!currentUserId || inCart) {
       return;
     }
 
@@ -64,7 +70,10 @@ export function SlotActionButtons({
         return;
       }
 
-      setShowModal(true);
+      await refreshCart();
+      triggerBadgePulse();
+      dispatchCartUpdated();
+      showToast(t("addToCartSuccess", { slotName: slot.name }));
     } catch {
       setError(t("addToCartError"));
     } finally {
@@ -72,7 +81,7 @@ export function SlotActionButtons({
     }
   }
 
-  if (!canBuyNow && !canAddToCart) {
+  if (!canBuyNow && !canAddToCart && !inCart) {
     return (
       <button
         type="button"
@@ -81,11 +90,13 @@ export function SlotActionButtons({
       >
         {breakStatus === "completed"
           ? t("completedSlot")
-          : slot.status === "sold"
-            ? t("soldOutSlot")
-            : slot.status === "locked"
-              ? t("lockedSlot")
-              : t("unavailable")}
+          : breakStatus === "cancelled"
+            ? t("cancelledSlot")
+            : slot.status === "sold"
+              ? t("soldOutSlot")
+              : slot.status === "locked"
+                ? t("lockedSlot")
+                : t("unavailable")}
       </button>
     );
   }
@@ -117,16 +128,25 @@ export function SlotActionButtons({
         )
       ) : null}
 
-      {canAddToCart ? (
+      {inCart ? (
+        <button
+          type="button"
+          disabled
+          className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-slate-800 px-4 py-3 text-sm font-medium text-slate-400 opacity-50"
+        >
+          {t("alreadyInCart")}
+        </button>
+      ) : canAddToCart ? (
         currentUserId ? (
-          <button
+          <LoadingButton
             type="button"
             onClick={handleAddToCart}
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition hover:border-accent/40 hover:text-foreground disabled:opacity-60"
+            loading={loading}
+            loadingText={t("addingToCart")}
+            className="inline-flex w-full rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition hover:border-accent/40 hover:text-foreground disabled:opacity-60"
           >
-            {loading ? t("addingToCart") : t("addToCart")}
-          </button>
+            {t("addToCart")}
+          </LoadingButton>
         ) : (
           <Link
             href={loginRedirect}
@@ -138,8 +158,6 @@ export function SlotActionButtons({
       ) : null}
 
       {error ? <p className="text-xs text-red-300">{error}</p> : null}
-
-      <AddToCartModal open={showModal} onClose={() => setShowModal(false)} breakId={breakId} />
     </div>
   );
 }

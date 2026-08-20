@@ -19,12 +19,6 @@ export default async function HomePage({
   ]);
   const featuredBreaks = breaks.slice(0, 3);
 
-  const stats = [
-    { label: t("stats.secure"), icon: "🔒" },
-    { label: t("stats.wallet"), icon: "💳" },
-    { label: t("stats.shipping"), icon: "📦" },
-  ];
-
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 py-12 md:py-20">
       <section className="space-y-6">
@@ -60,7 +54,10 @@ export default async function HomePage({
             <h2 className="text-2xl font-semibold">{breaksT("featuredTitle")}</h2>
             <p className="mt-2 text-sm text-muted">{breaksT("featuredSubtitle")}</p>
           </div>
-          <Link href="/breaks" className="text-sm font-medium text-accent-soft hover:text-accent">
+          <Link
+            href="/breaks"
+            className="shrink-0 text-sm font-medium text-accent-soft hover:text-accent"
+          >
             {breaksT("viewAll")}
           </Link>
         </div>
@@ -70,7 +67,7 @@ export default async function HomePage({
             {breaksT("empty")}
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
             {featuredBreaks.map((breakItem) => (
               <BreakCard key={breakItem.id} breakItem={breakItem} />
             ))}
@@ -97,25 +94,12 @@ export default async function HomePage({
             {breaksT("emptyCompleted")}
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
             {completedBreaks.map((breakItem) => (
               <BreakCard key={breakItem.id} breakItem={breakItem} />
             ))}
           </div>
         )}
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {stats.map((item) => (
-          <div key={item.label} className="glass-panel rounded-2xl p-5">
-            <div className="text-2xl">{item.icon}</div>
-            <p className="mt-3 text-sm font-medium text-foreground">{item.label}</p>
-          </div>
-        ))}
-      </section>
-
-      <section id="how-it-works" className="glass-panel rounded-3xl p-8">
-        <p className="text-sm text-accent-soft">{t("phaseNote")}</p>
       </section>
     </div>
   );

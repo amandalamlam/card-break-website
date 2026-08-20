@@ -3,10 +3,20 @@ import {
   PublicBreaksTabs,
   type PublicBreaksTab,
 } from "@/components/breaks/PublicBreaksTabs";
-import { getCompletedBreaks, getPublicBreaks } from "@/lib/breaks/queries";
+import {
+  getCancelledBreaks,
+  getCompletedBreaks,
+  getPublicBreaks,
+} from "@/lib/breaks/queries";
 
 function parseBreaksTab(tab: string | undefined): PublicBreaksTab {
-  return tab === "completed" ? "completed" : "inProgress";
+  if (tab === "completed") {
+    return "completed";
+  }
+  if (tab === "cancelled") {
+    return "cancelled";
+  }
+  return "inProgress";
 }
 
 export default async function BreaksPage({
@@ -21,9 +31,10 @@ export default async function BreaksPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("breaks");
-  const [inProgressBreaks, completedBreaks] = await Promise.all([
+  const [inProgressBreaks, completedBreaks, cancelledBreaks] = await Promise.all([
     getPublicBreaks(),
     getCompletedBreaks(),
+    getCancelledBreaks(),
   ]);
 
   const defaultTab = parseBreaksTab(tab);
@@ -38,6 +49,7 @@ export default async function BreaksPage({
       <PublicBreaksTabs
         inProgressBreaks={inProgressBreaks}
         completedBreaks={completedBreaks}
+        cancelledBreaks={cancelledBreaks}
         defaultTab={defaultTab}
       />
     </div>

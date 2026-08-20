@@ -49,6 +49,12 @@ export function getCartRemainingSeconds(expiresAt: string): number {
   return Math.max(0, Math.min(CART_LOCK_MINUTES * 60, remaining));
 }
 
+export function formatRemainingSeconds(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
 export function getLockExpiresAtIsoFromSlot(slot: {
   locked_at: string | null;
   lock_expires_at?: string | null;
