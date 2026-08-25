@@ -4,10 +4,14 @@ import {
   type PublicBreaksTab,
 } from "@/components/breaks/PublicBreaksTabs";
 import {
-  getCancelledBreaks,
-  getCompletedBreaks,
-  getPublicBreaks,
-} from "@/lib/breaks/queries";
+  getCancelledBreaksPaginatedCached,
+  getCompletedBreaksPaginatedCached,
+  getHistoryBreakCountCached,
+  getPublicBreaksCached,
+} from "@/lib/breaks/cached-queries";
+import type { BreakListItem } from "@/lib/breaks/types";
+
+export const revalidate = 60;
 
 function parseBreaksTab(tab: string | undefined): PublicBreaksTab {
   if (tab === "completed") {
@@ -19,25 +23,53 @@ function parseBreaksTab(tab: string | undefined): PublicBreaksTab {
   return "inProgress";
 }
 
+function parsePage(page: string | undefined): number {
+  const parsed = Number.parseInt(page ?? "1", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
 export default async function BreaksPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; page?: string }>;
 }) {
   const { locale } = await params;
-  const { tab } = await searchParams;
+  const { tab, page: pageParam } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations("breaks");
-  const [inProgressBreaks, completedBreaks, cancelledBreaks] = await Promise.all([
-    getPublicBreaks(),
-    getCompletedBreaks(),
-    getCancelledBreaks(),
+  const defaultTab = parseBreaksTab(tab);
+  const page = parsePage(pageParam);
+
+  const [inProgressBreaks, completedCount, cancelledCount] = await Promise.all([
+    getPublicBreaksCached(),
+    getHistoryBreakCountCached("completed"),
+    getHistoryBreakCountCached("cancelled"),
   ]);
 
-  const defaultTab = parseBreaksTab(tab);
+  let historyBreaks: BreakListItem[] = [];
+  let historyPagination: { page: number; totalPages: number; totalCount: number } | null =
+    null;
+
+  if (defaultTab === "completed") {
+    const result = await getCompletedBreaksPaginatedCached(page);
+    historyBreaks = result.items;
+    historyPagination = {
+      page: result.page,
+      totalPages: result.totalPages,
+      totalCount: result.totalCount,
+    };
+  } else if (defaultTab === "cancelled") {
+    const result = await getCancelledBreaksPaginatedCached(page);
+    historyBreaks = result.items;
+    historyPagination = {
+      page: result.page,
+      totalPages: result.totalPages,
+      totalCount: result.totalCount,
+    };
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
@@ -48,9 +80,11 @@ export default async function BreaksPage({
 
       <PublicBreaksTabs
         inProgressBreaks={inProgressBreaks}
-        completedBreaks={completedBreaks}
-        cancelledBreaks={cancelledBreaks}
+        historyBreaks={historyBreaks}
+        completedCount={completedCount}
+        cancelledCount={cancelledCount}
         defaultTab={defaultTab}
+        historyPagination={historyPagination}
       />
     </div>
   );

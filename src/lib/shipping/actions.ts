@@ -51,107 +51,100 @@ export async function getAllShippingOptions(): Promise<ShippingOption[]> {
   return (data ?? []) as ShippingOption[];
 }
 
-async function getUserPaidBreakIds(userId: string): Promise<string[]> {
+function parseSlotNames(snapshot: string | null | undefined): string[] {
+  return String(snapshot ?? "")
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+type UserShippingBreakRow = {
+  break_id: string;
+  title: string;
+  video_url: string | null;
+  slot_names: string;
+};
+
+async function fetchUserShippingBreakRows(userId: string): Promise<UserShippingBreakRow[]> {
   const admin = createAdminClient();
 
-  const { data: orders } = await admin
-    .from("orders")
-    .select("id, break_id")
-    .eq("user_id", userId)
-    .eq("status", "paid");
+  const { data, error } = await admin.rpc("get_user_shipping_breaks", {
+    p_user_id: userId,
+  });
 
-  const breakIds = new Set<string>();
-  const orderIds: string[] = [];
-
-  for (const row of orders ?? []) {
-    orderIds.push(row.id);
-    if (row.break_id) {
-      breakIds.add(row.break_id);
-    }
+  if (error) {
+    throw new Error(error.message);
   }
 
-  if (orderIds.length > 0) {
-    const { data: orderItems } = await admin
-      .from("order_items")
-      .select("break_id")
-      .in("order_id", orderIds);
+  return (data ?? []) as UserShippingBreakRow[];
+}
 
-    for (const row of orderItems ?? []) {
-      if (row.break_id) {
-        breakIds.add(row.break_id);
-      }
-    }
-  }
-
-  return [...breakIds];
+function mapUserShippingBreakRow(
+  row: UserShippingBreakRow,
+  requestByBreak: Map<string, ShippingRequest>
+): CompletedBreakShipping {
+  return {
+    breakId: row.break_id,
+    title: row.title,
+    videoUrl: row.video_url,
+    slotNames: parseSlotNames(row.slot_names),
+    shippingRequest: requestByBreak.get(row.break_id) ?? null,
+  };
 }
 
 export async function getUserCompletedBreaksForShipping(
   userId: string
 ): Promise<CompletedBreakShipping[]> {
   const admin = createAdminClient();
-  const paidBreakIds = await getUserPaidBreakIds(userId);
 
-  if (paidBreakIds.length === 0) {
-    return [];
+  const [rows, { data: requests, error: requestsError }] = await Promise.all([
+    fetchUserShippingBreakRows(userId),
+    admin.from("shipping_requests").select("*").eq("user_id", userId),
+  ]);
+
+  if (requestsError) {
+    throw new Error(requestsError.message);
   }
-
-  const { data: breaks, error } = await admin
-    .from("breaks")
-    .select("id, title, video_url, status")
-    .in("id", paidBreakIds)
-    .eq("status", "completed")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const { data: requests } = await admin
-    .from("shipping_requests")
-    .select("*")
-    .eq("user_id", userId);
 
   const requestByBreak = new Map(
     ((requests ?? []) as ShippingRequest[]).map((request) => [request.break_id, request])
   );
 
-  const results: CompletedBreakShipping[] = [];
-
-  for (const breakRow of breaks ?? []) {
-    const { data: snapshot } = await admin.rpc("build_user_break_slot_snapshot", {
-      p_user_id: userId,
-      p_break_id: breakRow.id,
-    });
-
-    const slotNames = String(snapshot ?? "")
-      .split(",")
-      .map((name) => name.trim())
-      .filter(Boolean);
-
-    if (slotNames.length === 0) {
-      continue;
-    }
-
-    results.push({
-      breakId: breakRow.id,
-      title: breakRow.title,
-      videoUrl: breakRow.video_url,
-      slotNames,
-      shippingRequest: requestByBreak.get(breakRow.id) ?? null,
-    });
-  }
-
-  return results;
+  return rows.map((row) => mapUserShippingBreakRow(row, requestByBreak));
 }
 
 export async function getShippingRequestForUserBreak(
   userId: string,
   breakId: string
 ): Promise<{ break: CompletedBreakShipping | null; options: ShippingOption[] }> {
-  const completed = await getUserCompletedBreaksForShipping(userId);
-  const breakItem = completed.find((item) => item.breakId === breakId) ?? null;
-  const options = breakItem && !breakItem.shippingRequest ? await getActiveShippingOptions() : [];
+  const admin = createAdminClient();
+
+  const [rows, { data: request, error: requestError }] = await Promise.all([
+    fetchUserShippingBreakRows(userId),
+    admin
+      .from("shipping_requests")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("break_id", breakId)
+      .maybeSingle(),
+  ]);
+
+  if (requestError) {
+    throw new Error(requestError.message);
+  }
+
+  const row = rows.find((item) => item.break_id === breakId);
+  if (!row) {
+    return { break: null, options: [] };
+  }
+
+  const requestByBreak = new Map<string, ShippingRequest>();
+  if (request) {
+    requestByBreak.set(breakId, request as ShippingRequest);
+  }
+
+  const breakItem = mapUserShippingBreakRow(row, requestByBreak);
+  const options = breakItem.shippingRequest ? [] : await getActiveShippingOptions();
 
   return { break: breakItem, options };
 }

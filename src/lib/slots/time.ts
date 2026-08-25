@@ -32,15 +32,16 @@ export function getLockRemainingSeconds(
   lockedAt: string,
   lockExpiresAt?: string | null
 ): number {
+  const lockedMs = new Date(lockedAt).getTime();
   const expiresMs = lockExpiresAt
     ? new Date(lockExpiresAt).getTime()
-    : new Date(lockedAt).getTime() + SLOT_LOCK_DURATION_MS;
+    : lockedMs + SLOT_LOCK_DURATION_MS;
 
-  const remaining = Math.ceil((expiresMs - Date.now()) / 1000);
   const maxSeconds = lockExpiresAt
-    ? Math.max(BUY_NOW_LOCK_MINUTES * 60, CART_LOCK_MINUTES * 60)
+    ? Math.max(1, Math.round((expiresMs - lockedMs) / 1000))
     : SLOT_LOCK_DURATION_SECONDS;
 
+  const remaining = Math.floor((expiresMs - Date.now()) / 1000);
   return Math.max(0, Math.min(maxSeconds, remaining));
 }
 

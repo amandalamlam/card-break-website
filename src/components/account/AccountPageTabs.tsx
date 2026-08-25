@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { Link } from "@/i18n/navigation";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { CompletedBreaksListClient } from "@/components/account/CompletedBreaksListClient";
 import { WalletHistoryPanel } from "@/components/account/WalletHistoryPanel";
@@ -36,6 +36,14 @@ type TabConfig = {
   badge?: number;
 };
 
+function tabHref(tab: AccountTabId) {
+  if (tab === "overview") {
+    return "/account";
+  }
+
+  return `/account?tab=${tab}`;
+}
+
 export function AccountPageTabs({
   defaultTab = "overview",
   locale,
@@ -51,10 +59,20 @@ export function AccountPageTabs({
   defaultEndMonth,
 }: AccountPageTabsProps) {
   const t = useTranslations("account");
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AccountTabId>(defaultTab);
   const containerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  useEffect(() => {
+    setActiveTab(defaultTab);
+  }, [defaultTab]);
+
+  function switchTab(next: AccountTabId) {
+    setActiveTab(next);
+    router.replace(tabHref(next), { scroll: false });
+  }
 
   const tabs: TabConfig[] = [
     { id: "overview", label: t("tabs.overview") },
@@ -125,7 +143,7 @@ export function AccountPageTabs({
               aria-selected={isActive}
               aria-controls={`account-tab-panel-${tab.id}`}
               id={`account-tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => switchTab(tab.id)}
               className={`relative z-10 flex flex-1 items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-sm transition-colors duration-200 sm:px-3 ${
                 isActive
                   ? "font-bold text-slate-950"

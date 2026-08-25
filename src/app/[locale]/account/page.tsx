@@ -44,8 +44,16 @@ export default async function AccountPage({ params, searchParams }: AccountPageP
 
   const { email, phone, role } = profile;
   const wallet = parseWalletBalance(profile);
-  const completedBreaks = await getUserCompletedBreaksForShipping(user.id);
-  const pendingShippingCount = completedBreaks.filter((item) => !item.shippingRequest).length;
+  const activeTab = parseAccountTab(tab);
+
+  let completedBreaks: Awaited<ReturnType<typeof getUserCompletedBreaksForShipping>> = [];
+  let pendingShippingCount = 0;
+
+  if (activeTab === "shipping") {
+    completedBreaks = await getUserCompletedBreaksForShipping(user.id);
+    pendingShippingCount = completedBreaks.filter((item) => !item.shippingRequest).length;
+  }
+
   const t = await getTranslations("account");
   const monthOptions = getMonthOptions();
   const { startMonth, endMonth } = getDefaultMonthRange();
@@ -58,7 +66,7 @@ export default async function AccountPage({ params, searchParams }: AccountPageP
       </div>
 
       <AccountPageTabs
-        defaultTab={parseAccountTab(tab)}
+        defaultTab={activeTab}
         locale={locale}
         email={email}
         phone={phone}

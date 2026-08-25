@@ -1,7 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BreakCard } from "@/components/breaks/BreakCard";
-import { getCompletedBreaks, getPublicBreaks } from "@/lib/breaks/queries";
+import {
+  getCompletedBreaksCached,
+  getPublicBreaksCached,
+} from "@/lib/breaks/cached-queries";
+
+export const revalidate = 60;
 
 export default async function HomePage({
   params,
@@ -14,8 +19,8 @@ export default async function HomePage({
   const t = await getTranslations("home");
   const breaksT = await getTranslations("breaks");
   const [breaks, completedBreaks] = await Promise.all([
-    getPublicBreaks(),
-    getCompletedBreaks(3),
+    getPublicBreaksCached(),
+    getCompletedBreaksCached(3),
   ]);
   const featuredBreaks = breaks.slice(0, 3);
 

@@ -1,7 +1,21 @@
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { fetchBreakSlotsWithLazyRelease } from "@/lib/slots/fetch-slots";
 import { releaseExpiredSlotLocks } from "@/lib/slots/locking";
 import type { AdminBreakDetail, Break, BreakListItem, BreakSlot, BreakWithSlots } from "./types";
+
+export const BREAKS_HISTORY_MAX = 50;
+export const BREAKS_HISTORY_PAGE_SIZE = 10;
+
+export type PaginatedBreakListResult = {
+  items: BreakListItem[];
+  page: number;
+  totalPages: number;
+  totalCount: number;
+};
+
+const PUBLIC_BREAK_LIST_SELECT =
+  "id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)";
 
 function mapBreakListItem(
   row: Break & { break_slots: Pick<BreakSlot, "status">[] }
@@ -22,14 +36,79 @@ function mapBreakListItem(
   };
 }
 
-export async function getPublicBreaks(): Promise<BreakListItem[]> {
-  await releaseExpiredSlotLocks();
+function createPublicBreaksClient() {
+  return createAdminClient();
+}
 
-  const supabase = await createClient();
+function clampHistoryPage(page: number): number {
+  const maxPage = Math.max(1, Math.ceil(BREAKS_HISTORY_MAX / BREAKS_HISTORY_PAGE_SIZE));
+  return Math.max(1, Math.min(page, maxPage));
+}
+
+export async function getHistoryBreakCount(status: "completed" | "cancelled"): Promise<number> {
+  const supabase = createPublicBreaksClient();
+
+  const { count, error } = await supabase
+    .from("breaks")
+    .select("id", { count: "exact", head: true })
+    .eq("status", status);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return Math.min(count ?? 0, BREAKS_HISTORY_MAX);
+}
+
+async function fetchHistoryBreaksPage(
+  status: "completed" | "cancelled",
+  page: number
+): Promise<PaginatedBreakListResult> {
+  const supabase = createPublicBreaksClient();
+  const safePage = clampHistoryPage(page);
+  const totalCount = await getHistoryBreakCount(status);
+  const totalPages = Math.max(1, Math.ceil(totalCount / BREAKS_HISTORY_PAGE_SIZE));
+  const boundedPage = Math.min(safePage, totalPages);
+  const offset = (boundedPage - 1) * BREAKS_HISTORY_PAGE_SIZE;
+  const end = Math.min(offset + BREAKS_HISTORY_PAGE_SIZE - 1, BREAKS_HISTORY_MAX - 1);
 
   const { data, error } = await supabase
     .from("breaks")
-    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
+    .select(PUBLIC_BREAK_LIST_SELECT)
+    .eq("status", status)
+    .order("updated_at", { ascending: false })
+    .range(offset, end);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    items: (data ?? []).map((row) =>
+      mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
+    ),
+    page: boundedPage,
+    totalPages,
+    totalCount,
+  };
+}
+
+export async function fetchCompletedBreaksPage(page: number): Promise<PaginatedBreakListResult> {
+  return fetchHistoryBreaksPage("completed", page);
+}
+
+export async function fetchCancelledBreaksPage(page: number): Promise<PaginatedBreakListResult> {
+  return fetchHistoryBreaksPage("cancelled", page);
+}
+
+export async function fetchPublicBreaks(): Promise<BreakListItem[]> {
+  await releaseExpiredSlotLocks();
+
+  const supabase = createPublicBreaksClient();
+
+  const { data, error } = await supabase
+    .from("breaks")
+    .select(PUBLIC_BREAK_LIST_SELECT)
     .in("status", ["active", "sold_out"])
     .order("created_at", { ascending: false });
 
@@ -42,52 +121,38 @@ export async function getPublicBreaks(): Promise<BreakListItem[]> {
   );
 }
 
-export async function getCompletedBreaks(limit?: number): Promise<BreakListItem[]> {
-  const supabase = await createClient();
+export async function getPublicBreaks(): Promise<BreakListItem[]> {
+  return fetchPublicBreaks();
+}
 
-  let query = supabase
-    .from("breaks")
-    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
-    .eq("status", "completed")
-    .order("updated_at", { ascending: false });
+export async function getCompletedBreaks(limit?: number): Promise<BreakListItem[]> {
+  const result = await fetchCompletedBreaksPage(1);
+  const items = result.items;
 
   if (typeof limit === "number" && limit > 0) {
-    query = query.limit(limit);
+    return items.slice(0, limit);
   }
 
-  const { data, error } = await query;
+  return items;
+}
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []).map((row) =>
-    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
-  );
+export async function getCompletedBreaksPaginated(page: number): Promise<PaginatedBreakListResult> {
+  return fetchCompletedBreaksPage(page);
 }
 
 export async function getCancelledBreaks(limit?: number): Promise<BreakListItem[]> {
-  const supabase = await createClient();
-
-  let query = supabase
-    .from("breaks")
-    .select("id, title, description, image_url, status, video_url, created_at, break_slots(status, locked_at)")
-    .eq("status", "cancelled")
-    .order("updated_at", { ascending: false });
+  const result = await fetchCancelledBreaksPage(1);
+  const items = result.items;
 
   if (typeof limit === "number" && limit > 0) {
-    query = query.limit(limit);
+    return items.slice(0, limit);
   }
 
-  const { data, error } = await query;
+  return items;
+}
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []).map((row) =>
-    mapBreakListItem(row as Break & { break_slots: Pick<BreakSlot, "status">[] })
-  );
+export async function getCancelledBreaksPaginated(page: number): Promise<PaginatedBreakListResult> {
+  return fetchCancelledBreaksPage(page);
 }
 
 export async function getBreakById(id: string): Promise<BreakWithSlots | null> {

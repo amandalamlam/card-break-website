@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { NavigationProgressBar } from "@/components/NavigationProgressBar";
 import { CartCountdownBanner } from "@/components/cart/CartCountdownBanner";
 import { SiteHeaderClient } from "@/components/SiteHeaderClient";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { CartProvider } from "@/context/CartContext";
-import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
+import { getAuthContext } from "@/lib/auth/session";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -55,12 +56,12 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const messages = await getMessages();
-  const user = await getCurrentUser();
-  const profile = user ? await getCurrentProfile() : null;
+  const { user, profile } = await getAuthContext();
 
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans`}>
+        <NavigationProgressBar />
         <NextIntlClientProvider messages={messages}>
           <CartProvider isLoggedIn={!!user}>
             <ToastProvider>

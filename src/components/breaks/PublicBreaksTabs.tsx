@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { BreakCardClient } from "@/components/breaks/BreakCardClient";
@@ -8,14 +8,20 @@ import type { BreakListItem } from "@/lib/breaks/types";
 
 export type PublicBreaksTab = "inProgress" | "completed" | "cancelled";
 
-type PublicBreaksTabsProps = {
-  inProgressBreaks: BreakListItem[];
-  completedBreaks: BreakListItem[];
-  cancelledBreaks: BreakListItem[];
-  defaultTab: PublicBreaksTab;
+type HistoryPagination = {
+  page: number;
+  totalPages: number;
+  totalCount: number;
 };
 
-const PAGE_SIZE = 10;
+type PublicBreaksTabsProps = {
+  inProgressBreaks: BreakListItem[];
+  historyBreaks: BreakListItem[];
+  completedCount: number;
+  cancelledCount: number;
+  defaultTab: PublicBreaksTab;
+  historyPagination: HistoryPagination | null;
+};
 
 function tabHref(pathname: string, tab: PublicBreaksTab) {
   if (tab === "inProgress") {
@@ -25,17 +31,26 @@ function tabHref(pathname: string, tab: PublicBreaksTab) {
   return `${pathname}?tab=${tab}`;
 }
 
+function pageHref(pathname: string, tab: PublicBreaksTab, page: number) {
+  const params = new URLSearchParams({ tab });
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+  return `${pathname}?${params.toString()}`;
+}
+
 export function PublicBreaksTabs({
   inProgressBreaks,
-  completedBreaks,
-  cancelledBreaks,
+  historyBreaks,
+  completedCount,
+  cancelledCount,
   defaultTab,
+  historyPagination,
 }: PublicBreaksTabsProps) {
   const t = useTranslations("breaks");
   const router = useRouter();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<PublicBreaksTab>(defaultTab);
-  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setActiveTab(defaultTab);
@@ -50,36 +65,23 @@ export function PublicBreaksTabs({
     {
       id: "completed",
       label: t("publicTabs.completed"),
-      count: completedBreaks.length,
+      count: completedCount,
     },
     {
       id: "cancelled",
       label: t("publicTabs.cancelled"),
-      count: cancelledBreaks.length,
+      count: cancelledCount,
     },
   ];
 
-  const activeList =
-    activeTab === "inProgress"
-      ? inProgressBreaks
-      : activeTab === "completed"
-        ? completedBreaks
-        : cancelledBreaks;
-
   const usePagination = activeTab === "completed" || activeTab === "cancelled";
-  const totalPages = usePagination ? Math.max(1, Math.ceil(activeList.length / PAGE_SIZE)) : 1;
-  const currentPage = Math.min(page, totalPages);
-
-  const visibleList = useMemo(() => {
-    if (!usePagination) {
-      return activeList;
-    }
-    return activeList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  }, [activeList, currentPage, usePagination]);
+  const visibleList = activeTab === "inProgress" ? inProgressBreaks : historyBreaks;
+  const currentPage = historyPagination?.page ?? 1;
+  const totalPages = historyPagination?.totalPages ?? 1;
+  const totalCount = historyPagination?.totalCount ?? 0;
 
   function switchTab(next: PublicBreaksTab) {
     setActiveTab(next);
-    setPage(1);
     router.replace(tabHref(pathname, next), { scroll: false });
   }
 
@@ -130,20 +132,22 @@ export function PublicBreaksTabs({
         </div>
       )}
 
-      {usePagination && activeList.length > PAGE_SIZE ? (
+      {usePagination && historyPagination && totalPages > 1 ? (
         <div className="flex items-center justify-between gap-3 text-sm">
           <p className="text-muted">
             {t("publicTabs.pageStatus", {
               page: currentPage,
               total: totalPages,
-              count: activeList.length,
+              count: totalCount,
             })}
           </p>
           <div className="flex gap-2">
             <button
               type="button"
               disabled={currentPage <= 1}
-              onClick={() => setPage((value) => Math.max(1, value - 1))}
+              onClick={() =>
+                router.replace(pageHref(pathname, activeTab, currentPage - 1), { scroll: false })
+              }
               className="rounded-lg border border-border px-3 py-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
             >
               {t("publicTabs.prevPage")}
@@ -151,7 +155,9 @@ export function PublicBreaksTabs({
             <button
               type="button"
               disabled={currentPage >= totalPages}
-              onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+              onClick={() =>
+                router.replace(pageHref(pathname, activeTab, currentPage + 1), { scroll: false })
+              }
               className="rounded-lg border border-border px-3 py-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
             >
               {t("publicTabs.nextPage")}
