@@ -6,7 +6,9 @@ import { Link } from "@/i18n/navigation";
 import { useToast } from "@/components/ui/ToastProvider";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { dispatchCartUpdated, useCart } from "@/context/CartContext";
+import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { CART_RPC_ERROR_I18N_KEYS } from "@/lib/cart/rpc-errors";
+import type { AppLocale } from "@/i18n/routing";
 import {
   canAddSlotToCart,
   isSlotAvailableForBuyNow,
@@ -43,10 +45,15 @@ export function SlotActionButtons({
   const isBuyNowResume =
     slot.lock_type === "buy_now" && isSlotLockedByUser(slot, currentUserId);
 
-  const loginRedirect = `/auth/login?redirect=/${locale}/breaks/${breakId}`;
+  const breakPagePath = `/${locale}/breaks/${breakId}`;
+  const loginRedirect = buildAuthRedirectPath(locale as AppLocale, breakPagePath, "login");
 
   async function handleAddToCart() {
-    if (!currentUserId || inCart) {
+    if (!currentUserId) {
+      return;
+    }
+
+    if (inCart) {
       return;
     }
 
@@ -121,6 +128,7 @@ export function SlotActionButtons({
         ) : (
           <Link
             href={loginRedirect}
+            prefetch={false}
             className="inline-flex w-full items-center justify-center rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-background transition hover:bg-accent-soft"
           >
             {t("buyNow")}
@@ -150,6 +158,7 @@ export function SlotActionButtons({
         ) : (
           <Link
             href={loginRedirect}
+            prefetch={false}
             className="inline-flex w-full items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition hover:border-accent/40 hover:text-foreground"
           >
             {t("addToCart")}

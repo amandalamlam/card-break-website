@@ -1,4 +1,5 @@
 import { formatPrice } from "@/lib/breaks/format";
+import { formatOrderItemsDescription } from "@/lib/orders/format-items-description";
 import type { WalletTransaction } from "./types";
 import { resolveOrderCreditPaid, resolveOrderStripePaid, resolveOrderTotal } from "./types";
 
@@ -39,20 +40,18 @@ function formatWalletActivityDate(createdAt: string, locale: string): string {
     .replace(/\u00a0/g, " ");
 }
 
-function formatWalletActivityItemDetails(tx: WalletTransaction, copy: WalletActivityCopy): string | null {
+function formatWalletActivityItemDetails(tx: WalletTransaction): string | null {
   const items = tx.orders?.order_items;
 
-  if (!items?.length) {
-    return null;
+  if (items?.length) {
+    const formatted = formatOrderItemsDescription(items);
+    if (formatted) {
+      return formatted;
+    }
   }
 
-  if (items.length === 1) {
-    const item = items[0];
-    return `${item.break_title} (${item.position_name})`;
-  }
-
-  const breakTitle = items[0]?.break_title ?? "—";
-  return `${breakTitle} (${items.length}${copy.positionsUnit})`;
+  const description = tx.description.trim();
+  return description ? description : null;
 }
 
 function formatWalletActivityPaymentBreakdown(
@@ -124,7 +123,7 @@ export function buildWalletActivityViewModel(
   return {
     id: tx.id,
     typeLabel: copy.transactionTypes[tx.type] ?? tx.type,
-    itemDetails: formatWalletActivityItemDetails(tx, copy),
+    itemDetails: formatWalletActivityItemDetails(tx),
     metadata,
     amount: formatWalletActivityAmount(tx),
   };

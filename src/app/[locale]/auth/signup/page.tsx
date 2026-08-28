@@ -1,8 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
+import { AuthEntryRedirect } from "@/components/auth/AuthEntryRedirect";
 import { SignupForm } from "@/components/auth/SignupForm";
-import { getSafeRedirect, stripLocalePrefix } from "@/lib/auth/redirect";
+import { getSafeRedirect } from "@/lib/auth/redirect";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -20,7 +21,7 @@ export default async function SignupPage({ params, searchParams }: SignupPagePro
 
   const user = await getCurrentUser();
   if (user) {
-    redirect({ href: stripLocalePrefix(redirectTo), locale: locale as AppLocale });
+    redirect({ href: "/", locale: locale as AppLocale });
   }
 
   const t = await getTranslations("auth");
@@ -40,6 +41,7 @@ export default async function SignupPage({ params, searchParams }: SignupPagePro
           </p>
         }
       >
+        <AuthEntryRedirect />
         <SignupForm redirectTo={redirectTo} />
       </AuthCard>
     </div>

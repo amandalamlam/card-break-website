@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { formatPrice } from "@/lib/breaks/format";
+import { formatOrderItemsDescription } from "@/lib/orders/format-items-description";
 import { buildPaymentReceipt } from "@/lib/orders/queries";
 import { resolvePaidOrderForSuccessPage } from "@/lib/stripe/complete-checkout";
 import type { AppLocale } from "@/i18n/routing";
@@ -38,10 +39,8 @@ export default async function CheckoutSuccessPage({
   const t = await getTranslations("checkout.success");
 
   const primaryItem = receipt.items[0];
-  const itemSummary =
-    receipt.items.length === 1
-      ? primaryItem?.position_name ?? "—"
-      : t("itemsMulti", { count: receipt.items.length });
+  const itemDescription = formatOrderItemsDescription(receipt.items);
+  const isMultiItem = receipt.items.length > 1;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-6 py-12 md:py-16">
@@ -53,14 +52,23 @@ export default async function CheckoutSuccessPage({
         <p className="mt-3 text-sm leading-7 text-muted">{t("subtitle")}</p>
 
         <div className="mt-6 space-y-2 rounded-2xl border border-border bg-background/50 p-4 text-left text-sm">
-          <p>
-            <span className="text-muted">{t("breakLabel")}: </span>
-            <span className="font-medium">{primaryItem?.break_title ?? "—"}</span>
-          </p>
-          <p>
-            <span className="text-muted">{t("slotLabel")}: </span>
-            <span className="font-medium">{itemSummary}</span>
-          </p>
+          {isMultiItem ? (
+            <p>
+              <span className="text-muted">{t("itemsLabel")}: </span>
+              <span className="whitespace-pre-line font-medium">{itemDescription}</span>
+            </p>
+          ) : (
+            <>
+              <p>
+                <span className="text-muted">{t("breakLabel")}: </span>
+                <span className="font-medium">{primaryItem?.break_title ?? "—"}</span>
+              </p>
+              <p>
+                <span className="text-muted">{t("slotLabel")}: </span>
+                <span className="font-medium">{primaryItem?.position_name ?? "—"}</span>
+              </p>
+            </>
+          )}
           <p>
             <span className="text-muted">{t("priceLabel")}: </span>
             <span className="font-semibold text-accent-soft">

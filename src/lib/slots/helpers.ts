@@ -57,9 +57,9 @@ export function isSlotInUserCart(
 export function canAddSlotToCart(
   slot: BreakSlot,
   breakStatus: BreakStatus,
-  userId: string | null | undefined
+  _userId?: string | null
 ): boolean {
-  if (breakStatus !== "active" || !userId) {
+  if (breakStatus !== "active") {
     return false;
   }
 

@@ -32,7 +32,7 @@ export function WalletActivityList({ activities, noTransactions }: WalletActivit
           </div>
 
           {activity.itemDetails ? (
-            <p className="leading-6 text-foreground/90">{activity.itemDetails}</p>
+            <p className="whitespace-pre-line leading-6 text-foreground/90">{activity.itemDetails}</p>
           ) : null}
 
           <p className="text-xs leading-5 text-muted">{activity.metadata}</p>

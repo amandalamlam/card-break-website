@@ -42,3 +42,20 @@ export function buildAuthRedirectPath(
   const params = new URLSearchParams({ redirect: safeTarget });
   return `/auth/${authPage}?${params.toString()}`;
 }
+
+export const AUTH_PAGE_PATHS = [
+  "/auth/login",
+  "/auth/signup",
+  "/auth/forgot-password",
+  "/auth/update-password",
+] as const;
+
+export function isAuthPagePath(pathname: string): boolean {
+  return (AUTH_PAGE_PATHS as readonly string[]).includes(pathname);
+}
+
+export const GUEST_AUTH_ENTRY_PATHS = ["/auth/login", "/auth/signup"] as const;
+
+export function isGuestAuthEntryPath(pathname: string): boolean {
+  return (GUEST_AUTH_ENTRY_PATHS as readonly string[]).includes(pathname);
+}

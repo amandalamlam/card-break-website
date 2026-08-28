@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { CartNavLink } from "@/components/cart/CartNavLink";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LogoutButton } from "./auth/LogoutButton";
+import type { HeaderAuthVisibility } from "./header/header-auth-visibility";
 
 type NavLink = {
   href: string;
@@ -21,7 +22,7 @@ type MobileNavDrawerProps = {
   onClose: () => void;
   brandLabel: string;
   navLinks: NavLink[];
-  isLoggedIn: boolean;
+  authVisibility: HeaderAuthVisibility;
 };
 
 export function MobileNavDrawer({
@@ -29,7 +30,7 @@ export function MobileNavDrawer({
   onClose,
   brandLabel,
   navLinks,
-  isLoggedIn,
+  authVisibility,
 }: MobileNavDrawerProps) {
   const t = useTranslations("nav");
   const [mounted, setMounted] = useState(false);
@@ -113,7 +114,7 @@ export function MobileNavDrawer({
               )
             )}
 
-            {!isLoggedIn ? (
+            {authVisibility.showGuestAuth ? (
               <>
                 <Link
                   href="/auth/login"
@@ -138,7 +139,7 @@ export function MobileNavDrawer({
           </div>
         </div>
 
-        {isLoggedIn ? (
+        {authVisibility.showLogout ? (
           <div className="mt-auto border-t border-slate-800 pt-6 text-rose-400">
             <LogoutButton
               variant="drawer"

@@ -9,6 +9,7 @@ import { CartCountdownBanner } from "@/components/cart/CartCountdownBanner";
 import { SiteHeaderClient } from "@/components/SiteHeaderClient";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { AuthSessionProvider } from "@/context/AuthSessionContext";
 import { CartProvider } from "@/context/CartContext";
 import { getAuthContext } from "@/lib/auth/session";
 import "../globals.css";
@@ -59,25 +60,27 @@ export default async function LocaleLayout({
   const { user, profile } = await getAuthContext();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-scroll-behavior="smooth">
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans`}>
         <NavigationProgressBar />
         <NextIntlClientProvider messages={messages}>
-          <CartProvider isLoggedIn={!!user}>
-            <ToastProvider>
-              <div className="flex min-h-screen flex-col">
-                <div className="sticky top-0 z-50 bg-background">
-                  <SiteHeaderClient
-                    isLoggedIn={!!user}
-                    isAdmin={profile?.role === "admin"}
-                  />
-                  <CartCountdownBanner />
+          <AuthSessionProvider
+            initialIsAuthenticated={!!user}
+            initialIsAdmin={profile?.role === "admin"}
+          >
+            <CartProvider isLoggedIn={!!user}>
+              <ToastProvider>
+                <div className="flex min-h-screen flex-col">
+                  <div className="sticky top-0 z-50 bg-background">
+                    <SiteHeaderClient />
+                    <CartCountdownBanner />
+                  </div>
+                  <main className="flex-1">{children}</main>
+                  <SiteFooter />
                 </div>
-                <main className="flex-1">{children}</main>
-                <SiteFooter />
-              </div>
-            </ToastProvider>
-          </CartProvider>
+              </ToastProvider>
+            </CartProvider>
+          </AuthSessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>
