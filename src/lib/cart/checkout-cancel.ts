@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CartCheckoutReturnResult = {
@@ -51,6 +52,8 @@ async function expireCartFully(cartId: string, userId: string): Promise<void> {
     .from("carts")
     .update({ status: "expired", updated_at: new Date().toISOString() })
     .eq("id", cartId);
+
+  revalidatePublicBreaksList();
 }
 
 async function cancelCartCheckoutPreserve(orderId: string, cartId: string): Promise<void> {

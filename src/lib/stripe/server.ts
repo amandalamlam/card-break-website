@@ -18,7 +18,7 @@ export function getStripe(): Stripe {
 }
 
 export function getStripeWebhookSecret(): string {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
   if (!secret) {
     throw new Error("Missing STRIPE_WEBHOOK_SECRET environment variable.");

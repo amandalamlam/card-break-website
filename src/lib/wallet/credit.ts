@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { WalletTransaction } from "./types";
 
@@ -76,7 +77,12 @@ export async function fulfillCreditOnlyOrder(orderId: string): Promise<boolean> 
     throw new Error(error.message);
   }
 
-  return Boolean(data);
+  const fulfilled = Boolean(data);
+  if (fulfilled) {
+    revalidatePublicBreaksList();
+  }
+
+  return fulfilled;
 }
 
 export async function cancelBreakAndRefund(breakId: string): Promise<CancelBreakResult> {
@@ -97,6 +103,8 @@ export async function cancelBreakAndRefund(breakId: string): Promise<CancelBreak
     refunded_slots?: number;
     released_locks?: number;
   };
+
+  revalidatePublicBreaksList();
 
   return {
     ok: true,

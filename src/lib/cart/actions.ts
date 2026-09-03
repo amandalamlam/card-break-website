@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CART_LOCK_MINUTES } from "@/lib/slots/constants";
 import { getCartRemainingSeconds, uuidEquals } from "@/lib/slots/time";
@@ -257,6 +258,9 @@ export async function addSlotToCart(
   // Prefer direct path so add-to-cart does not depend on broken wallet cleanup RPCs.
   const direct = await addSlotToCartDirect(userId, breakId, slotId);
   if (direct.ok || direct.code !== "MIGRATION_REQUIRED") {
+    if (direct.ok) {
+      revalidatePublicBreaksList();
+    }
     if (!direct.ok && process.env.NODE_ENV !== "production") {
       console.error("[addSlotToCart]", direct.code, direct.detail);
     }
@@ -287,6 +291,8 @@ export async function addSlotToCart(
     expires_at: string;
     is_new_cart: boolean;
   };
+
+  revalidatePublicBreaksList();
 
   return {
     ok: true,
@@ -364,6 +370,8 @@ export async function removeCartItem(userId: string, cartItemId: string) {
       .eq("id", activeCart.id);
   }
 
+  revalidatePublicBreaksList();
+
   return { ok: true as const };
 }
 
@@ -410,6 +418,8 @@ export async function getActiveCart(userId: string): Promise<CartWithItems | nul
       .from("carts")
       .update({ status: "expired", updated_at: new Date().toISOString() })
       .eq("id", cart.id);
+
+    revalidatePublicBreaksList();
 
     return null;
   }

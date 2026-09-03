@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSlotLockActive } from "@/lib/slots/helpers";
 import { uuidEquals } from "@/lib/slots/time";
@@ -21,6 +22,7 @@ export async function fulfillSlotPurchase(
   const fulfilled = Boolean(data);
   if (fulfilled) {
     await expireCartAfterOrderPaid(orderId);
+    revalidatePublicBreaksList();
   }
 
   return fulfilled;
@@ -57,7 +59,12 @@ export async function cancelPendingOrder(orderId: string): Promise<boolean> {
     throw new Error(error.message);
   }
 
-  return Boolean(data);
+  const cancelled = Boolean(data);
+  if (cancelled) {
+    revalidatePublicBreaksList();
+  }
+
+  return cancelled;
 }
 
 export async function validateBuyNowLock(slotId: string, userId: string): Promise<boolean> {

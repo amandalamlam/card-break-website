@@ -10,6 +10,7 @@ import {
   buildCheckoutSuccessUrl,
   buildCheckoutSuccessUrlCreditOnly,
 } from "@/lib/stripe/checkout-urls";
+import { buildCheckoutMetadata } from "@/lib/stripe/checkout-metadata";
 import { validateBuyNowLock } from "@/lib/stripe/orders-core";
 import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
 import { createCheckoutOrder, fulfillCreditOnlyOrder } from "@/lib/wallet/credit";
@@ -88,6 +89,15 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     const admin = createAdminClient();
 
+    const checkoutMetadata = buildCheckoutMetadata({
+      orderId,
+      userId: authSession.userId,
+      breakId,
+      slotId,
+      creditAmount: appliedCredit,
+      checkoutMode: "buy_now",
+    });
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -111,13 +121,9 @@ export async function POST(request: Request) {
       success_url: buildCheckoutSuccessUrl(locale, orderId),
       cancel_url: buildCheckoutCancelUrl(locale, orderId, "buy_now"),
       client_reference_id: orderId,
-      metadata: {
-        order_id: orderId,
-        break_id: breakId,
-        slot_id: slotId,
-        user_id: authSession.userId,
-        credit_amount: String(appliedCredit),
-        checkout_mode: "buy_now",
+      metadata: checkoutMetadata,
+      payment_intent_data: {
+        metadata: checkoutMetadata,
       },
     });
 

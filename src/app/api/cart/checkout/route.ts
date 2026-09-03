@@ -11,6 +11,7 @@ import {
   buildCheckoutSuccessUrl,
   buildCheckoutSuccessUrlCreditOnly,
 } from "@/lib/stripe/checkout-urls";
+import { buildCheckoutMetadata } from "@/lib/stripe/checkout-metadata";
 import { fulfillCreditOnlyOrder } from "@/lib/wallet/credit";
 import { clampCreditAmount, parseWalletBalance, roundMoney } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
@@ -92,6 +93,15 @@ export async function POST(request: Request) {
       appliedCredit
     );
 
+    const checkoutMetadata = buildCheckoutMetadata({
+      orderId,
+      userId: authSession.userId,
+      creditAmount: appliedCredit,
+      stripeAmount,
+      checkoutMode: "cart",
+      cartId: cart.id,
+    });
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -100,13 +110,9 @@ export async function POST(request: Request) {
       success_url: buildCheckoutSuccessUrl(locale, orderId),
       cancel_url: buildCartCheckoutCancelUrl(locale, orderId),
       client_reference_id: orderId,
-      metadata: {
-        order_id: orderId,
-        user_id: authSession.userId,
-        credit_amount: String(appliedCredit),
-        stripe_amount: String(stripeAmount),
-        checkout_mode: "cart",
-        cart_id: cart.id,
+      metadata: checkoutMetadata,
+      payment_intent_data: {
+        metadata: checkoutMetadata,
       },
     });
 

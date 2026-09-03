@@ -6,12 +6,14 @@ import {
   getHistoryBreakCount,
   type PaginatedBreakListResult,
 } from "@/lib/breaks/queries";
+import { PUBLIC_BREAKS_LIST_CACHE_TAG } from "@/lib/breaks/revalidate-public-list";
 
 export const PUBLIC_LIST_REVALIDATE_SECONDS = 60;
 
 export function getPublicBreaksCached() {
   return unstable_cache(fetchPublicBreaks, ["public-breaks-list"], {
     revalidate: PUBLIC_LIST_REVALIDATE_SECONDS,
+    tags: [PUBLIC_BREAKS_LIST_CACHE_TAG],
   })();
 }
 

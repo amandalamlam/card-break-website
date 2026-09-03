@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { sanitizeBreakDescription } from "@/lib/breaks/sanitize-html";
 import { parseSlotsInput } from "@/lib/breaks/slots-input";
@@ -72,6 +73,7 @@ export async function createBreakAction(
   }
 
   revalidatePath("/", "layout");
+  revalidatePublicBreaksList();
 
   redirect({ href: `/breaks/${breakRow.id}`, locale });
   return { success: true };

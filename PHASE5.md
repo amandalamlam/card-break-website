@@ -84,7 +84,7 @@ Stripe Dashboard → **Developers** → **Webhooks** → **Add endpoint**
 | Field | Value |
 |-------|--------|
 | URL | `https://card-break-website.vercel.app/api/stripe/webhook` |
-| Events | `checkout.session.completed`, `checkout.session.expired` |
+| Events | `checkout.session.completed`, `checkout.session.expired`, `payment_intent.payment_failed` |
 
 Copy the **Signing secret** → Vercel env `STRIPE_WEBHOOK_SECRET`
 
@@ -117,7 +117,8 @@ Verify in Supabase **Table Editor**:
 |-------|-----|
 | Pay button error | Check `STRIPE_SECRET_KEY` in `.env.local`, restart dev server |
 | Payment works but slot not sold | Webhook not running — use `stripe listen` locally |
-| Webhook 400 invalid signature | Wrong `STRIPE_WEBHOOK_SECRET` |
+| Webhook 400 invalid signature | Wrong `STRIPE_WEBHOOK_SECRET` — use the signing secret from the **Dashboard webhook endpoint** (`whsec_...` under Developers → Webhooks → your endpoint → Signing secret). Do **not** use the secret from `stripe listen` (local CLI). Test and live secrets differ. Redeploy Vercel after updating. |
+| Webhook disabled / other errors | Check Vercel env vars (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`); open Stripe → Webhooks → failed event → view response body; redeploy after fixing env |
 | `orders table does not exist` | Run `phase5_stripe_orders.sql` |
 
 ---

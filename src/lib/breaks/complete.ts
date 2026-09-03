@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSafeHttpUrl } from "@/lib/shipping/sanitize";
 
@@ -50,6 +51,8 @@ export async function completeBreakAdmin(
   if (updateError) {
     return { ok: false, code: "BREAK_UPDATE_FAILED", message: updateError.message };
   }
+
+  revalidatePublicBreaksList();
 
   return { ok: true };
 }

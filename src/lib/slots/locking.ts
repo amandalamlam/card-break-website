@@ -1,3 +1,4 @@
+import { revalidatePublicBreaksList } from "@/lib/breaks/revalidate-public-list";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BUY_NOW_LOCK_MINUTES } from "./constants";
 import { getLockExpiresAtIso, uuidEquals } from "./time";
@@ -105,6 +106,8 @@ export async function lockSlotBuyNow(slotId: string, userId: string): Promise<Lo
     return { ok: false, code: "UNKNOWN", message: mapErrorMessage("UNKNOWN") };
   }
 
+  revalidatePublicBreaksList();
+
   return {
     ok: true,
     slotId: row.slot_id,
@@ -129,7 +132,12 @@ export async function releaseSlotLock(slotId: string, userId: string): Promise<b
     return false;
   }
 
-  return Boolean(data);
+  const released = Boolean(data);
+  if (released) {
+    revalidatePublicBreaksList();
+  }
+
+  return released;
 }
 
 export async function releaseExpiredSlotLocks(): Promise<number> {
