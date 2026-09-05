@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { dispatchCartExpired, dispatchCartUpdated } from "@/lib/cart/events";
+import { cartApiUrl } from "@/lib/cart/client-api";
 import { normalizeCartWithItems } from "@/lib/cart/normalize";
 import type { CartWithItems } from "@/lib/cart/types";
 import { getCartRemainingSeconds } from "@/lib/slots/time";
@@ -63,7 +64,7 @@ export function CartProvider({ children, isLoggedIn }: CartProviderProps) {
     }
 
     try {
-      const response = await fetch(`/api/cart/items?_=${Date.now()}`, {
+      const response = await fetch(`${cartApiUrl("/api/cart/items")}?_=${Date.now()}`, {
         cache: "no-store",
         headers: {
           "Cache-Control": "no-cache",

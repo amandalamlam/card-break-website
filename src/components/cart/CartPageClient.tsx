@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/breaks/format";
 import { CartCheckoutPayment } from "@/components/cart/CartCheckoutPayment";
 import { useCart } from "@/context/CartContext";
+import { cartApiUrl } from "@/lib/cart/client-api";
 import { computeCartTotalAmount, removeItemFromCart } from "@/lib/cart/normalize";
 import { formatRemainingSeconds, getCartRemainingSeconds } from "@/lib/slots/time";
-import type { CartItem, CartWithItems } from "@/lib/cart/types";
+import type { CartWithItems } from "@/lib/cart/types";
 import type { AppLocale } from "@/i18n/routing";
 
 type CartPageClientProps = {
@@ -17,10 +18,6 @@ type CartPageClientProps = {
   availableCredit: number;
   notice?: "cancelled" | "expired" | null;
 };
-
-function cartItemsFrom(cart: CartWithItems | null | undefined): CartItem[] {
-  return cart?.items ?? [];
-}
 
 export function CartPageClient({
   locale,
@@ -31,56 +28,44 @@ export function CartPageClient({
   const t = useTranslations("cart");
   const { cart: contextCart, applyCart, refreshCart, remainingSeconds: contextRemainingSeconds } =
     useCart();
-  const [items, setItems] = useState<CartItem[]>(() => cartItemsFrom(initialCart));
   const [localRemainingSeconds, setLocalRemainingSeconds] = useState<number | null>(
     initialCart ? initialCart.remainingSeconds : null
   );
   const [removeError, setRemoveError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const sourceCart = contextCart ?? initialCart;
-  const expiresAt = sourceCart?.expires_at ?? null;
+  const cart = contextCart ?? initialCart;
+  const items = cart?.items ?? [];
+  const totalAmount = computeCartTotalAmount(items);
   const remainingSeconds =
     contextCart != null ? contextRemainingSeconds : localRemainingSeconds;
-
-  const totalAmount = useMemo(() => computeCartTotalAmount(items), [items]);
 
   useEffect(() => {
     void refreshCart();
   }, [refreshCart]);
 
   useEffect(() => {
-    if (!contextCart) {
+    if (contextCart != null || !cart?.expires_at) {
       return;
     }
 
-    setItems(cartItemsFrom(contextCart));
-  }, [contextCart]);
-
-  useEffect(() => {
-    if (contextCart != null || !expiresAt) {
-      return;
-    }
-
-    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(expiresAt));
+    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(cart.expires_at));
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [contextCart, expiresAt]);
+  }, [cart?.expires_at, contextCart]);
 
   async function handleRemove(itemId: string) {
-    const snapshot = sourceCart;
-    const previousItems = items;
+    const snapshot = cart;
     setRemovingId(itemId);
     setRemoveError(null);
-    setItems((current) => current.filter((item) => item.id !== itemId));
 
     if (snapshot) {
       applyCart(removeItemFromCart(snapshot, itemId));
     }
 
     try {
-      const response = await fetch(`/api/cart/items/${itemId}`, {
+      const response = await fetch(cartApiUrl(`/api/cart/items/${itemId}`), {
         method: "DELETE",
         cache: "no-store",
       });
@@ -91,10 +76,7 @@ export function CartPageClient({
       };
 
       if (response.ok) {
-        if (data.cart) {
-          applyCart(data.cart);
-          setItems(cartItemsFrom(data.cart));
-        }
+        applyCart(data.cart ?? (snapshot ? removeItemFromCart(snapshot, itemId) : null));
         return;
       }
 
@@ -103,13 +85,11 @@ export function CartPageClient({
         return;
       }
 
-      setItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
       setRemoveError(t("removeError"));
     } catch {
-      setItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
@@ -219,7 +199,7 @@ export function CartPageClient({
 
       {!isExpired ? (
         <CartCheckoutPayment
-          key={totalAmount}
+          key={items.map((item) => item.id).join("-")}
           locale={locale}
           totalAmount={totalAmount}
           availableCredit={availableCredit}

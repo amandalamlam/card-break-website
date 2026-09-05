@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/breaks/format";
 import { LoadingButton } from "@/components/ui/LoadingButton";
+import { cartApiUrl } from "@/lib/cart/client-api";
 import { clampCreditAmount, roundMoney } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -51,7 +52,7 @@ export function CartCheckoutPayment({
     setError(null);
 
     try {
-      const response = await fetch("/api/cart/checkout", {
+      const response = await fetch(cartApiUrl("/api/cart/checkout"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

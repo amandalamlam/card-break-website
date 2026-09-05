@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { dispatchCartUpdated, useCart } from "@/context/CartContext";
 import { buildAuthRedirectPath } from "@/lib/auth/redirect";
+import { cartApiUrl } from "@/lib/cart/client-api";
 import { CART_RPC_ERROR_I18N_KEYS } from "@/lib/cart/rpc-errors";
 import type { AppLocale } from "@/i18n/routing";
 import {
@@ -61,7 +62,7 @@ export function SlotActionButtons({
     setError(null);
 
     try {
-      const response = await fetch("/api/cart/items", {
+      const response = await fetch(cartApiUrl("/api/cart/items"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ breakId, slotId: slot.id }),
