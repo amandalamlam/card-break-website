@@ -6,10 +6,12 @@ import { buildAuthRedirectPath } from "@/lib/auth/redirect";
 import { getCurrentProfile, getCurrentUser } from "@/lib/auth/session";
 import { getActiveCart } from "@/lib/cart/actions";
 import { handleCartCheckoutReturn } from "@/lib/cart/checkout-cancel";
+import { normalizeCartWithItems } from "@/lib/cart/normalize";
 import { parseWalletBalance } from "@/lib/wallet/types";
 import type { AppLocale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type CartPageProps = {
   params: Promise<{ locale: string }>;
@@ -44,7 +46,7 @@ export default async function CartPage({ params, searchParams }: CartPageProps) 
   const wallet = profile
     ? parseWalletBalance(profile)
     : { availableCredit: 0, storeCredit: 0, creditReserved: 0 };
-  const cart = await getActiveCart(user!.id);
+  const cart = normalizeCartWithItems(await getActiveCart(user!.id));
   const t = await getTranslations("cart");
 
   const cartNotice =

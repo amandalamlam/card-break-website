@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { dispatchCartExpired, dispatchCartUpdated } from "@/lib/cart/events";
+import { normalizeCartWithItems } from "@/lib/cart/normalize";
 import type { CartWithItems } from "@/lib/cart/types";
 import { getCartRemainingSeconds } from "@/lib/slots/time";
 
@@ -23,6 +24,7 @@ type CartContextValue = {
   expiredBannerVisible: boolean;
   badgePulse: boolean;
   refreshCart: () => Promise<void>;
+  applyCart: (cart: CartWithItems | null) => void;
   triggerBadgePulse: () => void;
 };
 
@@ -41,6 +43,18 @@ export function CartProvider({ children, isLoggedIn }: CartProviderProps) {
   const [badgePulse, setBadgePulse] = useState(false);
   const expiryHandledRef = useRef(false);
 
+  const applyCart = useCallback((nextCart: CartWithItems | null) => {
+    const normalized = normalizeCartWithItems(nextCart);
+    setCart(normalized);
+
+    if (normalized?.expires_at && normalized.items.length > 0) {
+      setRemainingSeconds(getCartRemainingSeconds(normalized.expires_at));
+      expiryHandledRef.current = false;
+    } else {
+      setRemainingSeconds(null);
+    }
+  }, []);
+
   const refreshCart = useCallback(async () => {
     if (!isLoggedIn) {
       setCart(null);
@@ -49,28 +63,23 @@ export function CartProvider({ children, isLoggedIn }: CartProviderProps) {
     }
 
     try {
-      const response = await fetch("/api/cart/items", { cache: "no-store" });
+      const response = await fetch(`/api/cart/items?_=${Date.now()}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (!response.ok) {
-        setCart(null);
-        setRemainingSeconds(null);
         return;
       }
 
       const data = (await response.json()) as { cart: CartWithItems | null };
-      setCart(data.cart);
-
-      if (data.cart?.expires_at && data.cart.items.length > 0) {
-        setRemainingSeconds(getCartRemainingSeconds(data.cart.expires_at));
-        expiryHandledRef.current = false;
-      } else {
-        setRemainingSeconds(null);
-      }
+      applyCart(data.cart);
     } catch {
-      setCart(null);
-      setRemainingSeconds(null);
+      // Keep current client cart on transient failures.
     }
-  }, [isLoggedIn]);
+  }, [applyCart, isLoggedIn]);
 
   const triggerBadgePulse = useCallback(() => {
     setBadgePulse(true);
@@ -136,9 +145,11 @@ export function CartProvider({ children, isLoggedIn }: CartProviderProps) {
       expiredBannerVisible,
       badgePulse,
       refreshCart,
+      applyCart,
       triggerBadgePulse,
     }),
     [
+      applyCart,
       badgePulse,
       cart,
       cartSlotIds,

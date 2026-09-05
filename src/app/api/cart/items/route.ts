@@ -2,6 +2,20 @@ import { NextResponse } from "next/server";
 import { requireSessionUser } from "@/lib/security/require-session-user";
 import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
 import { addSlotToCart, getActiveCart } from "@/lib/cart/actions";
+import { normalizeCartWithItems } from "@/lib/cart/normalize";
+
+export const dynamic = "force-dynamic";
+
+function jsonCartResponse(cart: Awaited<ReturnType<typeof getActiveCart>>) {
+  return NextResponse.json(
+    { cart: normalizeCartWithItems(cart) },
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    }
+  );
+}
 
 export async function GET() {
   const session = await requireSessionUser();
@@ -10,7 +24,7 @@ export async function GET() {
   }
 
   const cart = await getActiveCart(session.userId);
-  return NextResponse.json({ cart });
+  return jsonCartResponse(cart);
 }
 
 type AddItemBody = {

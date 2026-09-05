@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireSessionUser } from "@/lib/security/require-session-user";
-import { enforceRateLimit, RATE_LIMITS } from "@/lib/security/rate-limit";
-import { removeCartItem } from "@/lib/cart/actions";
+import { getActiveCart, removeCartItem } from "@/lib/cart/actions";
+import { normalizeCartWithItems } from "@/lib/cart/normalize";
+
+export const dynamic = "force-dynamic";
 
 type RouteParams = {
   params: Promise<{ itemId: string }>;
@@ -20,5 +22,14 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: result.code }, { status: 409 });
   }
 
-  return NextResponse.json({ ok: true });
+  const cart = normalizeCartWithItems(await getActiveCart(session.userId));
+
+  return NextResponse.json(
+    { ok: true, cart },
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    }
+  );
 }

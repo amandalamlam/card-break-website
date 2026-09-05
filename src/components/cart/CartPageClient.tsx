@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/breaks/format";
 import { CartCheckoutPayment } from "@/components/cart/CartCheckoutPayment";
 import { useCart } from "@/context/CartContext";
-import { dispatchCartUpdated } from "@/lib/cart/events";
+import {
+  computeCartTotalAmount,
+  normalizeCartWithItems,
+  removeItemFromCart,
+} from "@/lib/cart/normalize";
 import { formatRemainingSeconds, getCartRemainingSeconds } from "@/lib/slots/time";
 import type { CartWithItems } from "@/lib/cart/types";
 import type { AppLocale } from "@/i18n/routing";
@@ -26,21 +29,57 @@ export function CartPageClient({
   notice = null,
 }: CartPageClientProps) {
   const t = useTranslations("cart");
-  const router = useRouter();
-  const { cart: contextCart, refreshCart, remainingSeconds: contextRemainingSeconds } = useCart();
+  const { cart: contextCart, applyCart, refreshCart, remainingSeconds: contextRemainingSeconds } =
+    useCart();
   const [localRemainingSeconds, setLocalRemainingSeconds] = useState<number | null>(
     initialCart ? initialCart.remainingSeconds : null
   );
   const [removeError, setRemoveError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [excludedItemIds, setExcludedItemIds] = useState<Set<string>>(() => new Set());
 
-  const cart = contextCart ?? initialCart;
+  const cart = useMemo(() => {
+    const source = normalizeCartWithItems(contextCart ?? initialCart);
+    if (!source) {
+      return null;
+    }
+
+    const items = source.items.filter((item) => !excludedItemIds.has(item.id));
+    return normalizeCartWithItems({ ...source, items });
+  }, [contextCart, excludedItemIds, initialCart]);
+
+  const totalAmount = useMemo(
+    () => (cart ? computeCartTotalAmount(cart.items) : 0),
+    [cart]
+  );
+
   const remainingSeconds =
     contextCart != null ? contextRemainingSeconds : localRemainingSeconds;
 
   useEffect(() => {
     void refreshCart();
   }, [refreshCart]);
+
+  useEffect(() => {
+    if (!contextCart) {
+      return;
+    }
+
+    setExcludedItemIds((previous) => {
+      const next = new Set<string>();
+      for (const itemId of previous) {
+        if (contextCart.items.some((item) => item.id === itemId)) {
+          next.add(itemId);
+        }
+      }
+
+      if (next.size === previous.size && [...next].every((id) => previous.has(id))) {
+        return previous;
+      }
+
+      return next;
+    });
+  }, [contextCart]);
 
   useEffect(() => {
     if (contextCart != null || !cart?.expires_at) {
@@ -54,25 +93,58 @@ export function CartPageClient({
   }, [cart?.expires_at, contextCart]);
 
   async function handleRemove(itemId: string) {
+    const snapshot = contextCart ?? initialCart;
     setRemovingId(itemId);
     setRemoveError(null);
+    setExcludedItemIds((previous) => {
+      const next = new Set(previous);
+      next.add(itemId);
+      return next;
+    });
+
+    if (snapshot) {
+      applyCart(removeItemFromCart(snapshot, itemId));
+    }
 
     try {
-      const response = await fetch(`/api/cart/items/${itemId}`, { method: "DELETE" });
+      const response = await fetch(`/api/cart/items/${itemId}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
+      const data = (await response.json()) as {
+        ok?: boolean;
+        cart?: CartWithItems | null;
+        error?: string;
+      };
+
       if (response.ok) {
-        dispatchCartUpdated();
-        await refreshCart();
-        router.refresh();
+        applyCart(data.cart ?? null);
         return;
       }
 
-      const data = (await response.json()) as { error?: string };
       if (data.error === "CART_ITEM_NOT_FOUND") {
         await refreshCart();
-        router.refresh();
+        return;
       }
+
+      if (snapshot) {
+        applyCart(snapshot);
+      }
+      setExcludedItemIds((previous) => {
+        const next = new Set(previous);
+        next.delete(itemId);
+        return next;
+      });
       setRemoveError(t("removeError"));
     } catch {
+      if (snapshot) {
+        applyCart(snapshot);
+      }
+      setExcludedItemIds((previous) => {
+        const next = new Set(previous);
+        next.delete(itemId);
+        return next;
+      });
       setRemoveError(t("removeError"));
     } finally {
       setRemovingId(null);
@@ -169,7 +241,7 @@ export function CartPageClient({
       <div className="glass-panel rounded-2xl p-4 text-sm">
         <div className="flex justify-between font-semibold">
           <span>{t("total")}</span>
-          <span className="text-accent-soft">{formatPrice(cart.totalAmount)}</span>
+          <span className="text-accent-soft">{formatPrice(totalAmount)}</span>
         </div>
       </div>
 
@@ -179,8 +251,9 @@ export function CartPageClient({
 
       {!isExpired ? (
         <CartCheckoutPayment
+          key={totalAmount}
           locale={locale}
-          totalAmount={cart.totalAmount}
+          totalAmount={totalAmount}
           availableCredit={availableCredit}
           onPaid={handleCheckoutRefresh}
         />
