@@ -45,7 +45,7 @@ export function CartProvider({ children, isLoggedIn }: CartProviderProps) {
 
   const applyCart = useCallback((nextCart: CartWithItems | null) => {
     const normalized = normalizeCartWithItems(nextCart);
-    setCart(normalized);
+    setCart(normalized ? { ...normalized, items: [...normalized.items] } : null);
 
     if (normalized?.expires_at && normalized.items.length > 0) {
       setRemainingSeconds(getCartRemainingSeconds(normalized.expires_at));

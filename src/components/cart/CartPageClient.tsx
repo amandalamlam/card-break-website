@@ -6,13 +6,9 @@ import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/breaks/format";
 import { CartCheckoutPayment } from "@/components/cart/CartCheckoutPayment";
 import { useCart } from "@/context/CartContext";
-import {
-  computeCartTotalAmount,
-  normalizeCartWithItems,
-  removeItemFromCart,
-} from "@/lib/cart/normalize";
+import { computeCartTotalAmount, removeItemFromCart } from "@/lib/cart/normalize";
 import { formatRemainingSeconds, getCartRemainingSeconds } from "@/lib/slots/time";
-import type { CartWithItems } from "@/lib/cart/types";
+import type { CartItem, CartWithItems } from "@/lib/cart/types";
 import type { AppLocale } from "@/i18n/routing";
 
 type CartPageClientProps = {
@@ -21,6 +17,10 @@ type CartPageClientProps = {
   availableCredit: number;
   notice?: "cancelled" | "expired" | null;
 };
+
+function cartItemsFrom(cart: CartWithItems | null | undefined): CartItem[] {
+  return cart?.items ?? [];
+}
 
 export function CartPageClient({
   locale,
@@ -31,30 +31,19 @@ export function CartPageClient({
   const t = useTranslations("cart");
   const { cart: contextCart, applyCart, refreshCart, remainingSeconds: contextRemainingSeconds } =
     useCart();
+  const [items, setItems] = useState<CartItem[]>(() => cartItemsFrom(initialCart));
   const [localRemainingSeconds, setLocalRemainingSeconds] = useState<number | null>(
     initialCart ? initialCart.remainingSeconds : null
   );
   const [removeError, setRemoveError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const [excludedItemIds, setExcludedItemIds] = useState<Set<string>>(() => new Set());
 
-  const cart = useMemo(() => {
-    const source = normalizeCartWithItems(contextCart ?? initialCart);
-    if (!source) {
-      return null;
-    }
-
-    const items = source.items.filter((item) => !excludedItemIds.has(item.id));
-    return normalizeCartWithItems({ ...source, items });
-  }, [contextCart, excludedItemIds, initialCart]);
-
-  const totalAmount = useMemo(
-    () => (cart ? computeCartTotalAmount(cart.items) : 0),
-    [cart]
-  );
-
+  const sourceCart = contextCart ?? initialCart;
+  const expiresAt = sourceCart?.expires_at ?? null;
   const remainingSeconds =
     contextCart != null ? contextRemainingSeconds : localRemainingSeconds;
+
+  const totalAmount = useMemo(() => computeCartTotalAmount(items), [items]);
 
   useEffect(() => {
     void refreshCart();
@@ -65,42 +54,26 @@ export function CartPageClient({
       return;
     }
 
-    setExcludedItemIds((previous) => {
-      const next = new Set<string>();
-      for (const itemId of previous) {
-        if (contextCart.items.some((item) => item.id === itemId)) {
-          next.add(itemId);
-        }
-      }
-
-      if (next.size === previous.size && [...next].every((id) => previous.has(id))) {
-        return previous;
-      }
-
-      return next;
-    });
+    setItems(cartItemsFrom(contextCart));
   }, [contextCart]);
 
   useEffect(() => {
-    if (contextCart != null || !cart?.expires_at) {
+    if (contextCart != null || !expiresAt) {
       return;
     }
 
-    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(cart.expires_at));
+    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(expiresAt));
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [cart?.expires_at, contextCart]);
+  }, [contextCart, expiresAt]);
 
   async function handleRemove(itemId: string) {
-    const snapshot = contextCart ?? initialCart;
+    const snapshot = sourceCart;
+    const previousItems = items;
     setRemovingId(itemId);
     setRemoveError(null);
-    setExcludedItemIds((previous) => {
-      const next = new Set(previous);
-      next.add(itemId);
-      return next;
-    });
+    setItems((current) => current.filter((item) => item.id !== itemId));
 
     if (snapshot) {
       applyCart(removeItemFromCart(snapshot, itemId));
@@ -118,7 +91,10 @@ export function CartPageClient({
       };
 
       if (response.ok) {
-        applyCart(data.cart ?? null);
+        if (data.cart) {
+          applyCart(data.cart);
+          setItems(cartItemsFrom(data.cart));
+        }
         return;
       }
 
@@ -127,24 +103,16 @@ export function CartPageClient({
         return;
       }
 
+      setItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
-      setExcludedItemIds((previous) => {
-        const next = new Set(previous);
-        next.delete(itemId);
-        return next;
-      });
       setRemoveError(t("removeError"));
     } catch {
+      setItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
-      setExcludedItemIds((previous) => {
-        const next = new Set(previous);
-        next.delete(itemId);
-        return next;
-      });
       setRemoveError(t("removeError"));
     } finally {
       setRemovingId(null);
@@ -155,7 +123,7 @@ export function CartPageClient({
     await refreshCart();
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="space-y-4">
         {notice === "cancelled" ? (
@@ -215,7 +183,7 @@ export function CartPageClient({
       {removeError ? <p className="text-sm text-red-300">{removeError}</p> : null}
 
       <div className="space-y-3">
-        {cart.items.map((item) => (
+        {items.map((item) => (
           <article
             key={item.id}
             className="glass-panel flex items-start justify-between gap-4 rounded-2xl p-4"

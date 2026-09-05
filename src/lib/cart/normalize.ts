@@ -1,7 +1,10 @@
 import type { CartItem, CartWithItems } from "@/lib/cart/types";
 
 export function computeCartTotalAmount(items: Pick<CartItem, "price">[]): number {
-  return items.reduce((sum, item) => sum + Number(item.price), 0);
+  return items.reduce((sum, item) => {
+    const price = typeof item.price === "number" ? item.price : Number(item.price);
+    return sum + (Number.isFinite(price) ? price : 0);
+  }, 0);
 }
 
 /** Keep totalAmount aligned with line items (avoids stale cached totals on Vercel). */
