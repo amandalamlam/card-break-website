@@ -3,18 +3,16 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "@/i18n/navigation";
-import { stripLocalePrefix } from "@/lib/auth/redirect";
+import { loginWithPassword } from "@/lib/auth/login-action";
+import type { AppLocale } from "@/i18n/routing";
 
 type LoginFormProps = {
+  locale: AppLocale;
   redirectTo: string;
 };
 
-export function LoginForm({ redirectTo }: LoginFormProps) {
+export function LoginForm({ locale, redirectTo }: LoginFormProps) {
   const t = useTranslations("auth");
-  const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,20 +24,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     setError(null);
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    const result = await loginWithPassword(locale, redirectTo, email, password);
 
     setLoading(false);
 
-    if (signInError) {
-      setError(signInError.message);
-      return;
+    if (!result.ok) {
+      setError(result.error);
     }
-
-    router.push(stripLocalePrefix(redirectTo));
-    router.refresh();
   }
 
   return (

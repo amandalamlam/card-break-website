@@ -47,7 +47,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
           </p>
         ) : null}
         <AuthEntryRedirect />
-        <LoginForm redirectTo={redirectTo} />
+        <LoginForm locale={locale as AppLocale} redirectTo={redirectTo} />
       </AuthCard>
     </div>
   );
