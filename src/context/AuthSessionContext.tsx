@@ -30,19 +30,52 @@ export function AuthSessionProvider({
   initialIsAdmin,
 }: AuthSessionProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(initialIsAuthenticated);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialIsAuthenticated);
+
+  useEffect(() => {
+    setIsAuthenticated(initialIsAuthenticated);
+    if (initialIsAuthenticated) {
+      setIsLoading(false);
+    }
+  }, [initialIsAuthenticated]);
 
   useEffect(() => {
     const supabase = createClient();
     let active = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    async function syncAuthState() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!active) {
         return;
       }
-      setIsAuthenticated(Boolean(session?.user));
+
+      if (session?.user) {
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!active) {
+        return;
+      }
+
+      if (user) {
+        setIsAuthenticated(true);
+      } else if (!initialIsAuthenticated) {
+        setIsAuthenticated(false);
+      }
+
       setIsLoading(false);
-    });
+    }
+
+    void syncAuthState();
 
     const {
       data: { subscription },
@@ -55,7 +88,7 @@ export function AuthSessionProvider({
       active = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [initialIsAuthenticated]);
 
   const value = useMemo(
     () => ({
