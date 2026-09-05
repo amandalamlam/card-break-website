@@ -5,11 +5,12 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/breaks/format";
 import { CartCheckoutPayment } from "@/components/cart/CartCheckoutPayment";
+import { CartTotalRow } from "@/components/cart/CartTotalRow";
 import { useCart } from "@/context/CartContext";
 import { cartApiUrl } from "@/lib/cart/client-api";
-import { computeCartTotalAmount, removeItemFromCart } from "@/lib/cart/normalize";
+import { removeItemFromCart } from "@/lib/cart/normalize";
 import { formatRemainingSeconds, getCartRemainingSeconds } from "@/lib/slots/time";
-import type { CartWithItems } from "@/lib/cart/types";
+import type { CartItem, CartWithItems } from "@/lib/cart/types";
 import type { AppLocale } from "@/i18n/routing";
 
 type CartPageClientProps = {
@@ -18,6 +19,10 @@ type CartPageClientProps = {
   availableCredit: number;
   notice?: "cancelled" | "expired" | null;
 };
+
+function itemSignature(items: CartItem[]): string {
+  return items.map((item) => item.id).join("|");
+}
 
 export function CartPageClient({
   locale,
@@ -28,15 +33,14 @@ export function CartPageClient({
   const t = useTranslations("cart");
   const { cart: contextCart, applyCart, refreshCart, remainingSeconds: contextRemainingSeconds } =
     useCart();
+  const [lineItems, setLineItems] = useState<CartItem[]>(() => initialCart?.items ?? []);
   const [localRemainingSeconds, setLocalRemainingSeconds] = useState<number | null>(
     initialCart ? initialCart.remainingSeconds : null
   );
   const [removeError, setRemoveError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const cart = contextCart ?? initialCart;
-  const items = cart?.items ?? [];
-  const totalAmount = computeCartTotalAmount(items);
+  const sourceCart = contextCart ?? initialCart;
   const remainingSeconds =
     contextCart != null ? contextRemainingSeconds : localRemainingSeconds;
 
@@ -45,20 +49,33 @@ export function CartPageClient({
   }, [refreshCart]);
 
   useEffect(() => {
-    if (contextCart != null || !cart?.expires_at) {
+    if (!contextCart) {
       return;
     }
 
-    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(cart.expires_at));
+    const nextItems = contextCart.items ?? [];
+    setLineItems((current) =>
+      itemSignature(current) === itemSignature(nextItems) ? current : nextItems
+    );
+  }, [contextCart]);
+
+  useEffect(() => {
+    if (contextCart != null || !sourceCart?.expires_at) {
+      return;
+    }
+
+    const tick = () => setLocalRemainingSeconds(getCartRemainingSeconds(sourceCart.expires_at));
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
-  }, [cart?.expires_at, contextCart]);
+  }, [contextCart, sourceCart?.expires_at]);
 
   async function handleRemove(itemId: string) {
-    const snapshot = cart;
+    const snapshot = sourceCart;
+    const previousItems = lineItems;
     setRemovingId(itemId);
     setRemoveError(null);
+    setLineItems((current) => current.filter((item) => item.id !== itemId));
 
     if (snapshot) {
       applyCart(removeItemFromCart(snapshot, itemId));
@@ -76,6 +93,8 @@ export function CartPageClient({
       };
 
       if (response.ok) {
+        const nextItems = data.cart?.items ?? previousItems.filter((item) => item.id !== itemId);
+        setLineItems(nextItems);
         applyCart(data.cart ?? (snapshot ? removeItemFromCart(snapshot, itemId) : null));
         return;
       }
@@ -85,11 +104,13 @@ export function CartPageClient({
         return;
       }
 
+      setLineItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
       setRemoveError(t("removeError"));
     } catch {
+      setLineItems(previousItems);
       if (snapshot) {
         applyCart(snapshot);
       }
@@ -103,7 +124,7 @@ export function CartPageClient({
     await refreshCart();
   }
 
-  if (items.length === 0) {
+  if (lineItems.length === 0) {
     return (
       <div className="space-y-4">
         {notice === "cancelled" ? (
@@ -136,6 +157,7 @@ export function CartPageClient({
       : isExpired
         ? "00:00"
         : formatRemainingSeconds(remainingSeconds);
+  const totalKey = itemSignature(lineItems);
 
   return (
     <div className="space-y-6">
@@ -163,7 +185,7 @@ export function CartPageClient({
       {removeError ? <p className="text-sm text-red-300">{removeError}</p> : null}
 
       <div className="space-y-3">
-        {items.map((item) => (
+        {lineItems.map((item) => (
           <article
             key={item.id}
             className="glass-panel flex items-start justify-between gap-4 rounded-2xl p-4"
@@ -186,12 +208,7 @@ export function CartPageClient({
         ))}
       </div>
 
-      <div className="glass-panel rounded-2xl p-4 text-sm">
-        <div className="flex justify-between font-semibold">
-          <span>{t("total")}</span>
-          <span className="text-accent-soft">{formatPrice(totalAmount)}</span>
-        </div>
-      </div>
+      <CartTotalRow key={totalKey} items={lineItems} />
 
       <p className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
         {t("paymentWarning")}
@@ -199,9 +216,9 @@ export function CartPageClient({
 
       {!isExpired ? (
         <CartCheckoutPayment
-          key={items.map((item) => item.id).join("-")}
+          key={`pay-${totalKey}`}
           locale={locale}
-          totalAmount={totalAmount}
+          totalAmount={lineItems.reduce((sum, item) => sum + Number(item.price), 0)}
           availableCredit={availableCredit}
           onPaid={handleCheckoutRefresh}
         />
