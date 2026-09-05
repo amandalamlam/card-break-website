@@ -149,8 +149,8 @@ export function AdminBreaksPanel({ breaks }: AdminBreaksPanelProps) {
           </Link>
         </div>
 
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="inline-flex max-w-full items-center gap-1 rounded-xl border border-slate-700/50 bg-slate-800/60 p-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="inline-flex w-fit max-w-full items-center gap-1 rounded-xl border border-slate-700/50 bg-slate-800/60 p-1">
             {subTabs.map((tab) => {
               const isActive = subTab === tab.id;
               return (
