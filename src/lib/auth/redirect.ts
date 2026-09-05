@@ -15,7 +15,7 @@ export function stripLocalePrefix(path: string): string {
 }
 
 export function getSafeRedirect(path: string | null | undefined, locale: AppLocale): string {
-  const fallback = `/${locale}/account`;
+  const fallback = `/${locale}`;
 
   if (!path) {
     return fallback;
